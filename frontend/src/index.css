@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+.filter-group {
+  @apply space-y-3;
+}
+
+.filter-label {
+  @apply flex items-center text-gray-700 font-medium text-sm;
+}

@@ -1,0 +1,286 @@
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Upload, ChevronDown, ClipboardCopy } from "lucide-react";
+import { toast } from "react-hot-toast";
+
+const WHATSAPP_LINK = "https://api.whatsapp.com/send?phone=9033197427";
+
+const Payment = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // formData passed from Register page
+  const { formData } = location.state || {};
+  if (!formData) {
+   
+    navigate("/register");
+    return null;
+  }
+
+  const [images, setImages] = useState([]);
+  const [paymentRef, setPaymentRef] = useState("");
+  const [selectedMethod, setSelectedMethod] = useState("UPI"); // UPI, Account, Whatsapp
+  const [showUpiDetails, setShowUpiDetails] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Fixed payment details (adjust as needed)
+  const accountDetails = {
+    bankName: "Example Bank",
+    accountName: "Sthaanix Registrations",
+    accountNumber: "1234567890",
+    ifsc: "EXAMP0001234",
+    upiId: "sthaanix@upi",
+  };
+
+  // Copy text to clipboard helper
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard");
+  };
+
+  // Image upload handler
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length + images.length > 4) {
+      toast.error("Maximum 4 images allowed");
+      return;
+    }
+    setImages(prev => [...prev, ...files]);
+  };
+
+  const removeImage = (index) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Toggle UPI details visibility
+  const toggleUpiDetails = () => {
+    setShowUpiDetails(prev => !prev);
+  };
+
+  // Handle payment method toggle
+  const handleMethodChange = (method) => {
+    setSelectedMethod(method);
+    setShowUpiDetails(false);
+  };
+
+  // Handle payment submit
+  const handlePaymentSubmit = () => {
+    if (!paymentRef.trim()) {
+      toast.error("Please enter Unique Transaction Reference");
+      return;
+    }
+    if (images.length === 0) {
+      toast.error("Please upload payment proof images");
+      return;
+    }
+
+    setLoading(true);
+
+    // Temporarily store payment status and registration data in localStorage
+    const paymentRecord = {
+      paid: true,
+      user: formData,
+      paymentRef,
+      paymentMethod: selectedMethod,
+      timestamp: new Date().toISOString(),
+    };
+    localStorage.setItem("payment", JSON.stringify(paymentRecord));
+
+    // Simulate payment verification delay
+    setTimeout(() => {
+      setLoading(false);
+      toast.success("Payment successful! Please login.");
+      navigate("/login");
+    }, 1500);
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <div className="w-full max-w-lg p-8 bg-white rounded-xl shadow-md space-y-6">
+        <h2 className="text-3xl font-bold text-gray-900 text-center">
+          Complete Registration Payment
+        </h2>
+
+        {/* Registration Fee Info */}
+        <p className="text-center text-lg font-semibold text-gray-700">
+          Registration Fee: ₹1500
+        </p>
+
+        {/* Payment Method toggles */}
+        <div className="flex justify-center gap-4 mb-4">
+          {["UPI", "Account", "Whatsapp Deposit"].map(method => (
+            <button
+              key={method}
+              type="button"
+              onClick={() => handleMethodChange(method)}
+              className={`px-4 py-2 rounded-md border font-semibold transition-colors ${
+                selectedMethod === method
+                  ? "bg-blue-600 text-white border-blue-600"
+                  : "border-gray-300 text-gray-700 hover:border-blue-500 hover:text-blue-600"
+              }`}
+            >
+              {method}
+            </button>
+          ))}
+        </div>
+
+        {/* Payment Details */}
+        {selectedMethod === "Account" && (
+          <div className="border border-gray-200 rounded-lg p-4 space-y-3">
+            <h3 className="font-semibold text-gray-800">Account Details</h3>
+            <p><span className="font-medium">Bank:</span> {accountDetails.bankName}</p>
+            <p>
+              <span className="font-medium">Account Name:</span> {accountDetails.accountName}
+            </p>
+            <p className="flex items-center justify-between">
+              <span><strong>Account Number:</strong> {accountDetails.accountNumber}</span>
+              <ClipboardCopy
+                className="w-5 h-5 cursor-pointer text-blue-600"
+                onClick={() => copyToClipboard(accountDetails.accountNumber)}
+                title="Copy Account Number"
+              />
+            </p>
+            <p className="flex items-center justify-between">
+              <span><strong>IFSC:</strong> {accountDetails.ifsc}</span>
+              <ClipboardCopy
+                className="w-5 h-5 cursor-pointer text-blue-600"
+                onClick={() => copyToClipboard(accountDetails.ifsc)}
+                title="Copy IFSC"
+              />
+            </p>
+          </div>
+        )}
+
+        {selectedMethod === "UPI" && (
+          <div className="border border-gray-200 rounded-lg p-4 space-y-2">
+            <button
+              onClick={toggleUpiDetails}
+              className="w-full flex items-center justify-between text-blue-600 font-semibold hover:text-blue-800 focus:outline-none"
+            >
+              UPI Payment Details
+              <ChevronDown
+                className={`w-5 h-5 transition-transform duration-300 ${
+                  showUpiDetails ? "rotate-180" : "rotate-0"
+                }`}
+              />
+            </button>
+            {showUpiDetails && (
+              <div className="mt-4 text-gray-700 space-y-1">
+                <p className="flex items-center justify-between">
+                  <span><strong>UPI ID:</strong> {accountDetails.upiId}</span>
+                  <ClipboardCopy
+                    className="w-5 h-5 cursor-pointer text-blue-600"
+                    onClick={() => copyToClipboard(accountDetails.upiId)}
+                    title="Copy UPI ID"
+                  />
+                </p>
+                {/* Add QR Code image here if available */}
+                {/* <img src="/path-to-upi-qr.png" alt="UPI QR Code" className="w-40 h-40 mx-auto" /> */}
+              </div>
+            )}
+          </div>
+        )}
+
+        {selectedMethod === "Whatsapp Deposit" && (
+          <div className="border border-gray-200 rounded-lg p-4 text-center text-gray-700">
+            <p>
+              Please deposit the payment by contacting us on WhatsApp.
+            </p>
+            <a
+              href={WHATSAPP_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block mt-3 py-2 px-4 bg-green-600 text-white rounded-md font-semibold hover:bg-green-700 transition"
+            >
+              Deposit via WhatsApp
+            </a>
+          </div>
+        )}
+
+        {/* Unique Transaction Reference Field */}
+        <div>
+          <label htmlFor="paymentRef" className="block text-sm font-medium text-gray-700 mb-1">
+            Unique Transaction Reference *
+          </label>
+          <input
+            id="paymentRef"
+            type="text"
+            value={paymentRef}
+            onChange={(e) => setPaymentRef(e.target.value)}
+            placeholder="Enter your transaction reference"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            required
+          />
+        </div>
+
+        {/* Image Upload for Payment Proof */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Upload Payment Proof (Max 4 images)
+          </label>
+          <div className="flex flex-wrap gap-3 mb-3">
+            {images.map((file, idx) => (
+              <div key={idx} className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-300">
+                <img
+                  src={URL.createObjectURL(file)}
+                  alt={`upload-${idx + 1}`}
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeImage(idx)}
+                  className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full p-1 text-xs"
+                  title="Remove Image"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+          {images.length < 4 && (
+            <label
+              htmlFor="payment-images"
+              className="inline-flex items-center justify-center px-4 py-2 border border-dashed border-gray-300 rounded-md cursor-pointer text-gray-600 hover:border-blue-500 hover:text-blue-600 transition"
+            >
+              <Upload className="mr-2 w-5 h-5" />
+              Upload Images
+              <input
+                id="payment-images"
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageChange}
+                className="hidden"
+              />
+            </label>
+          )}
+        </div>
+
+        {/* Payment Related Issue Button */}
+        <div className="space-y-3 text-center">
+          <a
+            href={WHATSAPP_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block w-full py-2 border border-gray-300 rounded-md text-gray-700 hover:border-blue-500 hover:text-blue-600 transition"
+          >
+            Payment Related Issue? Click here
+          </a>
+        </div>
+
+        {/* Submit Payment Button */}
+        <motion.button
+          onClick={handlePaymentSubmit}
+          disabled={loading}
+          whileTap={{ scale: 0.95 }}
+          className="w-full py-3 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 disabled:opacity-50"
+        >
+          {loading ? "Submitting Payment..." : "Submit Payment"}
+        </motion.button>
+      </div>
+    </div>
+  );
+};
+
+export default Payment;

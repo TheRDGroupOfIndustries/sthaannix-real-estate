@@ -1,0 +1,168 @@
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Mail, Lock, ArrowRight, Loader2, UserCheck, Home } from "lucide-react";
+import { toast } from "react-hot-toast";
+
+const ROLES = [
+  "Broker",
+  "Builder",
+  "Property Owner",
+  "Admin"
+];
+
+const Login = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  // Save authenticated user info in localStorage
+  const setUserSession = (user) => {
+    localStorage.setItem("user", JSON.stringify(user));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Basic validation
+    if (!name.trim()) {
+      toast.error("Please enter your name");
+      return;
+    }
+    if (!role) {
+      toast.error("Please select a role");
+      return;
+    }
+    if (!email.trim() || !password.trim()) {
+      toast.error("Please enter both email and password");
+      return;
+    }
+    setLoading(true);
+
+    setTimeout(() => {
+      toast.success(`Welcome back, ${name}!`);
+      setUserSession({ name, role });
+      navigate(`/${role.toLowerCase().replace(/ /g, "-")}`); // e.g., /broker, /builder, etc.
+      setLoading(false);
+    }, 1000);
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-xl shadow-md">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-gray-900">Welcome back</h2>
+          <p className="mt-2 text-gray-600">Sign in to your account</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Name</label>
+              <div className="mt-1 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <UserCheck className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Your full name"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Email address</label>
+              <div className="mt-1 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="you@example.com"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Password</label>
+              <div className="mt-1 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Your password"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Select Role</label>
+              <div className="grid grid-cols-4 gap-2">
+                {ROLES.map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => setRole(r)}
+                    className={`py-2 px-3 rounded-md border transition-colors flex flex-col items-center justify-center ${
+                      role === r
+                        ? "border-blue-500 bg-blue-50 text-blue-600"
+                        : "border-gray-300 hover:border-blue-300 text-gray-700"
+                    }`}
+                  >
+                    <Home className="h-5 w-5 mb-1" />
+                    <span className="text-xs">{r}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <motion.button
+              type="submit"
+              whileTap={{ scale: 0.95 }}
+              disabled={loading}
+              className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  Sign in to Dashboard
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </>
+              )}
+            </motion.button>
+          </div>
+        </form>
+
+        <div className="text-center text-sm">
+          <span className="text-gray-600">Don't have an account? </span>
+          <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
+            Register here
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Login;

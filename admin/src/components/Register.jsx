@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { User, Mail, Lock, Phone, Home, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
-const ROLES = ["Broker", "Builder", "Property Owner", "Admin"];
+const ROLES = ["Broker", "Builder", "Property Owner"]; // Admin removed from role selection UI
 const REGISTRATION_FEE_ROLES = ["Broker", "Builder", "Property Owner"];
 const REGISTRATION_FEE = 1500;
 
@@ -15,23 +15,22 @@ const Register = () => {
     email: "",
     password: "",
     phone: "",
-    role: "Broker",
+    role: "",
   });
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleRoleSelect = (role) => {
-    setFormData(prev => ({ ...prev, role }));
+    setFormData((prev) => ({ ...prev, role }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Basic validation
     if (!formData.name.trim() || !formData.email.trim() || !formData.password.trim() || !formData.role) {
       toast.error("Please fill all required fields");
       return;
@@ -40,16 +39,20 @@ const Register = () => {
     setLoading(true);
 
     setTimeout(() => {
-      if (formData.role === "Admin") {
-        // Admin registration - no payment
-        toast.success("Registration successful! Redirecting to Admin Dashboard.");
-        // Save user session (simulate)
-        localStorage.setItem("user", JSON.stringify(formData));
-        navigate("/admin");
-      } else {
-        // For other roles, proceed to payment page with formData
-        navigate("/payment", { state: { formData } });
+      // Save registration data in localStorage for login check
+      let registeredUsers = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
+      // Check if email already registered
+      if (registeredUsers.find((u) => u.email === formData.email)) {
+        toast.error("Email already registered");
+        setLoading(false);
+        return;
       }
+      registeredUsers.push(formData);
+      localStorage.setItem("registeredUsers", JSON.stringify(registeredUsers));
+
+      // Proceed to payment page for non-admin roles
+      navigate("/payment", { state: { formData } });
+
       setLoading(false);
     }, 800);
   };
@@ -137,8 +140,8 @@ const Register = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">I am a</label>
-              <div className="grid grid-cols-4 gap-2">
-                {ROLES.map(roleOption => (
+              <div className="grid grid-cols-3 gap-2">
+                {ROLES.map((roleOption) => (
                   <button
                     key={roleOption}
                     type="button"
@@ -158,18 +161,10 @@ const Register = () => {
               </div>
             </div>
 
-            {/* Registration Fee Display for applicable roles */}
             {REGISTRATION_FEE_ROLES.includes(formData.role) && (
               <div className="pt-3">
                 <p className="text-center font-semibold text-sm border border-gray-600 p-2 rounded-md  text-gray-800">
-                  Registration Fee : ₹{REGISTRATION_FEE} 
-                </p>
-              </div>
-            )}
-            {formData.role === "Admin" && (
-              <div className="pt-3">
-                <p className="text-center font-semibold text-sm border border-gray-600 p-2 rounded-md  text-gray-800">
-                  Admin registration is free. 
+                  Registration Fee : ₹{REGISTRATION_FEE}{" "}
                 </p>
               </div>
             )}
@@ -185,7 +180,7 @@ const Register = () => {
               {loading ? (
                 <>
                   <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                  {REGISTRATION_FEE_ROLES.includes(formData.role) ? "Continue to Payment" : "Registering..."}
+                  Continue to Payment
                 </>
               ) : (
                 <>

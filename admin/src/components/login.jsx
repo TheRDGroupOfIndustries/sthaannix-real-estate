@@ -4,12 +4,7 @@ import { motion } from "framer-motion";
 import { Mail, Lock, ArrowRight, Loader2, UserCheck, Home } from "lucide-react";
 import { toast } from "react-hot-toast";
 
-const ROLES = [
-  "Broker",
-  "Builder",
-  "Property Owner",
-  "Admin"
-];
+const ROLES = ["Broker", "Builder", "Property Owner"]; // Roles for selection
 
 const Login = () => {
   const [name, setName] = useState("");
@@ -19,14 +14,13 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Save authenticated user info in localStorage
   const setUserSession = (user) => {
     localStorage.setItem("user", JSON.stringify(user));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Basic validation
+
     if (!name.trim()) {
       toast.error("Please enter your name");
       return;
@@ -39,12 +33,28 @@ const Login = () => {
       toast.error("Please enter both email and password");
       return;
     }
+
     setLoading(true);
 
     setTimeout(() => {
-      toast.success(`Welcome back, ${name}!`);
-      setUserSession({ name, role });
-      navigate(`/${role.toLowerCase().replace(/ /g, "-")}`); // e.g., /broker, /builder, etc.
+      // Check registered users in localStorage for matching name, email, password (role-based system removed)
+      const registeredUsers = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
+      const matchedUser = registeredUsers.find(
+        (u) =>
+          u.email === email &&
+          u.password === password &&
+          u.name === name
+      );
+
+      if (matchedUser) {
+        toast.success(`Welcome back, ${name}!`);
+        setUserSession(matchedUser);
+
+        // Redirect based on stored role in registration data
+        navigate(`/${matchedUser.role.toLowerCase().replace(/ /g, "-")}`);
+      } else {
+        toast.error("Invalid credentials or user not registered");
+      }
       setLoading(false);
     }, 1000);
   };
@@ -109,28 +119,9 @@ const Login = () => {
                 />
               </div>
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Select Role</label>
-              <div className="grid grid-cols-4 gap-2">
-                {ROLES.map((r) => (
-                  <button
-                    key={r}
-                    type="button"
-                    onClick={() => setRole(r)}
-                    className={`py-2 px-3 rounded-md border transition-colors flex flex-col items-center justify-center ${
-                      role === r
-                        ? "border-blue-500 bg-blue-50 text-blue-600"
-                        : "border-gray-300 hover:border-blue-300 text-gray-700"
-                    }`}
-                  >
-                    <Home className="h-5 w-5 mb-1" />
-                    <span className="text-xs">{r}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
+
+          {/* Role selection removed from login form */}
 
           <div>
             <motion.button

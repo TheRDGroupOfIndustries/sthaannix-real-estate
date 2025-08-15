@@ -1,10 +1,11 @@
+// src/components/Register.jsx
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { User, Mail, Lock, Phone, Home, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
-const ROLES = ["Broker", "Builder", "Property Owner"]; // Admin removed from role selection UI
+const ROLES = ["Broker", "Builder", "Property Owner", "Admin"];
 const REGISTRATION_FEE_ROLES = ["Broker", "Builder", "Property Owner"];
 const REGISTRATION_FEE = 1500;
 
@@ -21,40 +22,62 @@ const Register = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleRoleSelect = (role) => {
-    setFormData((prev) => ({ ...prev, role }));
+    setFormData(prev => ({ ...prev, role }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!formData.name.trim() || !formData.email.trim() || !formData.password.trim() || !formData.role) {
+    // Basic validation
+    if (
+      !formData.name.trim() ||
+      !formData.email.trim() ||
+      !formData.password.trim() ||
+      !formData.role
+    ) {
       toast.error("Please fill all required fields");
       return;
     }
 
     setLoading(true);
 
-    setTimeout(() => {
-      // Save registration data in localStorage for login check
-      let registeredUsers = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
+    try {
+      // Get existing users from localStorage
+      const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
+
       // Check if email already registered
-      if (registeredUsers.find((u) => u.email === formData.email)) {
-        toast.error("Email already registered");
+      const emailExists = storedUsers.some(user => user.email === formData.email);
+      if (emailExists) {
+        toast.error("Email is already registered");
         setLoading(false);
         return;
       }
-      registeredUsers.push(formData);
-      localStorage.setItem("registeredUsers", JSON.stringify(registeredUsers));
 
-      // Proceed to payment page for non-admin roles
-      navigate("/payment", { state: { formData } });
+      // Add new user to stored users
+      const newUser = { ...formData };
+      storedUsers.push(newUser);
+      localStorage.setItem("users", JSON.stringify(storedUsers));
 
+      if (formData.role === "Admin") {
+        // Admin registration - no payment required
+        toast.success("Registration successful! Redirecting to Admin Dashboard.");
+        localStorage.setItem("user", JSON.stringify(newUser));
+        navigate("/admin");
+      } else {
+        // Other roles proceed to payment page with formData passed in state
+        toast.success("Registration successful! Proceed to payment.");
+        navigate("/payment", { state: { formData: newUser } });
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      toast.error("An error occurred during registration");
+    } finally {
       setLoading(false);
-    }, 800);
+    }
   };
 
   return (
@@ -140,8 +163,8 @@ const Register = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">I am a</label>
-              <div className="grid grid-cols-3 gap-2">
-                {ROLES.map((roleOption) => (
+              <div className="grid grid-cols-4 gap-2">
+                {ROLES.map(roleOption => (
                   <button
                     key={roleOption}
                     type="button"
@@ -161,10 +184,18 @@ const Register = () => {
               </div>
             </div>
 
+            {/* Registration Fee Display */}
             {REGISTRATION_FEE_ROLES.includes(formData.role) && (
               <div className="pt-3">
-                <p className="text-center font-semibold text-sm border border-gray-600 p-2 rounded-md  text-gray-800">
-                  Registration Fee : ₹{REGISTRATION_FEE}{" "}
+                <p className="text-center font-semibold text-sm border border-gray-600 p-2 rounded-md text-gray-800">
+                  Registration Fee : ₹{REGISTRATION_FEE}
+                </p>
+              </div>
+            )}
+            {formData.role === "Admin" && (
+              <div className="pt-3">
+                <p className="text-center font-semibold text-sm border border-gray-600 p-2 rounded-md text-gray-800">
+                  Admin registration is free.
                 </p>
               </div>
             )}
@@ -180,7 +211,9 @@ const Register = () => {
               {loading ? (
                 <>
                   <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                  Continue to Payment
+                  {REGISTRATION_FEE_ROLES.includes(formData.role)
+                    ? "Continue to Payment"
+                    : "Registering..."}
                 </>
               ) : (
                 <>

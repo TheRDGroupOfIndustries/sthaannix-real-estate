@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 import {
   Users,
   Home,
@@ -12,26 +13,31 @@ import {
   RefreshCw,
   BarChart2,
   CalendarCheck,
+  CreditCard,
   CheckCircle,
   XCircle,
-  CreditCard,
   FileText,
+  Image,
 } from "lucide-react";
 
 const AdminDashboard = () => {
-  // State for users overview
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-
-  // State for payments
-  const [payments, setPayments] = useState([]);
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("users");
+  
+  // Users state
+  const [users, setUsers] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(true);
+  
+  // Payments state
+  const [payments, setPayments] = useState([]);
+  const [paymentsLoading, setPaymentsLoading] = useState(true);
+  
+  const [refreshing, setRefreshing] = useState(false);
 
   // Fetch all users and their data
   const fetchUsersData = async () => {
     try {
-      setLoading(true);
+      setUsersLoading(true);
       const response = await axios.get(`${backendurl}/api/admin/users-with-properties-leads`);
       if (response.data.success) {
         setUsers(response.data.users);
@@ -42,14 +48,16 @@ const AdminDashboard = () => {
       console.error("Error fetching admin data:", error);
       toast.error("Error loading data");
     } finally {
-      setLoading(false);
+      setUsersLoading(false);
     }
   };
 
   // Load payments from localStorage
   const loadPayments = () => {
+    setPaymentsLoading(true);
     const storedPayments = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
     setPayments(storedPayments);
+    setPaymentsLoading(false);
   };
 
   useEffect(() => {
@@ -67,13 +75,15 @@ const AdminDashboard = () => {
     } else {
       loadPayments();
     }
-    setRefreshing(false);
-    toast.success("Data refreshed");
+    setTimeout(() => {
+      setRefreshing(false);
+      toast.success("Data refreshed");
+    }, 700);
   };
 
   // Payment actions
   const approvePayment = (id) => {
-    const updated = payments.map((p) =>
+    const updated = payments.map(p =>
       p.id === id ? { ...p, status: "approved", approvalTimestamp: new Date().toISOString() } : p
     );
     setPayments(updated);
@@ -82,7 +92,7 @@ const AdminDashboard = () => {
   };
 
   const cancelPayment = (id) => {
-    const updated = payments.map((p) =>
+    const updated = payments.map(p =>
       p.id === id ? { ...p, status: "canceled", approvalTimestamp: null } : p
     );
     setPayments(updated);
@@ -90,10 +100,12 @@ const AdminDashboard = () => {
     toast.success("Payment canceled");
   };
 
-  const pendingPayments = payments.filter((p) => p.status === "pending");
-  const canceledPayments = payments.filter((p) => p.status === "canceled");
+  const pendingPayments = payments.filter(p => p.status === "pending");
+  const canceledPayments = payments.filter(p => p.status === "canceled");
 
-  if (loading && activeTab === "users") {
+  const loading = activeTab === "users" ? usersLoading : paymentsLoading;
+
+  if (loading) {
     return (
       <motion.div
         initial={{ opacity: 0 }}
@@ -112,16 +124,8 @@ const AdminDashboard = () => {
             transition={{ delay: 0.2 }}
             className="text-xl font-semibold text-gray-700 mb-2"
           >
-            Loading Admin Data
+            Loading {activeTab === "users" ? "Users Data" : "Payments"}...
           </motion.h3>
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="text-gray-500"
-          >
-            Please wait while we fetch all user details...
-          </motion.p>
         </div>
       </motion.div>
     );
@@ -204,10 +208,10 @@ const AdminDashboard = () => {
                       Phone
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      No. of Properties
+                      Properties
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      No. of Leads
+                      Leads
                     </th>
                   </tr>
                 </thead>
@@ -335,22 +339,28 @@ const AdminDashboard = () => {
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        User Name
+                        No
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Name
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Role
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Payment System
+                        Email
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Transaction Ref
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Date & Time
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Transaction Reference
+                        Payment Method
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Proof
+                        Payment Proof
                       </th>
                       <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Actions
@@ -366,30 +376,33 @@ const AdminDashboard = () => {
                         transition={{ delay: idx * 0.05 }}
                         className="hover:bg-gray-50"
                       >
+                        <td className="px-6 py-4 whitespace-nowrap">{idx + 1}</td>
                         <td className="px-6 py-4 whitespace-nowrap">{payment.user.name}</td>
                         <td className="px-6 py-4 whitespace-nowrap">{payment.user.role}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">{payment.paymentMethod}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {new Date(payment.timestamp).toLocaleString()}
-                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">{payment.user.email}</td>
                         <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">
                           {payment.paymentRef}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
+                          {new Date(payment.timestamp).toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">{payment.paymentMethod}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex gap-2">
-                            {payment.images.map((imgUrl, i) => (
+                            {payment.images?.map((imgUrl, i) => (
                               <div
                                 key={i}
                                 className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
                                 title="View Image"
+                                onClick={() => window.open(imgUrl, '_blank')}
                               >
                                 <img
                                   src={imgUrl}
-                                  alt={`proof-${i}`}
+                                  alt={`payment-proof-${i}`}
                                   className="w-full h-full object-cover"
                                 />
                                 <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
-                                  View
+                                  <Image className="w-4 h-4" />
                                 </div>
                               </div>
                             ))}
@@ -397,7 +410,16 @@ const AdminDashboard = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-center space-x-2">
                           <button
-                            onClick={() => approvePayment(payment.id)}
+                            onClick={() => {
+                              approvePayment(payment.id);
+                              const approvedUser = {
+                                ...payment.user, 
+                                paymentRef: payment.paymentRef, 
+                                paymentMethod: payment.paymentMethod, 
+                                timestamp: payment.timestamp
+                              };
+                              localStorage.setItem("approvedUser", JSON.stringify(approvedUser));
+                            }}
                             className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-green-600 text-white hover:bg-green-700 transition"
                             title="Approve Payment"
                           >
@@ -436,22 +458,28 @@ const AdminDashboard = () => {
                     <thead className="bg-gray-50">
                       <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          User Name
+                          No
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Name
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Role
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Payment System
+                          Email
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Transaction Ref
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Date & Time
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Transaction Reference
+                          Payment Method
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Proof
+                          Payment Proof
                         </th>
                       </tr>
                     </thead>
@@ -464,30 +492,33 @@ const AdminDashboard = () => {
                           transition={{ delay: idx * 0.05 }}
                           className="hover:bg-gray-50"
                         >
+                          <td className="px-6 py-4 whitespace-nowrap">{idx + 1}</td>
                           <td className="px-6 py-4 whitespace-nowrap">{payment.user.name}</td>
                           <td className="px-6 py-4 whitespace-nowrap">{payment.user.role}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{payment.paymentMethod}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {new Date(payment.timestamp).toLocaleString()}
-                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">{payment.user.email}</td>
                           <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">
                             {payment.paymentRef}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
+                            {new Date(payment.timestamp).toLocaleString()}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">{payment.paymentMethod}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex gap-2">
-                              {payment.images.map((imgUrl, i) => (
+                              {payment.images?.map((imgUrl, i) => (
                                 <div
                                   key={i}
                                   className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
                                   title="View Image"
+                                  onClick={() => window.open(imgUrl, '_blank')}
                                 >
                                   <img
                                     src={imgUrl}
-                                    alt={`proof-${i}`}
+                                    alt={`payment-proof-${i}`}
                                     className="w-full h-full object-cover"
                                   />
                                   <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
-                                    View
+                                    <Image className="w-4 h-4" />
                                   </div>
                                 </div>
                               ))}

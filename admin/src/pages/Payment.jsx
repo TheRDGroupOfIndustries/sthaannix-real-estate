@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+// src/components/Payment.jsx
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Upload, ChevronDown, ClipboardCopy } from "lucide-react";
@@ -13,7 +14,6 @@ const Payment = () => {
   // formData passed from Register page
   const { formData } = location.state || {};
   if (!formData) {
-   
     navigate("/register");
     return null;
   }
@@ -24,7 +24,6 @@ const Payment = () => {
   const [showUpiDetails, setShowUpiDetails] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Fixed payment details (adjust as needed)
   const accountDetails = {
     bankName: "Example Bank",
     accountName: "Sthaanix Registrations",
@@ -33,13 +32,11 @@ const Payment = () => {
     upiId: "sthaanix@upi",
   };
 
-  // Copy text to clipboard helper
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     toast.success("Copied to clipboard");
   };
 
-  // Image upload handler
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     if (files.length + images.length > 4) {
@@ -53,18 +50,15 @@ const Payment = () => {
     setImages(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Toggle UPI details visibility
   const toggleUpiDetails = () => {
     setShowUpiDetails(prev => !prev);
   };
 
-  // Handle payment method toggle
   const handleMethodChange = (method) => {
     setSelectedMethod(method);
     setShowUpiDetails(false);
   };
 
-  // Handle payment submit
   const handlePaymentSubmit = () => {
     if (!paymentRef.trim()) {
       toast.error("Please enter Unique Transaction Reference");
@@ -77,20 +71,25 @@ const Payment = () => {
 
     setLoading(true);
 
-    // Temporarily store payment status and registration data in localStorage
-    const paymentRecord = {
-      paid: true,
+    // Save payment record in localStorage (append)
+    const paymentRecords = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
+
+    const newPayment = {
+      id: Date.now().toString(),
       user: formData,
-      paymentRef,
+      paymentRef: paymentRef.trim(),
       paymentMethod: selectedMethod,
       timestamp: new Date().toISOString(),
+      images: images.map(file => URL.createObjectURL(file)),
+      status: "pending",
     };
-    localStorage.setItem("payment", JSON.stringify(paymentRecord));
 
-    // Simulate payment verification delay
+    paymentRecords.push(newPayment);
+    localStorage.setItem("paymentRecords", JSON.stringify(paymentRecords));
+
     setTimeout(() => {
       setLoading(false);
-      toast.success("Payment successful! Please login.");
+      toast.success("Payment submitted! Please login.");
       navigate("/login");
     }, 1500);
   };
@@ -102,12 +101,10 @@ const Payment = () => {
           Complete Registration Payment
         </h2>
 
-        {/* Registration Fee Info */}
         <p className="text-center text-lg font-semibold text-gray-700">
           Registration Fee: ₹1500
         </p>
 
-        {/* Payment Method toggles */}
         <div className="flex justify-center gap-4 mb-4">
           {["UPI", "Account", "Whatsapp Deposit"].map(method => (
             <button
@@ -125,7 +122,6 @@ const Payment = () => {
           ))}
         </div>
 
-        {/* Payment Details */}
         {selectedMethod === "Account" && (
           <div className="border border-gray-200 rounded-lg p-4 space-y-3">
             <h3 className="font-semibold text-gray-800">Account Details</h3>
@@ -176,7 +172,6 @@ const Payment = () => {
                   />
                 </p>
                 {/* Add QR Code image here if available */}
-                {/* <img src="/path-to-upi-qr.png" alt="UPI QR Code" className="w-40 h-40 mx-auto" /> */}
               </div>
             )}
           </div>
@@ -198,7 +193,6 @@ const Payment = () => {
           </div>
         )}
 
-        {/* Unique Transaction Reference Field */}
         <div>
           <label htmlFor="paymentRef" className="block text-sm font-medium text-gray-700 mb-1">
             Unique Transaction Reference *
@@ -214,7 +208,6 @@ const Payment = () => {
           />
         </div>
 
-        {/* Image Upload for Payment Proof */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Upload Payment Proof (Max 4 images)
@@ -257,7 +250,6 @@ const Payment = () => {
           )}
         </div>
 
-        {/* Payment Related Issue Button */}
         <div className="space-y-3 text-center">
           <a
             href={WHATSAPP_LINK}
@@ -269,7 +261,6 @@ const Payment = () => {
           </a>
         </div>
 
-        {/* Submit Payment Button */}
         <motion.button
           onClick={handlePaymentSubmit}
           disabled={loading}

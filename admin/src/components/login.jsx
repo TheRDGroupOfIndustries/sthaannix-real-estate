@@ -1,62 +1,59 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Mail, Lock, ArrowRight, Loader2, UserCheck, Home } from "lucide-react";
+import { Mail, Lock, ArrowRight, Loader2, UserCheck } from "lucide-react";
 import { toast } from "react-hot-toast";
-
-const ROLES = ["Broker", "Builder", "Property Owner"]; // Roles for selection
 
 const Login = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Save authenticated user info in localStorage
   const setUserSession = (user) => {
     localStorage.setItem("user", JSON.stringify(user));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setLoading(true);
 
+    // Basic validation
     if (!name.trim()) {
       toast.error("Please enter your name");
-      return;
-    }
-    if (!role) {
-      toast.error("Please select a role");
+      setLoading(false);
       return;
     }
     if (!email.trim() || !password.trim()) {
       toast.error("Please enter both email and password");
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
+    try {
+      // Get registered users from localStorage
+      const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
 
-    setTimeout(() => {
-      // Check registered users in localStorage for matching name, email, password (role-based system removed)
-      const registeredUsers = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
-      const matchedUser = registeredUsers.find(
-        (u) =>
-          u.email === email &&
-          u.password === password &&
-          u.name === name
+      // Check if user exists with matching email and password
+      const matchedUser = storedUsers.find(
+        (user) => user.email === email && user.password === password && user.name === name
       );
 
       if (matchedUser) {
         toast.success(`Welcome back, ${name}!`);
         setUserSession(matchedUser);
-
-        // Redirect based on stored role in registration data
-        navigate(`/${matchedUser.role.toLowerCase().replace(/ /g, "-")}`);
+        navigate(`/dashboard`); // Redirect to dashboard or desired page
       } else {
         toast.error("Invalid credentials or user not registered");
       }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("An error occurred during login");
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -69,6 +66,7 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="space-y-4">
+
             <div>
               <label className="block text-sm font-medium text-gray-700">Name</label>
               <div className="mt-1 relative">
@@ -120,8 +118,6 @@ const Login = () => {
               </div>
             </div>
           </div>
-
-          {/* Role selection removed from login form */}
 
           <div>
             <motion.button

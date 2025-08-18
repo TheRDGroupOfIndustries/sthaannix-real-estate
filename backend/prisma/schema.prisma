@@ -1,0 +1,170 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URI")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  BROKER
+  BUILDER
+  PROPERTY_OWNER
+  ADMIN
+  USER
+}
+
+enum PropertyType {
+  HOUSE
+  APARTMENT
+  OFFICE
+  VILLA
+  PLOT
+}
+
+enum AvailabilityType {
+  RENT
+  BUY
+  LEASE
+}
+
+model User {
+  id           String       @id @default(cuid())
+  name         String
+  email        String       @unique
+  password     String
+  phone        String
+  role         Role
+  wallet       Wallet?
+  properties   Property[]
+  leads        Lead[]       @relation("UserLeads")
+  listingFees  ListingFee[] 
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+
+model Wallet {
+  id        String  @id @default(cuid())
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String  @unique
+  balance   Float   @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  transactions Transaction[]
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  wallet      Wallet   @relation(fields: [walletId], references: [id])
+  walletId    String
+  amount      Float
+  type        String   // credit or debit
+  description String?
+  createdAt   DateTime @default(now())
+}
+
+model Property {
+  id            String   @id @default(cuid())
+  title         String
+  type          PropertyType
+  price         Float
+  location      String
+  description   String
+  beds          Int?
+  baths         Int?
+  sqft          Int?
+  phone         String
+  availability  AvailabilityType
+  amenities     String[] // ["Pool", "Garage", etc.]
+  images        PropertyImage[]
+  owner         User     @relation(fields: [ownerId], references: [id])
+  ownerId       String
+  leads         Lead[]   @relation("PropertyLeads")
+  promotedAds   Promotion[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model PropertyImage {
+  id         String   @id @default(cuid())
+  property   Property @relation(fields: [propertyId], references: [id])
+  propertyId String
+  url        String
+}
+
+model Lead {
+  id          String    @id @default(cuid())
+  name        String
+  email       String
+  phone       String
+  message     String?
+  buyer       User      @relation("UserLeads", fields: [buyerId], references: [id])
+  buyerId     String
+  property    Property  @relation("PropertyLeads", fields: [propertyId], references: [id])
+  propertyId  String
+  createdAt   DateTime  @default(now())
+}
+
+
+model Promotion {
+  id             String    @id @default(cuid())
+  property       Property  @relation(fields: [propertyId], references: [id])
+  propertyId     String
+  platform       String    // Facebook, Instagram, Google
+  budget         Float
+  feePercentage  Float     @default(33.33)
+  createdAt      DateTime  @default(now())
+}
+
+
+model ListingFee {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  amount    Float    @default(1500)
+  duration  Int      @default(30) 
+  createdAt DateTime @default(now())
+}
+
+enum PaymentMethod {
+  UPI
+  ACCOUNT
+  WHATSAPP
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// A temporary record created when a user fills the "Create account" form
+model RegistrationRequest {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String  
+  phone     String
+  role      Role
+  payment   RegistrationPayment?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Proof and verification for that request
+model RegistrationPayment {
+  id          String          @id @default(cuid())
+  request     RegistrationRequest @relation(fields: [requestId], references: [id])
+  requestId   String          @unique
+  amount      Float           @default(1500)
+  method      PaymentMethod
+  utr         String?         @unique
+  proofImages String[]        // up to 4 local or cloud URLs
+  status      PaymentStatus   @default(PENDING)
+  verifiedBy  String?         // admin userId
+  verifiedAt  DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}

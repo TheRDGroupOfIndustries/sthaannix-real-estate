@@ -47,6 +47,12 @@ export const verifyOtp = async (req: Request, res: Response) => {
 
     const hashedPass = await bcrypt.hash(password, 10);
 
+    // Set status according to role
+    let status: "pending" | "approved" | "rejected" = "approved"; // default for regular users
+    if (["broker", "builder", "owner"].includes(role.toLowerCase())) {
+      status = "pending"; // pending approval/payment
+    }
+
     const user = await User.create({
       name,
       email,
@@ -54,18 +60,24 @@ export const verifyOtp = async (req: Request, res: Response) => {
       phone,
       role,
       isVerified: true,
+      status, 
     });
 
-    await Otp.deleteMany({ email }); 
+    await Otp.deleteMany({ email });
+
     res.status(200).json({
-      message: "User registered successfully",
-      user
+      message:
+        status === "pending"
+          ? "User registered successfully. Please complete the registration payment."
+          : "User registered successfully.",
+      user,
     });
   } catch (error) {
     console.error("VerifyOtp Error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 // ---------------- LOGIN ----------------
 export const login = async (req: Request, res: Response) => {

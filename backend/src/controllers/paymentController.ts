@@ -28,7 +28,7 @@ export const uploadPaymentProof = async (req: Request, res: Response) => {
       user: user._id,
       amount,
       purpose,
-      proofUrl: uploaded.secure_url,
+      screenshot: uploaded.secure_url,
       status: "pending",
     });
 
@@ -72,7 +72,7 @@ export const approvePayment = async (req: Request, res: Response) => {
     await payment.save({ session });
 
     if (payment.purpose === "registration") {
-      user.role = "broker"; 
+      user.role = "broker";
       await user.save({ session });
     }
 
@@ -115,7 +115,7 @@ export const rejectPayment = async (req: Request, res: Response) => {
 
     const payment = await Payment.findByIdAndUpdate(
       id,
-      { status: "rejected", reason },
+      { status: "rejected", reason, reviewedAt: new Date() }, 
       { new: true }
     );
 

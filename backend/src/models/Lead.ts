@@ -7,7 +7,7 @@ export interface ILead extends Document {
   buyer: mongoose.Types.ObjectId;  
   owner: mongoose.Types.ObjectId;   
   message?: string;
-  status: LeadStatus;
+  status: LeadStatus; 
 }
 
 const LeadSchema = new Schema<ILead>(

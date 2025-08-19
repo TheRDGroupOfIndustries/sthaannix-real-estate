@@ -1,0 +1,61 @@
+import { Request, Response } from "express";
+import User from "../models/User";
+import Property from "../models/Property";
+import Lead from "../models/Lead";
+import Transaction from "../models/Transaction";
+
+export const getAdminStats = async (_req: Request, res: Response) => {
+  try {
+    const [
+      totalUsers,
+      usersByRole,
+      totalProperties,
+      propertiesByStatus,
+      totalLeads,
+      leadsOpen,
+      leadsClosed,
+      totalCredits,
+      totalDebits,
+    ] = await Promise.all([
+      User.countDocuments(),
+      User.aggregate([{ $group: { _id: "$role", count: { $sum: 1 } } }]),
+      Property.countDocuments(),
+      Property.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
+      Lead.countDocuments(),
+      Lead.countDocuments({ status: "open" }),
+      Lead.countDocuments({ status: "closed" }),
+      Transaction.aggregate([
+        { $match: { type: "credit" } },
+        { $group: { _id: null, total: { $sum: "$amount" } } },
+      ]),
+      Transaction.aggregate([
+        { $match: { type: "debit" } },
+        { $group: { _id: null, total: { $sum: "$amount" } } },
+      ]),
+    ]);
+
+    res.json({
+      users: {
+        total: totalUsers,
+        byRole: usersByRole.reduce(
+          (acc: any, r) => ({ ...acc, [r._id]: r.count }),
+          {}
+        ),
+      },
+      properties: {
+        total: totalProperties,
+        byStatus: propertiesByStatus.reduce(
+          (acc: any, r) => ({ ...acc, [r._id]: r.count }),
+          {}
+        ),
+      },
+      leads: { total: totalLeads, open: leadsOpen, closed: leadsClosed },
+      wallet: {
+        totalCredits: totalCredits[0]?.total || 0,
+        totalDebits: totalDebits[0]?.total || 0,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to get stats", error: err });
+  }
+};

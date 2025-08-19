@@ -11,7 +11,7 @@ import walletRoutes from "./routes/walletRoutes";
 import adminStatsRoutes from "./routes/adminStatusRoutes"
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 12000;
 app.use(cors());
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true })); 

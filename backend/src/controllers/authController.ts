@@ -45,7 +45,7 @@ export const verifyOtp = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Invalid or expired OTP" });
     }
 
-    const hashedPass = await bcrypt.hash(password, 10);
+   const hashedPass = await bcrypt.hash(password.toString(), 10);
 
     // Set status according to role
     let status: "pending" | "approved" | "rejected" = "approved"; // default for regular users
@@ -91,7 +91,7 @@ export const login = async (req: Request, res: Response) => {
       return res.status(403).json({ message: "Please verify your account first" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password.toString(), user.password);
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
     const payload = {
@@ -105,6 +105,24 @@ export const login = async (req: Request, res: Response) => {
     res.json({ token, role: user.role });
   } catch (error) {
     console.error("Login Error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+// ---------------- GET ALL USERS ----------------
+export const getAllUsers = async (req: Request, res: Response) => {
+  try {
+  
+    const users = await User.find().select("-password"); 
+    // `.select("-password")` removes password field for security
+
+    res.status(200).json({
+      message: "All registered users fetched successfully",
+      users,
+    });
+  } catch (error) {
+    console.error("GetAllUsers Error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };

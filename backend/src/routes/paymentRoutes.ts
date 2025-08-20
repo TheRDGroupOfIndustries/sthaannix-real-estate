@@ -29,7 +29,9 @@ router.post(
   },
   uploadPaymentProof
 );
+
 router.get("/my-payments", authenticate, getMyPayments);
+
 
 // Admin routes
 router.get("/admin/all", authenticate, adminOnly, getAllPayments);

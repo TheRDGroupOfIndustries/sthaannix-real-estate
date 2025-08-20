@@ -92,7 +92,8 @@ export const sendLeadNotification = async (
   to: string,
   leadData: {
     propertyTitle: string;
-    buyerName: string;
+    buyerName: string | undefined;
+    buyerEmail: string | undefined;
     message?: string;
     price: number;
   }
@@ -109,12 +110,11 @@ export const sendLeadNotification = async (
         <div style="background: #f7fafc; padding: 16px; border-radius: 4px; margin: 16px 0;">
           <h3 style="margin-top: 0;">${leadData.propertyTitle}</h3>
           <p><strong>Price:</strong> ₹${leadData.price.toLocaleString()}</p>
-          <p><strong>From:</strong> ${leadData.buyerName}</p>
+          <p><strong>Name:</strong> ${leadData.buyerName}</p>
+          <p><strong>From:</strong> ${leadData.buyerEmail}</p>
           ${leadData.message ? `<p><strong>Message:</strong> ${leadData.message}</p>` : ''}
         </div>
-        
-        <p>Please respond to this lead within 24 hours for best results.</p>
-        
+                
         <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0;">
           <a href="${process.env.FRONTEND_URL}/dashboard/leads" 
              style="background: #4299e1; color: white; padding: 8px 16px; 

@@ -11,7 +11,7 @@ export interface IProperty extends Document {
   propertyType: PropertyType;
   transactionType: TxType;
   price: number;
-  size?: number; // sq.ft
+  size?: number; 
   bhk?: number;
   images: string[];
   videos: string[];

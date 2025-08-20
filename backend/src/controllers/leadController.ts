@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import mongoose from "mongoose";
 import Property from "../models/Property";
 import Lead from "../models/Lead";
+import { sendLeadNotification, sendLeadStatusUpdate } from "../utils/emailService";
+import User from "../models/User";
 
 const buyerOnly = (role?: string) => role === "buyer";
 const sellerRoles = ["owner", "broker", "builder"];
@@ -20,9 +22,12 @@ export const createLead = async (req: Request, res: Response) => {
       propertyId: string;
       message?: string;
     };
+
     if (!propertyId || !mongoose.Types.ObjectId.isValid(propertyId)) {
       return res.status(400).json({ message: "Valid propertyId is required" });
     }
+
+    // Check duplicate lead
     const existingLead = await Lead.findOne({
       property: propertyId,
       buyer: req.user.id,
@@ -33,7 +38,12 @@ export const createLead = async (req: Request, res: Response) => {
         .status(400)
         .json({ message: "You already enquired about this property" });
     }
-    const property = await Property.findById(propertyId);
+
+    // Fetch property + owner
+    const property = await Property.findById(propertyId).populate(
+      "owner",
+      "email"
+    );
     if (!property)
       return res.status(404).json({ message: "Property not found" });
 
@@ -48,10 +58,24 @@ export const createLead = async (req: Request, res: Response) => {
       buyer: req.user.id,
       owner: property.owner,
       message,
-    }); 
+    });
+
+    const username = await User.findById(req.user.id);
+
+    if (property.owner && (property.owner as any).email) {
+      await sendLeadNotification((property.owner as any).email, {
+        propertyTitle: property.title,
+        buyerName: username?.name,
+        buyerEmail: username?.email,
+
+        price: property.price,
+        message,
+      });
+    }
 
     res.status(201).json(lead);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Failed to create lead", error: err });
   }
 };
@@ -103,9 +127,9 @@ export const updateLeadStatus = async (req: Request, res: Response) => {
     ) {
       return res.status(403).json({ message: "Not allowed" });
     }
-    
+
     const { id } = req.params;
-    const { status } = req.body; // ✅ must exist
+    const { status, responseMessage } = req.body;
 
     if (!status) {
       return res.status(400).json({ message: "Status is required" });
@@ -115,10 +139,21 @@ export const updateLeadStatus = async (req: Request, res: Response) => {
       id,
       { status },
       { new: true }
-    );
+    ).populate("property buyer"); 
 
     if (!updatedLead) {
       return res.status(404).json({ message: "Lead not found" });
+    }
+
+    const property = updatedLead.property as any;
+    const buyer = updatedLead.buyer as any;
+
+    if (buyer?.email) {
+      await sendLeadStatusUpdate(buyer.email, {
+        propertyTitle: property?.title || "Property",
+        status: updatedLead.status,
+        responseMessage,
+      });
     }
 
     res.json({

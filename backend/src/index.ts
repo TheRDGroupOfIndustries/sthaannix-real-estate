@@ -9,9 +9,12 @@ import adminRoutes from "./routes/adminRoutes"
 import leadRoutes from "./routes/leadRoutes";
 import walletRoutes from "./routes/walletRoutes";
 import adminStatsRoutes from "./routes/adminStatusRoutes"
+import userRoutes from "./routes/userRoutes"
+import paymentRoutes from "./routes/paymentRoutes"
+import adRoute from "./routes/adRoutes"
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 12000;
 app.use(cors());
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true })); 
@@ -22,6 +25,9 @@ app.use("/admin", adminRoutes);
 app.use("/leads", leadRoutes);
 app.use("/wallet", walletRoutes);
 app.use("/admin", adminStatsRoutes);
+app.use("/me", userRoutes);
+app.use("/payment", paymentRoutes);
+app.use("/ad",adRoute);
 
 
 const runServer = async () => {

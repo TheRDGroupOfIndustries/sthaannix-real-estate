@@ -6,6 +6,7 @@ import { uploadFile } from "../utils/uploadToCloudinary";
 declare global {
   namespace Express {
     interface UserPayload {
+      [x: string]: any;
       id: string;
       role: string;
     }

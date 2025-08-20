@@ -2,16 +2,51 @@ import { Request, Response } from "express";
 import Payment from "../models/Payment";
 import User from "../models/User";
 import { uploadFile } from "../utils/uploadToCloudinary";
-import Transaction from "../models/Transaction";
+import TopUpRequest from "../models/TopUpRequest";
 import mongoose from "mongoose";
+
+// export const uploadPaymentProof = async (req: Request, res: Response) => {
+//   try {
+//     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+//     if (!req.file)
+//       return res.status(400).json({ message: "Proof image required" });
+
+//     const { amount, purpose, utrNumber } = req.body; // get UTR number
+//     const user = await User.findById(req.user.id);
+
+//     if (!user) return res.status(404).json({ message: "User not found" });
+
+//     if (purpose === "registration" && amount < 1500) {
+//       return res
+//         .status(400)
+//         .json({ message: "Registration fee must be ₹1500 or higher" });
+//     }
+
+//     const uploaded = await uploadFile(req.file.buffer, "payments/proofs");
+
+//     const payment = await Payment.create({
+//       user: user._id,
+//       amount,
+//       purpose,
+//       screenshot: uploaded.secure_url,
+//       utrNumber, //  store UTR number
+//       status: "pending",
+//     });
+
+//     res
+//       .status(201)
+//       .json({ message: "Payment proof submitted for approval", payment });
+//   } catch (error) {
+//     res.status(500).json({ message: "Payment submission failed", error });
+//   }
+// };
+
 
 export const uploadPaymentProof = async (req: Request, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
-    if (!req.file)
-      return res.status(400).json({ message: "Proof image required" });
 
-    const { amount, purpose } = req.body;
+    const { amount, purpose, utrNumber, proof } = req.body; // proof can be URL
     const user = await User.findById(req.user.id);
 
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -22,19 +57,30 @@ export const uploadPaymentProof = async (req: Request, res: Response) => {
         .json({ message: "Registration fee must be ₹1500 or higher" });
     }
 
-    const uploaded = await uploadFile(req.file.buffer, "payments/proofs");
+    let screenshot = "";
+
+    // Case 1: File uploaded
+    if (req.file) {
+      const uploaded = await uploadFile(req.file.buffer, "payments/proofs");
+      screenshot = uploaded.secure_url;
+    }
+    // Case 2: Proof URL provided in JSON
+    else if (proof) {
+      screenshot = proof;
+    } else {
+      return res.status(400).json({ message: "Proof image required (file or URL)" });
+    }
 
     const payment = await Payment.create({
       user: user._id,
       amount,
       purpose,
-      proofUrl: uploaded.secure_url,
+      utrNumber,
+      screenshot,
       status: "pending",
     });
 
-    res
-      .status(201)
-      .json({ message: "Payment proof submitted for approval", payment });
+    res.status(201).json({ message: "Payment proof submitted for approval", payment });
   } catch (error) {
     res.status(500).json({ message: "Payment submission failed", error });
   }
@@ -69,10 +115,11 @@ export const approvePayment = async (req: Request, res: Response) => {
 
     payment.status = "approved";
     payment.approvedBy = new mongoose.Types.ObjectId(req.user.id);
+    payment.reviewedAt = new Date(); //  track review date
     await payment.save({ session });
 
     if (payment.purpose === "registration") {
-      user.role = "broker"; 
+      user.role = "broker";
       await user.save({ session });
     }
 
@@ -80,8 +127,8 @@ export const approvePayment = async (req: Request, res: Response) => {
       user.walletBalance += payment.amount;
       await user.save({ session });
 
-      await Transaction.create(
-        [
+      await TopUpRequest.create(
+        [ 
           {
             user: user._id,
             amount: payment.amount,
@@ -115,7 +162,7 @@ export const rejectPayment = async (req: Request, res: Response) => {
 
     const payment = await Payment.findByIdAndUpdate(
       id,
-      { status: "rejected", reason },
+      { status: "rejected", reason, reviewedAt: new Date() }, 
       { new: true }
     );
 

@@ -9,16 +9,33 @@ import {
   getAllPayments,
 } from "../controllers/paymentController";
 import { upload } from "../middlewares/multer";
+import multer from "multer";
 
 const router = Router();
 
 // User routes
-router.post("/submit-proof", authenticate, upload.single("proof"), uploadPaymentProof);
-router.get("/my", authenticate, getMyPayments);
+router.post(
+  "/submit-proof",
+  authenticate,
+  (req, res, next) => {
+    upload.single("screenshot")(req, res, (err) => {
+      if (err instanceof multer.MulterError) {
+        return res.status(400).json({ message: err.message });
+      } else if (err) {
+        return res.status(500).json({ message: "File upload failed" });
+      }
+      next();
+    });
+  },
+  uploadPaymentProof
+);
+
+router.get("/my-payments", authenticate, getMyPayments);
+
 
 // Admin routes
-router.get("/all", authenticate, adminOnly, getAllPayments);
-router.patch("/approve/:id", authenticate, adminOnly, approvePayment);
-router.patch("/reject/:id", authenticate, adminOnly, rejectPayment);
+router.get("/admin/all", authenticate, adminOnly, getAllPayments);
+router.patch("/admin/approve/:id", authenticate, adminOnly, approvePayment);
+router.patch("/admin/reject/:id", authenticate, adminOnly, rejectPayment);
 
 export default router;

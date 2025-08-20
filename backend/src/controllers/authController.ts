@@ -36,41 +36,49 @@ export const register = async (req: Request, res: Response) => {
 
     const generatedOTP = generateOTP().toString();
 
-    await Otp.create({ email, otp: generatedOTP });
+    await Otp.create({
+      email,
+      otp: generatedOTP,
+      name,
+      phone,
+      role,
+      password, // plain password for now (will hash after OTP verified)
+    });
+
     await sendOTP(email, generatedOTP);
 
-    res.status(200).json({ message: "OTP sent to email", email });
+    res.status(200).json({
+      message: "OTP sent to email. Please verify to complete registration.",
+      email,
+    });
   } catch (error) {
     console.error("Register Error:", error);
-    res
-      .status(500)
-      .json({ error: (error as Error).message, message: "Server error" });
+    res.status(500).json({ error: (error as Error).message, message: "Server error" });
   }
 };
+
 
 //VERIFY OTP
 export const verifyOtp = async (req: Request, res: Response) => {
   try {
-    console.log("🔍 Full Body:", req.body);
-    const { email, otp, name, role, phone, password } = req.body;
+    const { email, otp } = req.body;
 
     if (!otp) {
       return res.status(400).json({ message: "OTP is required" });
     }
 
     const validOtp = await Otp.findOne({ email, otp: otp.toString() });
-    console.log("🔍 OTP Record:", validOtp);
-
     if (!validOtp) {
       return res.status(404).json({ message: "Invalid or expired OTP" });
     }
 
+    const { name, phone, role, password } = validOtp; // take stored values
+
     const hashedPass = await bcrypt.hash(password.toString(), 10);
 
-    // Set status according to role
-    let status: "pending" | "approved" | "rejected" = "approved"; // default for regular users
+    let status: "pending" | "approved" | "rejected" = "approved"; 
     if (["broker", "builder", "owner"].includes(role.toLowerCase())) {
-      status = "pending"; // pending approval/payment
+      status = "pending"; 
     }
 
     const user = await User.create({
@@ -83,7 +91,7 @@ export const verifyOtp = async (req: Request, res: Response) => {
       status,
     });
 
-    await Otp.deleteMany({ email });
+    await Otp.deleteMany({ email }); 
 
     res.status(200).json({
       message:
@@ -135,7 +143,6 @@ export const login = async (req: Request, res: Response) => {
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
     const users = await User.find().select("-password");
-    // `.select("-password")` removes password field for security
 
     res.status(200).json({
       message: "All registered users fetched successfully",

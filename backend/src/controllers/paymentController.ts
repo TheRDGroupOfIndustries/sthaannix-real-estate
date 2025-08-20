@@ -81,7 +81,7 @@ export const approvePayment = async (req: Request, res: Response) => {
       await user.save({ session });
 
       await TopUpRequest.create(
-        [
+        [ 
           {
             user: user._id,
             amount: payment.amount,

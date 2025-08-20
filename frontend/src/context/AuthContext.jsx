@@ -13,7 +13,6 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        // Add token to axios default headers
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
         const response = await axios.get(`${Backendurl}/api/users/me`, {
@@ -30,7 +29,6 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (error) {
         console.error("Auth check failed:", error);
-        // Only remove token if it's an auth error (401)
         if (error.response && error.response.status === 401) {
           localStorage.removeItem("token");
           setIsLoggedIn(false);
@@ -59,7 +57,8 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  return (
+  
+return (
     <AuthContext.Provider value={{ isLoggedIn, user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>

@@ -97,6 +97,8 @@ const Signup = () => {
     email: '',
     password: ''
   });
+  const [otp, setOtp] = useState('');
+   const [otpSent, setOtpSent] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fieldFocus, setFieldFocus] = useState({
@@ -109,14 +111,14 @@ const Signup = () => {
   const navigate = useNavigate();
 
   // Password strength calculation
-  const calculatePasswordStrength = (password) => {
-    let strength = 0;
-    if (password.length >= 8) strength += 25;
-    if (/[A-Z]/.test(password)) strength += 25;
-    if (/[a-z]/.test(password)) strength += 25;
-    if (/[0-9]/.test(password)) strength += 25;
-    return strength;
-  };
+  // const calculatePasswordStrength = (password) => {
+  //   let strength = 0;
+  //   if (password.length >= 8) strength += 25;
+  //   if (/[A-Z]/.test(password)) strength += 25;
+  //   if (/[a-z]/.test(password)) strength += 25;
+  //   if (/[0-9]/.test(password)) strength += 25;
+  //   return strength;
+  // };
 
   // Real-time validation
   const validateField = (name, value) => {
@@ -135,7 +137,13 @@ const Signup = () => {
       }
       case 'password':
         if (!value) errors.password = 'Password is required';
-        else if (value.length < 6) errors.password = 'Password must be at least 6 characters';
+        else if (value.length < 4) errors.password = 'Password must be at least 4 characters';
+        break;
+      case "otp":
+        if (!value) errors.otp = "OTP is required";
+        else if (value.length !== 6) errors.otp = "OTP must be 6 digits";
+        break;
+        default:
         break;
     }
     
@@ -157,7 +165,7 @@ const Signup = () => {
 
     // Calculate password strength
     if (name === 'password') {
-      setPasswordStrength(calculatePasswordStrength(value));
+      setPasswordStrength((value));
     }
 
     // Real-time validation
@@ -170,27 +178,71 @@ const Signup = () => {
 
   const handleBlur = (fieldName) => {
     setFieldFocus(prev => ({ ...prev, [fieldName]: false }));
-    validateField(fieldName, formData[fieldName]);
-  };
+    validateField(fieldName, fieldName === "otp" ? otp : formData[fieldName]);  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+     // Validate all fields before sending OTP
+    const isNameValid = validateField('name', formData.name);
+    const isEmailValid = validateField('email', formData.email);
+    const isPasswordValid = validateField('password', formData.password);
+    
+    if (!isNameValid || !isEmailValid || !isPasswordValid) {
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await axios.post(
-        `${Backendurl}/api/users/register`, 
+        `${Backendurl}/user/register`, 
         formData
       );
+      
+      if (response.data.success) {
+        setOtpSent(true);
+        toast.success('OTP sent to your email!');
+      } else {
+        toast.error(response.data.message || 'Failed to send OTP');
+      }
+    } catch (error) {
+      console.error('Error registering user:', error);
+      toast.error(error.response?.data?.message || 'Failed to register. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Verify OTP and complete registration
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    if (!validateField('otp', otp)) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${Backendurl}/user/verify-otp`, 
+        {
+          email: formData.email,
+          otp: otp
+        }
+      );
+      
       if (response.data.success) {
         localStorage.setItem('token', response.data.token);
         toast.success('Account created successfully!');
         navigate('/');
       } else {
-        toast.error(response.data.message);
+        toast.error(response.data.message || 'Invalid OTP');
       }
     } catch (error) {
-      console.error('Error signing up:', error);
-      toast.error('An error occurred. Please try again.');
+      console.error('Error verifying OTP:', error);
+      toast.error(error.response?.data?.message || 'Failed to verify OTP. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -279,10 +331,15 @@ const Signup = () => {
               </Link>
               
               <div className="space-y-2">
-                <h2 className="text-2xl font-bold text-gray-800">Create Your Account</h2>
-                <p className="text-gray-600">Join thousands of property enthusiasts</p>
+                <h2 className="text-2xl font-bold text-gray-800">
+                   {otpSent ? 'Verify Your Email' : 'Create Your Account'}
+                  </h2>
+                <p className="text-gray-600">
+                 {otpSent ? 'Enter the OTP sent to your email' : 'Join thousands of property enthusiasts'}
+                  </p>
                 
                 {/* Stats */}
+                 {!otpSent && (
                 <div className="flex items-center justify-center space-x-6 mt-4 text-sm text-gray-500">
                   <div className="flex items-center space-x-1">
                     <Star className="w-4 h-4 text-yellow-500 fill-current" />
@@ -297,10 +354,87 @@ const Signup = () => {
                     <span>50K+ Users</span>
                   </div>
                 </div>
+                )}
               </div>
             </motion.div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={otpSent ? handleVerifyOtp : handleSubmit} className="space-y-6">
+              {/* OTP Field - Only show after OTP is sent */}
+              <AnimatePresence>
+                {otpSent && (
+                  <motion.div
+                    variants={inputVariants}
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                  >
+                    <label htmlFor="otp" className="block text-sm font-medium text-gray-700 mb-2">
+                      Verification Code
+                    </label>
+                    <div className="relative group">
+                      <div className={`absolute left-3 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
+                        fieldFocus.otp ? 'text-blue-500' : 'text-gray-400'
+                      }`}>
+                        <MessageCircle className="h-5 w-5" />
+                      </div>
+                      <input
+                        type="text"
+                        name="otp"
+                        id="otp"
+                        required
+                        value={otp}
+                        onChange={handleChange}
+                        onFocus={() => handleFocus('otp')}
+                        onBlur={() => handleBlur('otp')}
+                        className={`w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50/50 border-2 transition-all duration-200 placeholder-gray-400 ${
+                          validationErrors.otp
+                            ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20'
+                            : fieldFocus.otp
+                            ? 'border-blue-500 focus:border-blue-500 focus:ring-blue-500/20'
+                            : 'border-gray-200 hover:border-gray-300 focus:border-blue-500 focus:ring-blue-500/20'
+                        } focus:ring-4 focus:outline-none`}
+                        placeholder="Enter 6-digit OTP"
+                        maxLength="6"
+                      />
+                      {validationErrors.otp && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="absolute right-3 top-1/2 -translate-y-1/2"
+                        >
+                          <AlertCircle className="h-5 w-5 text-red-500" />
+                        </motion.div>
+                      )}
+                      {otp && !validationErrors.otp && otp.length === 6 && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="absolute right-3 top-1/2 -translate-y-1/2"
+                        >
+                          <CheckCircle className="h-5 w-5 text-green-500" />
+                        </motion.div>
+                      )}
+                    </div>
+                    <AnimatePresence>
+                      {validationErrors.otp && (
+                        <motion.p
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="mt-1 text-sm text-red-600"
+                        >
+                          {validationErrors.otp}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Registration Fields - Only show before OTP is sent */}
+              <AnimatePresence>
+                {!otpSent && (
+                  <>
               {/* Name Field */}
               <motion.div variants={inputVariants}>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -512,6 +646,9 @@ const Signup = () => {
                   )}
                 </AnimatePresence>
               </motion.div>
+               </>
+                )}
+              </AnimatePresence>
 
               {/* Submit Button */}
               <motion.div variants={inputVariants}>
@@ -529,19 +666,30 @@ const Signup = () => {
                   {loading ? (
                     <>
                       <Loader className="w-5 h-5 animate-spin" />
-                      <span>Creating Account...</span>
+                      <span>{otpSent ? 'Verifying...' : 'Creating Account...'}</span>
                     </>
                   ) : (
                     <>
-                      <UserPlus className="w-5 h-5" />
-                      <span>Create Account</span>
-                      <ArrowRight className="w-5 h-5" />
+                      {otpSent ? (
+                        <>
+                          <CheckCircle className="w-5 h-5" />
+                          <span>Verify OTP</span>
+                        </>
+                      ) : (
+                        <>
+                          <UserPlus className="w-5 h-5" />
+                          <span>Create Account</span>
+                          <ArrowRight className="w-5 h-5" />
+                        </>
+                      )}
                     </>
                   )}
                 </motion.button>
               </motion.div>
 
               {/* Features */}
+              <AnimatePresence>
+                {!otpSent && (
               <motion.div variants={inputVariants} className="grid grid-cols-3 gap-4 py-4">
                 <div className="text-center">
                   <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
@@ -561,7 +709,10 @@ const Signup = () => {
                   </div>
                   <p className="text-xs text-gray-600">Premium</p>
                 </div>
+                
               </motion.div>
+              )}
+              </AnimatePresence>
 
               {/* Divider */}
               <motion.div variants={inputVariants} className="relative my-6">
@@ -569,12 +720,23 @@ const Signup = () => {
                   <div className="w-full border-t border-gray-200"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-white text-gray-500">Already have an account?</span>
+                  <span className="px-4 bg-white text-gray-500">
+                     {otpSent ? 'Didn\'t receive OTP?' : 'Already have an account?'}
+                    </span>
                 </div>
               </motion.div>
 
               {/* Sign In Link */}
               <motion.div variants={inputVariants}>
+                {otpSent ? (
+                  <button
+                    type="button"
+                    onClick={() => setOtpSent(false)}
+                    className="w-full flex items-center justify-center px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium"
+                  >
+                    <span>Resend OTP</span>
+                  </button>
+                ) : (
                 <Link
                   to="/login"
                   className="group w-full flex items-center justify-center px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium"
@@ -582,6 +744,7 @@ const Signup = () => {
                   <span className="group-hover:mr-2 transition-all duration-200">Sign in to your account</span>
                   <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all duration-200 ml-1" />
                 </Link>
+                )}
               </motion.div>
             </form>
           </motion.div>

@@ -117,7 +117,7 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        `${Backendurl}/api/users/login`,
+        `${Backendurl}/users/login`,
         formData
       );
       if (response.data.success) {

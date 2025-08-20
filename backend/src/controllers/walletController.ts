@@ -118,6 +118,15 @@ export const reviewTopUpRequest = async (req: Request, res: Response) => {
       reason?: string;
     };
 
+    const topupReq = await TopUpRequest.findById(id);
+    const user = await User.findById(topupReq.user);
+    const amount = topupReq.amount;
+    console.log();
+
+    if (!user) {
+      return res.status(400).json({ message: "No user found" });
+    }
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid TopUp ID" });
     }
@@ -136,6 +145,8 @@ export const reviewTopUpRequest = async (req: Request, res: Response) => {
 
     if (action === "approve") {
       topUp.status = "approved";
+      user.walletBalance += amount;
+      user.save();
     } else if (action === "reject") {
       topUp.status = "rejected";
       topUp.reason = reason;
@@ -149,11 +160,12 @@ export const reviewTopUpRequest = async (req: Request, res: Response) => {
       message: `Top-up ${action}ed successfully`,
       topUp,
     });
-
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
     console.error(error);
-    return res.status(500).json({ message: "Server error", error: (error as Error).message });
+    return res
+      .status(500)
+      .json({ message: "Server error", error: (error as Error).message });
   }
 };

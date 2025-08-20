@@ -18,7 +18,7 @@ const TopUpRequestSchema = new Schema<ITopUpRequest>(
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      index: true,
+      index: true, 
     },
     amount: { type: Number, required: true },
     proofUrl: { type: String, required: true },

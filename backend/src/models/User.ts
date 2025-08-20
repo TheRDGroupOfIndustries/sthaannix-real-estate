@@ -14,7 +14,7 @@ export interface IUser extends Document {
   isVerified: boolean;
   walletBalance: number;
   status: UserStatus; 
-}
+} 
 
 const UserSchema = new Schema<IUser>(
   {

@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
   createProperty, 
   getProperties,
-  getPropertyById,
+  getPropertyById, 
   updateProperty,
   deleteProperty,
 } from "../controllers/propertyController";

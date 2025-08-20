@@ -59,12 +59,12 @@ export const uploadPaymentProof = async (req: Request, res: Response) => {
 
     let screenshot = "";
 
-    // ✅ Case 1: File uploaded
+    // Case 1: File uploaded
     if (req.file) {
       const uploaded = await uploadFile(req.file.buffer, "payments/proofs");
       screenshot = uploaded.secure_url;
     }
-    // ✅ Case 2: Proof URL provided in JSON
+    // Case 2: Proof URL provided in JSON
     else if (proof) {
       screenshot = proof;
     } else {

@@ -6,10 +6,28 @@ import Otp from "../models/Otp";
 import { sendOTP } from "../utils/emailService";
 import { generateToken } from "../utils/generateToken";
 
-// ---------------- REGISTER ----------------
+const calculatePasswordStrength = (password: string): number => {
+  let strength = 0;
+  if (password.length >= 8) strength += 25;
+  if (/[A-Z]/.test(password)) strength += 25;
+  if (/[a-z]/.test(password)) strength += 25;
+  if (/[0-9]/.test(password)) strength += 25;
+  return strength;
+};
+
+//  REGISTER
 export const register = async (req: Request, res: Response) => {
   try {
     const { name, email, phone, role, password } = req.body;
+
+    const strength = calculatePasswordStrength(password);
+    if (strength < 100) {
+      return res.status(400).json({
+        message:
+          "Weak password. Must be at least 8 chars, include uppercase, lowercase, and a number.",
+        strength,
+      });
+    }
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -24,11 +42,13 @@ export const register = async (req: Request, res: Response) => {
     res.status(200).json({ message: "OTP sent to email", email });
   } catch (error) {
     console.error("Register Error:", error);
-    res.status(500).json({ error: (error as Error).message, message: "Server error" });
+    res
+      .status(500)
+      .json({ error: (error as Error).message, message: "Server error" });
   }
 };
 
-// ---------------- VERIFY OTP ----------------
+//VERIFY OTP
 export const verifyOtp = async (req: Request, res: Response) => {
   try {
     console.log("🔍 Full Body:", req.body);
@@ -45,7 +65,7 @@ export const verifyOtp = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Invalid or expired OTP" });
     }
 
-   const hashedPass = await bcrypt.hash(password.toString(), 10);
+    const hashedPass = await bcrypt.hash(password.toString(), 10);
 
     // Set status according to role
     let status: "pending" | "approved" | "rejected" = "approved"; // default for regular users
@@ -60,7 +80,7 @@ export const verifyOtp = async (req: Request, res: Response) => {
       phone,
       role,
       isVerified: true,
-      status, 
+      status,
     });
 
     await Otp.deleteMany({ email });
@@ -78,8 +98,7 @@ export const verifyOtp = async (req: Request, res: Response) => {
   }
 };
 
-
-// ---------------- LOGIN ----------------
+// LOGIN
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
@@ -88,11 +107,14 @@ export const login = async (req: Request, res: Response) => {
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
     if (!user.isVerified) {
-      return res.status(403).json({ message: "Please verify your account first" });
+      return res
+        .status(403)
+        .json({ message: "Please verify your account first" });
     }
 
     const isMatch = await bcrypt.compare(password.toString(), user.password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+    if (!isMatch)
+      return res.status(400).json({ message: "Invalid credentials" });
 
     const payload = {
       id: user._id.toString(),
@@ -109,12 +131,10 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-
-// ---------------- GET ALL USERS ----------------
+//  GET ALL USERS
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
-  
-    const users = await User.find().select("-password"); 
+    const users = await User.find().select("-password");
     // `.select("-password")` removes password field for security
 
     res.status(200).json({

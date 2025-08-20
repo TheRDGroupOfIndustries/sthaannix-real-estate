@@ -6,7 +6,7 @@ export interface IPayment extends mongoose.Document {
   purpose: "registration" | "promotion";
   status: "pending" | "approved" | "rejected";
   screenshot: string; 
-  utrNumber?: string; //new field
+  utrNumber?: string; 
   approvedBy?: mongoose.Types.ObjectId; 
   reviewedAt?: Date;
   reason?: string;

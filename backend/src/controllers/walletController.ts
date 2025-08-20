@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
 import User from "../models/User";
-import Transaction from "../models/Transaction";
 import TopUpRequest from "../models/TopUpRequest";
 import { uploadFile } from "../utils/uploadToCloudinary";
 
@@ -12,7 +11,7 @@ export const getMyWallet = async (req: Request, res: Response) => {
     const user = await User.findById(req.user.id).select("walletBalance");
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    const txns = await Transaction.find({ user: req.user.id })
+    const txns = await TopUpRequest.find({ user: req.user.id })
       .sort({ createdAt: -1 })
       .limit(50);
 
@@ -155,6 +154,6 @@ export const reviewTopUpRequest = async (req: Request, res: Response) => {
     await session.abortTransaction();
     session.endSession();
     console.error(error);
-    return res.status(500).json({ message: "Server error", error });
+    return res.status(500).json({ message: "Server error", error: (error as Error).message });
   }
 };

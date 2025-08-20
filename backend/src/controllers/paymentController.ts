@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import Payment from "../models/Payment";
 import User from "../models/User";
 import { uploadFile } from "../utils/uploadToCloudinary";
-import Transaction from "../models/Transaction";
+import TopUpRequest from "../models/TopUpRequest";
 import mongoose from "mongoose";
 
 export const uploadPaymentProof = async (req: Request, res: Response) => {
@@ -80,7 +80,7 @@ export const approvePayment = async (req: Request, res: Response) => {
       user.walletBalance += payment.amount;
       await user.save({ session });
 
-      await Transaction.create(
+      await TopUpRequest.create(
         [
           {
             user: user._id,

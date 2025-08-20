@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import User from "../models/User";
 import Property from "../models/Property";
 import Lead from "../models/Lead";
-import Transaction from "../models/Transaction";
+import TopUpRequest from "../models/TopUpRequest";
 
 export const getAdminStats = async (_req: Request, res: Response) => {
   try {
@@ -24,11 +24,11 @@ export const getAdminStats = async (_req: Request, res: Response) => {
       Lead.countDocuments(),
       Lead.countDocuments({ status: "open" }),
       Lead.countDocuments({ status: "closed" }),
-      Transaction.aggregate([
+      TopUpRequest.aggregate([
         { $match: { type: "credit" } },
         { $group: { _id: null, total: { $sum: "$amount" } } },
       ]),
-      Transaction.aggregate([
+      TopUpRequest.aggregate([
         { $match: { type: "debit" } },
         { $group: { _id: null, total: { $sum: "$amount" } } },
       ]),

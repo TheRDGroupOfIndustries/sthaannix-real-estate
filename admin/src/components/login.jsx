@@ -3,6 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Mail, Lock, ArrowRight, Loader2, UserCheck } from "lucide-react";
 import { toast } from "react-hot-toast";
+import axios from "axios";
+import { Backendurl } from "../App";
 
 const Login = () => {
   const [name, setName] = useState("");
@@ -11,16 +13,16 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Save authenticated user info in localStorage
-  const setUserSession = (user) => {
+  // Save token and user info in localStorage
+  const setUserSession = (token, user) => {
+    localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    // Basic validation
     if (!name.trim()) {
       toast.error("Please enter your name");
       setLoading(false);
@@ -33,24 +35,30 @@ const Login = () => {
     }
 
     try {
-      // Get registered users from localStorage
-      const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
+      // Call backend login API
+      const response = await axios.post(`${Backendurl}/user/login`, {
+        name,
+        email,
+        password,
+      });
 
-      // Check if user exists with matching email and password
-      const matchedUser = storedUsers.find(
-        (user) => user.email === email && user.password === password && user.name === name
-      );
-
-      if (matchedUser) {
+      if (response.data.success) {
         toast.success(`Welcome back, ${name}!`);
-        setUserSession(matchedUser);
-        navigate(`/dashboard`); // Redirect to dashboard or desired page
+        setUserSession(response.data.token, response.data.user);
+
+        // Role-based dashboard navigation
+        const role = response.data.user.role?.toLowerCase();
+        if (["broker", "builder", "property owner"].includes(role)) {
+          navigate("/dashboard"); // User dashboard
+        } else {
+          navigate("/admin"); // Admin dashboard (no role selected or other)
+        }
       } else {
-        toast.error("Invalid credentials or user not registered");
+        toast.error(response.data.message || "Invalid credentials or user not registered");
       }
     } catch (error) {
       console.error("Login error:", error);
-      toast.error("An error occurred during login");
+      toast.error(error.response?.data?.message || "An error occurred during login");
     } finally {
       setLoading(false);
     }
@@ -66,7 +74,7 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="space-y-4">
-
+            {/* Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Name</label>
               <div className="mt-1 relative">
@@ -84,6 +92,7 @@ const Login = () => {
               </div>
             </div>
 
+            {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Email address</label>
               <div className="mt-1 relative">
@@ -101,6 +110,7 @@ const Login = () => {
               </div>
             </div>
 
+            {/* Password */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Password</label>
               <div className="mt-1 relative">
@@ -119,6 +129,7 @@ const Login = () => {
             </div>
           </div>
 
+          {/* Submit */}
           <div>
             <motion.button
               type="submit"

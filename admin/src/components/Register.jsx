@@ -1,11 +1,12 @@
-// src/components/Register.jsx
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { User, Mail, Lock, Phone, Home, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import axios from "axios";
+import { Backendurl } from "../App";
 
-const ROLES = ["Broker", "Builder", "Property Owner", "Admin"];
+const ROLES = ["Broker", "Builder", "Property Owner"];
 const REGISTRATION_FEE_ROLES = ["Broker", "Builder", "Property Owner"];
 const REGISTRATION_FEE = 1500;
 
@@ -22,23 +23,17 @@ const Register = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleRoleSelect = (role) => {
-    setFormData(prev => ({ ...prev, role }));
+    setFormData((prev) => ({ ...prev, role }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic validation
-    if (
-      !formData.name.trim() ||
-      !formData.email.trim() ||
-      !formData.password.trim() ||
-      !formData.role
-    ) {
+    if (!formData.name.trim() || !formData.email.trim() || !formData.password.trim()) {
       toast.error("Please fill all required fields");
       return;
     }
@@ -46,35 +41,28 @@ const Register = () => {
     setLoading(true);
 
     try {
-      // Get existing users from localStorage
-      const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
+      const response = await axios.post(`${Backendurl}/user/register`, formData);
 
-      // Check if email already registered
-      const emailExists = storedUsers.some(user => user.email === formData.email);
-      if (emailExists) {
-        toast.error("Email is already registered");
-        setLoading(false);
-        return;
-      }
+      if (response.data.success) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
 
-      // Add new user to stored users
-      const newUser = { ...formData };
-      storedUsers.push(newUser);
-      localStorage.setItem("users", JSON.stringify(storedUsers));
+        toast.success("Registration successful!");
 
-      if (formData.role === "Admin") {
-        // Admin registration - no payment required
-        toast.success("Registration successful! Redirecting to Admin Dashboard.");
-        localStorage.setItem("user", JSON.stringify(newUser));
-        navigate("/admin");
+        // Redirect based on role selection
+        const role = formData.role.toLowerCase();
+        if (ROLES.map(r => r.toLowerCase()).includes(role)) {
+          navigate("/dashboard");
+        } else {
+          // If no role selected, redirect to admin dashboard (admin auto-registers)
+          navigate("/admin");
+        }
       } else {
-        // Other roles proceed to payment page with formData passed in state
-        toast.success("Registration successful! Proceed to payment.");
-        navigate("/payment", { state: { formData: newUser } });
+        toast.error(response.data.message || "Registration failed");
       }
     } catch (error) {
       console.error("Registration error:", error);
-      toast.error("An error occurred during registration");
+      toast.error(error.response?.data?.message || "An error occurred during registration");
     } finally {
       setLoading(false);
     }
@@ -90,6 +78,7 @@ const Register = () => {
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="space-y-4">
+            {/* Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Full name</label>
               <div className="mt-1 relative">
@@ -108,6 +97,7 @@ const Register = () => {
               </div>
             </div>
 
+            {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Email address</label>
               <div className="mt-1 relative">
@@ -126,6 +116,7 @@ const Register = () => {
               </div>
             </div>
 
+            {/* Password */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Password</label>
               <div className="mt-1 relative">
@@ -144,6 +135,7 @@ const Register = () => {
               </div>
             </div>
 
+            {/* Phone */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Phone number</label>
               <div className="mt-1 relative">
@@ -161,10 +153,11 @@ const Register = () => {
               </div>
             </div>
 
+            {/* Role */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">I am a</label>
-              <div className="grid grid-cols-4 gap-2">
-                {ROLES.map(roleOption => (
+              <div className="grid grid-cols-3 gap-2">
+                {ROLES.map((roleOption) => (
                   <button
                     key={roleOption}
                     type="button"
@@ -184,7 +177,7 @@ const Register = () => {
               </div>
             </div>
 
-            {/* Registration Fee Display */}
+            {/* Registration Fee */}
             {REGISTRATION_FEE_ROLES.includes(formData.role) && (
               <div className="pt-3">
                 <p className="text-center font-semibold text-sm border border-gray-600 p-2 rounded-md text-gray-800">
@@ -192,15 +185,9 @@ const Register = () => {
                 </p>
               </div>
             )}
-            {formData.role === "Admin" && (
-              <div className="pt-3">
-                <p className="text-center font-semibold text-sm border border-gray-600 p-2 rounded-md text-gray-800">
-                  Admin registration is free.
-                </p>
-              </div>
-            )}
           </div>
 
+          {/* Submit button */}
           <div>
             <motion.button
               type="submit"
@@ -211,9 +198,7 @@ const Register = () => {
               {loading ? (
                 <>
                   <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                  {REGISTRATION_FEE_ROLES.includes(formData.role)
-                    ? "Continue to Payment"
-                    : "Registering..."}
+                  Registering...
                 </>
               ) : (
                 <>

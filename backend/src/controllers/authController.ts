@@ -53,10 +53,11 @@ export const register = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Register Error:", error);
-    res.status(500).json({ error: (error as Error).message, message: "Server error" });
+    res
+      .status(500)
+      .json({ error: (error as Error).message, message: "Server error" });
   }
 };
-
 
 //VERIFY OTP
 export const verifyOtp = async (req: Request, res: Response) => {
@@ -76,9 +77,9 @@ export const verifyOtp = async (req: Request, res: Response) => {
 
     const hashedPass = await bcrypt.hash(password.toString(), 10);
 
-    let status: "pending" | "approved" | "rejected" = "approved"; 
+    let status: "pending" | "approved" | "rejected" = "approved";
     if (["broker", "builder", "owner"].includes(role.toLowerCase())) {
-      status = "pending"; 
+      status = "pending";
     }
 
     const user = await User.create({
@@ -91,7 +92,7 @@ export const verifyOtp = async (req: Request, res: Response) => {
       status,
     });
 
-    await Otp.deleteMany({ email }); 
+    await Otp.deleteMany({ email });
 
     res.status(200).json({
       message:
@@ -128,6 +129,8 @@ export const login = async (req: Request, res: Response) => {
       id: user._id.toString(),
       role: user.role,
       email: user.email,
+      name: user.name,
+      status: user.status,
     };
 
     const token = generateToken(payload);

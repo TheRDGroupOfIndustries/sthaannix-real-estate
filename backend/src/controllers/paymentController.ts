@@ -5,41 +5,6 @@ import { uploadFile } from "../utils/uploadToCloudinary";
 import TopUpRequest from "../models/TopUpRequest";
 import mongoose from "mongoose";
 
-// export const uploadPaymentProof = async (req: Request, res: Response) => {
-//   try {
-//     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
-//     if (!req.file)
-//       return res.status(400).json({ message: "Proof image required" });
-
-//     const { amount, purpose, utrNumber } = req.body; // get UTR number
-//     const user = await User.findById(req.user.id);
-
-//     if (!user) return res.status(404).json({ message: "User not found" });
-
-//     if (purpose === "registration" && amount < 1500) {
-//       return res
-//         .status(400)
-//         .json({ message: "Registration fee must be ₹1500 or higher" });
-//     }
-
-//     const uploaded = await uploadFile(req.file.buffer, "payments/proofs");
-
-//     const payment = await Payment.create({
-//       user: user._id,
-//       amount,
-//       purpose,
-//       screenshot: uploaded.secure_url,
-//       utrNumber, //  store UTR number
-//       status: "pending",
-//     });
-
-//     res
-//       .status(201)
-//       .json({ message: "Payment proof submitted for approval", payment });
-//   } catch (error) {
-//     res.status(500).json({ message: "Payment submission failed", error });
-//   }
-// };
 
 
 export const uploadPaymentProof = async (req: Request, res: Response) => {

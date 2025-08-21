@@ -18,14 +18,13 @@ declare global {
 }
 
 const canCreateProperty = (role?: string) =>
-  ["broker", "builder", "owner"].includes(role || "");
+  ["broker", "builder", "owner", "admin"].includes(role || "");
 
 const isOwnerOrAdmin = (
   userId: string,
   ownerId: mongoose.Types.ObjectId,
   role?: string
 ) => role === "admin" || userId === ownerId.toString();
-
 
 export const createProperty = async (req: Request, res: Response) => {
   try {
@@ -35,7 +34,12 @@ export const createProperty = async (req: Request, res: Response) => {
     if (!canCreateProperty(req.user.role)) {
       return res.status(403).json({ message: "You cannot create properties" });
     }
-
+    // if (req.user.status === "pending") {
+    //   return res.status(403).json({
+    //     message:
+    //       "Your account is pending approval. You cannot create properties yet.",
+    //   });
+    // }  
     const {
       title,
       description,
@@ -79,17 +83,9 @@ export const createProperty = async (req: Request, res: Response) => {
   }
 };
 
-
 export const getProperties = async (req: Request, res: Response) => {
   try {
-    const {
-      search,
-      minPrice,
-      maxPrice,
-      city,
-      sort,
-      status, 
-    } = req.query as {
+    const { search, minPrice, maxPrice, city, sort, status } = req.query as {
       search?: string;
       minPrice?: string;
       maxPrice?: string;
@@ -135,7 +131,6 @@ export const getProperties = async (req: Request, res: Response) => {
   }
 };
 
-
 export const getPropertyById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -170,18 +165,13 @@ export const updateProperty = async (req: Request, res: Response) => {
     }
 
     if (!isOwnerOrAdmin(req.user.id, property.owner, req.user.role)) {
-      return res.status(403).json({ message: "You cannot update this property" });
+      return res
+        .status(403)
+        .json({ message: "You cannot update this property" });
     }
 
-    const {
-      title,
-      description,
-      price,
-      size,
-      bhk,
-      location,
-      isPromoted,
-    } = req.body;
+    const { title, description, price, size, bhk, location, isPromoted } =
+      req.body;
 
     if (title !== undefined) property.title = title;
     if (description !== undefined) property.description = description;
@@ -199,7 +189,6 @@ export const updateProperty = async (req: Request, res: Response) => {
   }
 };
 
-
 export const deleteProperty = async (req: Request, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
@@ -215,7 +204,9 @@ export const deleteProperty = async (req: Request, res: Response) => {
     }
 
     if (!isOwnerOrAdmin(req.user.id, property.owner, req.user.role)) {
-      return res.status(403).json({ message: "You cannot delete this property" });
+      return res
+        .status(403)
+        .json({ message: "You cannot delete this property" });
     }
 
     await property.deleteOne();

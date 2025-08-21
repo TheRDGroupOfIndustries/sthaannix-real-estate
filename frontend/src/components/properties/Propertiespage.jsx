@@ -25,7 +25,7 @@ const PropertiesPage = () => {
     error: null,
     selectedProperty: null,
   });
-
+ 
   const [filters, setFilters] = useState({
     propertyType: "",
     priceRange: [0, Number.MAX_SAFE_INTEGER],
@@ -40,15 +40,15 @@ const PropertiesPage = () => {
     try {
       setPropertyState((prev) => ({ ...prev, loading: true }));
       // Future: Uncomment to fetch data from backend API
-      // const propertiesFromAPI = await fetchProperties();
-      // setPropertyState((prev) => ({
-      //   ...prev,
-      //   properties: propertiesFromAPI,
-      //   error: null,
-      //   loading: false,
-      // }));
+      const propertiesFromAPI = await fetchProperties();
+      setPropertyState((prev) => ({
+        ...prev,
+        properties: propertiesFromAPI,
+        error: null,
+        loading: false,
+      }));
       // Save to localStorage
-      // setLocalStorage(LOCAL_STORAGE_KEY, propertiesFromAPI);
+      setLocalStorage(LOCAL_STORAGE_KEY, propertiesFromAPI);
 
       // Using localStorage fallback: if no properties, set empty list
       if (!getLocalStorage(LOCAL_STORAGE_KEY)) {

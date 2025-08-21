@@ -169,7 +169,7 @@ const PropertyCard = ({ property, viewType }) => {
             group-hover:text-blue-600 transition-colors">
             {property.title}
           </h3>
-
+ 
           <div className="flex items-center gap-2">
             <div className="flex-1">
               <p className="text-sm text-gray-500 mb-1">Price</p>

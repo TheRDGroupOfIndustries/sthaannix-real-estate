@@ -108,6 +108,38 @@ export const verifyOtp = async (req: Request, res: Response) => {
 };
 
 // LOGIN
+// export const login = async (req: Request, res: Response) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     const user = await User.findOne({ email });
+//     if (!user) return res.status(400).json({ message: "Invalid credentials" });
+
+//     if (!user.isVerified) {
+//       return res
+//         .status(403)
+//         .json({ message: "Please verify your account first" });
+//     }
+
+//     const isMatch = await bcrypt.compare(password.toString(), user.password);
+//     if (!isMatch)
+//       return res.status(400).json({ message: "Invalid credentials" });
+
+//     const payload = {
+//       id: user._id.toString(),
+//       role: user.role,
+//       email: user.email,
+//     };
+
+//     const token = generateToken(payload);
+
+//     res.json({ token, role: user.role });
+//   } catch (error) {
+//     console.error("Login Error:", error);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// };
+
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
@@ -135,12 +167,26 @@ export const login = async (req: Request, res: Response) => {
 
     const token = generateToken(payload);
 
-    res.json({ token, role: user.role });
+    // 👇 Build a safe response object
+    const responseUser = {
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+      isVerified: user.isVerified,
+      walletBalance: user.walletBalance,
+      status: user.status,
+    };
+
+    res.json({ token, user: responseUser });
   } catch (error) {
     console.error("Login Error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
 
 //  GET ALL USERS
 export const getAllUsers = async (req: Request, res: Response) => {

@@ -2,55 +2,30 @@ import { Request, Response } from "express";
 import AdCampaign from "../models/AdCampaign";
 import Property from "../models/Property";
 import User from "../models/User";
-import mongoose from "mongoose";
 
 // User submits ad request → default status = pending
 export const submitAdRequest = async (req: Request, res: Response) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
   try {
     const { userId, propertyId, budget, platform, startDate } = req.body;
 
     // Validate budget
     if (budget < 1500) {
-      await session.abortTransaction();
-      session.endSession();
       return res.status(400).json({
         success: false,
         message: "Minimum advertisement budget is ₹1500",
       });
     }
 
-    // Check user exists
-    const user = await User.findById(userId).session(session);
-    if (!user) {
-      await session.abortTransaction();
-      session.endSession();
+    // Check user & property exist
+    const userExists = await User.findById(userId);
+    if (!userExists) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // Check wallet balance
-    if (user.walletBalance < budget) {
-      await session.abortTransaction();
-      session.endSession();
-      return res.status(400).json({
-        success: false,
-        message: "Insufficient wallet balance. Please top up your wallet.",
-      });
-    }
-
-    // Check property exists
-    const property = await Property.findById(propertyId).session(session);
-    if (!property) {
-      await session.abortTransaction();
-      session.endSession();
+    const propertyExists = await Property.findById(propertyId);
+    if (!propertyExists) {
       return res.status(404).json({ success: false, message: "Property not found" });
     }
-
-    // Deduct budget from wallet
-    user.walletBalance -= budget;
-    await user.save({ session });
 
     // Create new campaign with pending status
     const newCampaign = new AdCampaign({
@@ -62,20 +37,14 @@ export const submitAdRequest = async (req: Request, res: Response) => {
       status: "pending",
     });
 
-    await newCampaign.save({ session });
-
-    await session.commitTransaction();
-    session.endSession();
+    await newCampaign.save();
 
     return res.status(201).json({
       success: true,
-      message: "Ad request submitted successfully & wallet updated",
+      message: "Ad request submitted to admin for review",
       campaign: newCampaign,
-      remainingBalance: user.walletBalance,
     });
   } catch (error: any) {
-    await session.abortTransaction();
-    session.endSession();
     console.error("Error submitting ad request:", error);
     return res.status(500).json({
       success: false,

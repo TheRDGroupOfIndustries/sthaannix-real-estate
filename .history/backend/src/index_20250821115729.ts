@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 dotenv.config();
-
 import express from "express";
 import dbConnect from "./config/db";
 import cors from "cors";
@@ -30,7 +29,6 @@ app.use("/admin", adminStatsRoutes);
 app.use("/me", userRoutes);
 app.use("/payment", paymentRoutes);
 app.use("/ad",adRoute);
-app.use('/revenue',revenueRoute);
 
 
 const runServer = async () => {

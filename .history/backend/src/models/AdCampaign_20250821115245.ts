@@ -1,8 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
-import { IUser } from "../models/User"; 
 
 export interface IAdCampaign extends Document {
-  property: mongoose.Types.ObjectId | Pick<IUser, "_id" | "name" | "email" | "phone">;
+  property: mongoose.Types.ObjectId;
   user: mongoose.Types.ObjectId;
   budget: number;
   platform: ("meta ads" | "google ads")[];

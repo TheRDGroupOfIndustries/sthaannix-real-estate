@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 dotenv.config();
-
 import express from "express";
 import dbConnect from "./config/db";
 import cors from "cors";
@@ -13,7 +12,6 @@ import adminStatsRoutes from "./routes/adminStatusRoutes"
 import userRoutes from "./routes/userRoutes"
 import paymentRoutes from "./routes/paymentRoutes"
 import adRoute from "./routes/adRoutes"
-import revenueRoute from "./routes/adminRevenueRoute"
 
 const app = express();
 const port = process.env.PORT || 12000;
@@ -30,7 +28,6 @@ app.use("/admin", adminStatsRoutes);
 app.use("/me", userRoutes);
 app.use("/payment", paymentRoutes);
 app.use("/ad",adRoute);
-app.use('/revenue',revenueRoute);
 
 
 const runServer = async () => {

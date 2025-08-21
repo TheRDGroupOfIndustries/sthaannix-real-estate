@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import AdCampaign from "../models/AdCampaign";
 import Property from "../models/Property";
 import User from "../models/User";
-import mongoose from "mongoose";
+
 
 // User submits ad request → default status = pending
 export const submitAdRequest = async (req: Request, res: Response) => {

@@ -1,19 +1,17 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Mail, Lock, ArrowRight, Loader2, UserCheck } from "lucide-react";
+import { Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 import { Backendurl } from "../App";
 
 const Login = () => {
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Save token and user info in localStorage
   const setUserSession = (token, user) => {
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));
@@ -23,11 +21,6 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
 
-    if (!name.trim()) {
-      toast.error("Please enter your name");
-      setLoading(false);
-      return;
-    }
     if (!email.trim() || !password.trim()) {
       toast.error("Please enter both email and password");
       setLoading(false);
@@ -35,33 +28,42 @@ const Login = () => {
     }
 
     try {
-      // Call backend login API
       const response = await axios.post(`${Backendurl}/user/login`, {
-        name,
         email,
         password,
       });
 
       if (response.data.success) {
-        toast.success(`Welcome back, ${name}!`);
         setUserSession(response.data.token, response.data.user);
+        localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(user));
 
-        // Role-based dashboard navigation
+        toast.success("Login successful!");
+
         const role = response.data.user.role?.toLowerCase();
-        if (["broker", "builder", "property owner"].includes(role)) {
-          navigate("/dashboard"); // User dashboard
+         if (role === "admin") {
+        navigate("/admin");
+      } else if (["broker", "builder", "owner"].includes(role)) {
+        // Check payment status
+        if (user.paymentStatus === "approved") {
+          navigate("/dashboard");
         } else {
-          navigate("/admin"); // Admin dashboard (no role selected or other)
+          // Payment pending or cancelled
+          navigate("/payment");
         }
       } else {
-        toast.error(response.data.message || "Invalid credentials or user not registered");
+        // fallback
+        navigate("/login");
       }
-    } catch (error) {
-      console.error("Login error:", error);
-      toast.error(error.response?.data?.message || "An error occurred during login");
-    } finally {
-      setLoading(false);
+    } else {
+      toast.error(response.data.message || "Invalid credentials");
     }
+  } catch (error) {
+    console.error("Login error:", error);
+    toast.error("An error occurred during login");
+  } finally {
+    setLoading(false);
+  }
   };
 
   return (
@@ -74,24 +76,6 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="space-y-4">
-            {/* Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Name</label>
-              <div className="mt-1 relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <UserCheck className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Your full name"
-                  required
-                />
-              </div>
-            </div>
-
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Email address</label>

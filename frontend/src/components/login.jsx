@@ -118,30 +118,19 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await loginUser(formData);
-      if (response.status === 200) {
-      const { token, user } = response.data;
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-      toast.success("Login successful!");
-
-      const role = user.role?.toLowerCase();
-      if (role === "admin") {
-        navigate("/admin");
-      } else if (["broker", "builder", "owner"].includes(role)) {
-        if (user.paymentStatus === "approved") {
-          navigate("/dashboard");
-        } else {
-          navigate("/payment");
-        }
+      if (response.data.success) {
+        await login(response.data.token, response.data.user);
+        toast.success("Login successful!");
+        navigate("/");
       } else {
-        navigate("/login");
+        toast.error(response.data.message);
       }
-    } else {
-      toast.error(response.data.message || "Invalid credentials");
+    } catch (error) {
+      console.error("Error logging in:", error);
+      toast.error("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    toast.error(error.response?.data?.message || "Login error");
-  }
   };
 
   return (

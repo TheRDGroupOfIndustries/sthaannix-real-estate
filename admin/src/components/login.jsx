@@ -354,18 +354,17 @@ const Login = () => {
 
         const role = user.role?.toLowerCase();
 
-        if (role === "admin") {
-          navigate("/admin");
-        } else if (["broker", "builder", "owner"].includes(role)) {
-          // Replace below condition with actual payment status check if exists
-          if (user.paymentStatus === "approved") {
-            navigate("/dashboard");
-          } else {
-            navigate("/payment");
-          }
-        } else {
-          navigate("/login");
-        }
+        if (["broker", "builder", "owner"].includes(role)) {
+  if (response.data.user.paymentStatus === "approved") {
+    navigate("/dashboard");
+  } else {
+    navigate("/payment");
+  }
+} else if (role === "admin") {
+  navigate("/admin");
+} else {
+  navigate("/login");
+}
       } else {
         toast.error(response.data.message || "Invalid credentials");
       }

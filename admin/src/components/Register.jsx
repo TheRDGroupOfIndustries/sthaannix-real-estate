@@ -322,6 +322,7 @@ const Register = () => {
       const response = await axios.post(`${Backendurl}/user/register`, {
         ...formData,
         email: formData.email.trim(),
+         role: formData.role.toLowerCase(),
         password: formData.password.trim(),
       });
       if (response.status === 200 && response.data.email) {
@@ -352,9 +353,8 @@ const handleOtpSubmit = async (e) => {
     const response = await axios.post(`${Backendurl}/user/verify-otp`, {
       email: formData.email.trim(),
       otp: otpValue,
-      // send password & role again in case backend lost them
       password: formData.password.trim(),
-      role: formData.role,
+       role: formData.role.toLowerCase(),
       phone: formData.phone,
       name: formData.name,
     });

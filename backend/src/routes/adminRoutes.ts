@@ -17,4 +17,3 @@ router.patch("/reject-property/:id", authenticate, adminOnly, rejectProperty);
 router.delete("/property/:id", authenticate, adminOnly, deleteProperty);
 
 export default router;
- 

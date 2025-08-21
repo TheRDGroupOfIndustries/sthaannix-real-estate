@@ -358,14 +358,14 @@ const handleOtpSubmit = async (e) => {
       phone: formData.phone,
       name: formData.name,
     });
-
-    toast.success(response.data.message || "OTP verified successfully");
-    navigate("/login");
-  } catch (error) {
-    console.error("OTP Verification Error:", error.response || error.message);
-    toast.error(error.response?.data?.message || "OTP verification failed");
-  } finally {
-    setLoading(false);
+      if (res.data.success) {
+      toast.success("OTP verified successfully");
+      navigate("/payment");
+    } else {
+      toast.error(res.data.message || "OTP verification failed");
+    }
+  } catch (err) {
+    toast.error(err.response?.data?.message || "OTP verification failed");
   }
 };
 

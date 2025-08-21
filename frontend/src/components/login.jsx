@@ -15,9 +15,10 @@ import {
   User,
   Key
 } from "lucide-react";
-import { Backendurl } from "../App";
+// import { API_URL} from "../App";
 import { toast } from "react-toastify";
 import { useAuth } from '../context/AuthContext';
+import { loginUser } from "../services/authService";
 
 // Enhanced Animation Variants
 const containerVariants = {
@@ -116,10 +117,7 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await axios.post(
-        `${Backendurl}/users/login`,
-        formData
-      );
+      const response = await loginUser(formData);
       if (response.data.success) {
         await login(response.data.token, response.data.user);
         toast.success("Login successful!");

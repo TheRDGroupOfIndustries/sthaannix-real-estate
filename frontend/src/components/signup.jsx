@@ -17,8 +17,9 @@ import {
   Key,
   Home
 } from 'lucide-react';
-import { Backendurl } from '../App';
+// import { API_URL} from '../App';
 import { toast } from 'react-toastify';
+import { registerUser, verifyOtp } from "../services/authService";
 
 // Enhanced Animation Variants
 const containerVariants = {
@@ -97,7 +98,7 @@ const Signup = () => {
     email: '',
     password: ''
   });
-  const [otp, setOtp] = useState('');
+  const [otp, setOtp] = useState("");
    const [otpSent, setOtpSent] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -111,14 +112,14 @@ const Signup = () => {
   const navigate = useNavigate();
 
   // Password strength calculation
-  // const calculatePasswordStrength = (password) => {
-  //   let strength = 0;
-  //   if (password.length >= 8) strength += 25;
-  //   if (/[A-Z]/.test(password)) strength += 25;
-  //   if (/[a-z]/.test(password)) strength += 25;
-  //   if (/[0-9]/.test(password)) strength += 25;
-  //   return strength;
-  // };
+  const calculatePasswordStrength = (password) => {
+    let strength = 0;
+    if (password.length >= 8) strength += 25;
+    if (/[A-Z]/.test(password)) strength += 25;
+    if (/[a-z]/.test(password)) strength += 25;
+    if (/[0-9]/.test(password)) strength += 25;
+    return strength;
+  };
 
   // Real-time validation
   const validateField = (name, value) => {
@@ -137,7 +138,7 @@ const Signup = () => {
       }
       case 'password':
         if (!value) errors.password = 'Password is required';
-        else if (value.length < 4) errors.password = 'Password must be at least 4 characters';
+        else if (value.length < 6) errors.password = 'Password must be at least 4 characters';
         break;
       case "otp":
         if (!value) errors.otp = "OTP is required";
@@ -165,7 +166,7 @@ const Signup = () => {
 
     // Calculate password strength
     if (name === 'password') {
-      setPasswordStrength((value));
+      setPasswordStrength(calculatePasswordStrength(value));
     }
 
     // Real-time validation
@@ -195,26 +196,23 @@ const Signup = () => {
     }
 
     try {
-      const response = await axios.post(
-        `${Backendurl}/user/register`, 
-        formData
-      );
+       const response = await registerUser(formData);
       
       if (response.data.success) {
         setOtpSent(true);
         toast.success('OTP sent to your email!');
       } else {
-        toast.error(response.data.message || 'Failed to send OTP');
+        toast.error(response.data.message || 'Registration failed');
       }
-    } catch (error) {
-      console.error('Error registering user:', error);
-      toast.error(error.response?.data?.message || 'Failed to register. Please try again.');
-    } finally {
+    } catch (err) {
+      console.error('Error registering user:', err);
+       toast.error(err.response?.data?.message || "Error during registration");   
+       } finally {
       setLoading(false);
     }
   };
 
-  // Verify OTP and complete registration
+  // Verify OTP 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -225,13 +223,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await axios.post(
-        `${Backendurl}/user/verify-otp`, 
-        {
-          email: formData.email,
-          otp: otp
-        }
-      );
+       const response = await verifyOtp(formData.email, otp);
       
       if (response.data.success) {
         localStorage.setItem('token', response.data.token);

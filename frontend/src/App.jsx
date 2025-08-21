@@ -22,7 +22,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 
 
-export const Backendurl = import.meta.env.VITE_API_BASE_URL;
+export const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 const App = () => {
   return (

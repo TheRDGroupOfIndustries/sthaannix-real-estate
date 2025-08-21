@@ -17,7 +17,7 @@ import {
   Key,
   Home
 } from 'lucide-react';
-// import { API_URL} from '../App';
+// import { Backendurl } from '../App';
 import { toast } from 'react-toastify';
 import { registerUser, verifyOtp } from "../services/authService";
 

@@ -1,6 +1,12 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-export type UserRole = "buyer" | "broker" | "builder" | "owner" | "admin" | "user" ;
+export type UserRole =
+  | "buyer"
+  | "broker"
+  | "builder"
+  | "owner"
+  | "admin"
+  | "user";
 
 export type UserStatus = "pending" | "approved" | "rejected";
 
@@ -13,19 +19,27 @@ export interface IUser extends Document {
   password: string;
   isVerified: boolean;
   walletBalance: number;
-  status: UserStatus; 
-} 
- 
+  status: UserStatus;
+}
+
 const UserSchema = new Schema<IUser>(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     phone: { type: String, required: false },
-    role: { type: String, enum: ["buyer", "broker", "builder", "owner", "admin","user"], required: true },
+    role: {
+      type: String,
+      enum: ["buyer", "broker", "builder", "owner", "admin", "user"],
+      default: "user", // instead of required: true
+    },
     password: { type: String, required: true },
     isVerified: { type: Boolean, default: false },
     walletBalance: { type: Number, default: 0 },
-    status: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" }, 
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+    },
   },
   { timestamps: true }
 );

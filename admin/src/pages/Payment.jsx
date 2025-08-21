@@ -7,15 +7,19 @@ import { toast } from "react-hot-toast";
 const WHATSAPP_LINK = "https://api.whatsapp.com/send?phone=9033197427";
 
 const Payment = () => {
+   const [formData, setFormData] = useState({
+    amount: 0,
+    paymentMethod: "",
+  });
   const location = useLocation();
   const navigate = useNavigate();
 
   // formData passed from Register page
-  const { formData } = location.state || {};
-  if (!formData) {
-    navigate("/register");
-    return null;
-  }
+  // const { formData } = location.state || {};
+  // if (!formData) {
+  //   navigate("/register");
+  //   return null;
+  // }
 
   const [images, setImages] = useState([]);
   const [paymentRef, setPaymentRef] = useState("");
@@ -58,7 +62,8 @@ const Payment = () => {
     setShowUpiDetails(false);
   };
 
-  const handlePaymentSubmit = () => {
+  const handlePaymentSubmit = async (e) => {
+    e.preventDefault();
     if (!paymentRef.trim()) {
       toast.error("Please enter Unique Transaction Reference");
       return;
@@ -97,7 +102,7 @@ const Payment = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-lg p-8 bg-white rounded-xl shadow-md space-y-6">
         <h2 className="text-3xl font-bold text-gray-900 text-center">
-          Complete Registration Payment
+          Registration Payment
         </h2>
 
         <p className="text-center text-lg font-semibold text-gray-700">

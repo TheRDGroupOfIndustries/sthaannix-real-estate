@@ -358,7 +358,7 @@ const handleOtpSubmit = async (e) => {
       phone: formData.phone,
       name: formData.name,
     });
-      if (res.data.success) {
+      if (response.data.message) {
       toast.success("OTP verified successfully");
       navigate("/payment");
     } else {

@@ -265,9 +265,12 @@ const PrivateRoute = ({ children, allowedRoles }) => {
   const user = getUser();
   if (!user) return <Navigate to="/login" replace />;
 
-  const userRole = user.role?.toLowerCase();
-  if (allowedRoles && !allowedRoles.includes(userRole)) {
-    return <Navigate to={`/${userRole}`} replace />;
+  // const userRole = user.role?.toLowerCase();
+  // if (allowedRoles && !allowedRoles.includes(userRole)) {
+  //   return <Navigate to={`/${userRole}`} replace />;
+  // }
+  if (allowedRoles && !allowedRoles.includes(user.role.toLowerCase())) {
+    return <Navigate to={`/${user.role.toLowerCase()}`} replace />;
   }
 
   return children;
@@ -276,6 +279,16 @@ const PrivateRoute = ({ children, allowedRoles }) => {
 const RoleDashboardRedirect = () => {
   const user = getUser();
   if (!user) return <Navigate to="/login" replace />;
+  // If user is broker/builder/owner and payment not approved, redirect to payment page
+if (["broker", "builder", "owner"].includes(user.role.toLowerCase())) {
+  if (user.paymentStatus === "approved") {
+    return <Navigate to={`/${user.role.toLowerCase()}`} replace />;
+  } else {
+    return <Navigate to="/payment" replace />;
+  }
+} else if (user.role.toLowerCase() === "admin") {
+  return <Navigate to="/admin" replace />;
+}
   const roleSlug = user.role.toLowerCase();
   return <Navigate to={`/${roleSlug}`} replace />;
 };

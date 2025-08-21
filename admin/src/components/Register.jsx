@@ -6,8 +6,8 @@ import { toast } from "react-hot-toast";
 import axios from "axios";
 import { Backendurl } from "../App";
 
-const ROLES = ["Broker", "Builder", "Property Owner"];
-const REGISTRATION_FEE_ROLES = ["Broker", "Builder", "Property Owner"];
+const ROLES = ["Broker", "Builder", "Owner"]; // Removed Admin
+const REGISTRATION_FEE_ROLES = ["Broker", "Builder", "Owner"];
 const REGISTRATION_FEE = 1500;
 
 const Register = () => {
@@ -33,33 +33,38 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.name.trim() || !formData.email.trim() || !formData.password.trim()) {
-      toast.error("Please fill all required fields");
+    // Basic validation
+    if (
+      !formData.name.trim() ||
+      !formData.email.trim() ||
+      !formData.password.trim() ||
+      !formData.role
+    ) {
+      toast.error("Please fill all required fields and select a role");
       return;
     }
 
     setLoading(true);
 
     try {
+      // Call backend register API
       const response = await axios.post(`${Backendurl}/user/register`, formData);
 
       if (response.data.success) {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user));
 
-        toast.success("Registration successful!");
+        toast.success("Registration successful! Please complete your payment");
 
-        // Redirect based on role selection
+        // Role-based dashboard routing
         const role = formData.role.toLowerCase();
-        if (ROLES.map(r => r.toLowerCase()).includes(role)) {
-          navigate("/dashboard");
+        if (["broker", "builder", "owner"].includes(role)) {
+           navigate("/payment");
         } else {
-          // If no role selected, redirect to admin dashboard (admin auto-registers)
-          navigate("/admin");
-        }
-      } else {
-        toast.error(response.data.message || "Registration failed");
-      }
+                // fallback if needed, but admin shouldn't register here
+                 navigate("/admin");
+               }
+}
     } catch (error) {
       console.error("Registration error:", error);
       toast.error(error.response?.data?.message || "An error occurred during registration");

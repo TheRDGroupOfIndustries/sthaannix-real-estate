@@ -506,7 +506,7 @@ const PropertyDetails = () => {
             View on Google Maps
           </a>
         </div>
-
+ 
         {/* Viewing Modal */}
         <AnimatePresence>
           {showSchedule && (

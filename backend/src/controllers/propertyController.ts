@@ -18,7 +18,7 @@ declare global {
 }
 
 const canCreateProperty = (role?: string) =>
-  ["broker", "builder", "owner"].includes(role || "");
+  ["broker", "builder", "owner", "admin"].includes(role || "");
 
 const isOwnerOrAdmin = (
   userId: string,
@@ -26,15 +26,70 @@ const isOwnerOrAdmin = (
   role?: string
 ) => role === "admin" || userId === ownerId.toString();
 
+// export const createProperty = async (req: Request, res: Response) => {
+//   try {
+//     if (!req.user) {
+//       return res.status(401).json({ message: "Unauthorized" });
+//     }
+//     if (!canCreateProperty(req.user.role)) {
+//       return res.status(403).json({ message: "You cannot create properties" });
+//     }
+//     // if (req.user.status === "pending") {
+//     //   return res.status(403).json({
+//     //     message:
+//     //       "Your account is pending approval. You cannot create properties yet.",
+//     //   });
+//     // }  
+//     const {
+//       title,
+//       description,
+//       propertyType,
+//       transactionType,
+//       price,
+//       size,
+//       bhk,
+//       location,
+//       isPromoted,
+//     } = req.body;
+
+//     const uploadedImages: string[] = [];
+//     if (req.files && Array.isArray(req.files)) {
+//       for (const file of req.files as Express.Multer.File[]) {
+//         const result = await uploadFile(file.buffer, "properties/images");
+//         uploadedImages.push(result.secure_url);
+//       }
+//     }
+
+//     const property = new Property({
+//       title,
+//       description,
+//       propertyType,
+//       transactionType,
+//       price,
+//       size,
+//       bhk,
+//       location,
+//       isPromoted,
+//       owner: req.user.id,
+//       images: uploadedImages,
+//       videos: [],
+//     });
+
+//     await property.save();
+//     res.status(201).json(property);
+//   } catch (error) {
+//     console.error("Create Property Error:", error);
+//     res.status(500).json({ message: "Failed to create property", error });
+//   }
+// };
+
+
 
 export const createProperty = async (req: Request, res: Response) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-    if (!canCreateProperty(req.user.role)) {
+    if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+    if (!canCreateProperty(req.user.role))
       return res.status(403).json({ message: "You cannot create properties" });
-    }
 
     const {
       title,
@@ -47,6 +102,9 @@ export const createProperty = async (req: Request, res: Response) => {
       location,
       isPromoted,
     } = req.body;
+
+    // Parse location JSON string if necessary
+    const parsedLocation = typeof location === "string" ? JSON.parse(location) : location;
 
     const uploadedImages: string[] = [];
     if (req.files && Array.isArray(req.files)) {
@@ -61,11 +119,11 @@ export const createProperty = async (req: Request, res: Response) => {
       description,
       propertyType,
       transactionType,
-      price,
-      size,
-      bhk,
-      location,
-      isPromoted,
+      price: Number(price),
+      size: size ? Number(size) : undefined,
+      bhk: bhk ? Number(bhk) : undefined,
+      location: parsedLocation,
+      isPromoted: isPromoted === "true" || isPromoted === true,
       owner: req.user.id,
       images: uploadedImages,
       videos: [],
@@ -82,14 +140,7 @@ export const createProperty = async (req: Request, res: Response) => {
 
 export const getProperties = async (req: Request, res: Response) => {
   try {
-    const {
-      search,
-      minPrice,
-      maxPrice,
-      city,
-      sort,
-      status, 
-    } = req.query as {
+    const { search, minPrice, maxPrice, city, sort, status } = req.query as {
       search?: string;
       minPrice?: string;
       maxPrice?: string;
@@ -135,7 +186,6 @@ export const getProperties = async (req: Request, res: Response) => {
   }
 };
 
-
 export const getPropertyById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -170,18 +220,13 @@ export const updateProperty = async (req: Request, res: Response) => {
     }
 
     if (!isOwnerOrAdmin(req.user.id, property.owner, req.user.role)) {
-      return res.status(403).json({ message: "You cannot update this property" });
+      return res
+        .status(403)
+        .json({ message: "You cannot update this property" });
     }
 
-    const {
-      title,
-      description,
-      price,
-      size,
-      bhk,
-      location,
-      isPromoted,
-    } = req.body;
+    const { title, description, price, size, bhk, location, isPromoted } =
+      req.body;
 
     if (title !== undefined) property.title = title;
     if (description !== undefined) property.description = description;
@@ -199,7 +244,6 @@ export const updateProperty = async (req: Request, res: Response) => {
   }
 };
 
-
 export const deleteProperty = async (req: Request, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
@@ -215,7 +259,9 @@ export const deleteProperty = async (req: Request, res: Response) => {
     }
 
     if (!isOwnerOrAdmin(req.user.id, property.owner, req.user.role)) {
-      return res.status(403).json({ message: "You cannot delete this property" });
+      return res
+        .status(403)
+        .json({ message: "You cannot delete this property" });
     }
 
     await property.deleteOne();

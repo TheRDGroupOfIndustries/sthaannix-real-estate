@@ -15,7 +15,7 @@ export interface IUser extends Document {
   walletBalance: number;
   status: UserStatus; 
 } 
- 
+
 const UserSchema = new Schema<IUser>(
   {
     name: { type: String, required: true },

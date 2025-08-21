@@ -28,12 +28,30 @@ const pageVariants = {
   exit: { opacity: 0, y: -20 },
 };
 
+// const getUser = () => {
+//   if (typeof window !== "undefined" && localStorage.getItem("user")) {
+//     return JSON.parse(localStorage.getItem("user"));
+//   }
+//   return null;
+// };
+
 const getUser = () => {
-  if (typeof window !== "undefined" && localStorage.getItem("user")) {
-    return JSON.parse(localStorage.getItem("user"));
+  if (typeof window !== "undefined") {
+    const value = localStorage.getItem("user");
+    // Only parse if value is valid JSON
+    if (value && value !== "undefined" && value !== "null") {
+      try {
+        return JSON.parse(value);
+      } catch (err) {
+        // Optionally: Remove invalid value from localStorage
+        localStorage.removeItem("user");
+        return null;
+      }
+    }
   }
   return null;
 };
+
 
 const PrivateRoute = ({ children, allowedRoles }) => {
   const user = getUser();

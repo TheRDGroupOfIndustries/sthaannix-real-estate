@@ -13,3 +13,6 @@
 //   IS_ADMIN_KEY: 'isAdmin',
 //   DEFAULT_TOAST_DURATION: 3000
 // };
+
+
+export const Backendurl = "http://localhost:12000"

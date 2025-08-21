@@ -4,9 +4,10 @@ import { motion } from "framer-motion";
 import { Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import axios from "axios";
-import { Backendurl } from "../App";
+import { Backendurl } from "../config/constants.js"
 
 const Login = () => {
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -32,11 +33,13 @@ const Login = () => {
         email,
         password,
       });
+      console.log("res: ",response);
+      
 
-      if (response.data.success) {
+      if (response.status==200) {
         setUserSession(response.data.token, response.data.user);
         localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("user", JSON.stringify(user));
 
         toast.success("Login successful!");
 

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
 // import { backendurl } from '../config/constants';
+import { Backendurl } from "../App";
 import { Upload, X } from 'lucide-react';
 
 const PROPERTY_TYPES = ['House', 'Apartment', 'Office', 'Villa'];
@@ -100,7 +101,7 @@ const PropertyForm = () => {
         formdata.append(`image${index + 1}`, image);
       });
 
-      const response = await axios.post(`${backendurl}`, formdata, {
+      const response = await axios.post(`${Backendurl}`, formdata, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

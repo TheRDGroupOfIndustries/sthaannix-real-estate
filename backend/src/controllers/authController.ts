@@ -186,8 +186,6 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-
-
 //  GET ALL USERS
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
@@ -199,6 +197,37 @@ export const getAllUsers = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("GetAllUsers Error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+// DELETE USER 
+export const deleteUser = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    const user = await User.findByIdAndDelete(id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "User deleted successfully",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error("DeleteUser Error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };

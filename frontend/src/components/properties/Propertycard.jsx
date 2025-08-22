@@ -20,6 +20,32 @@ const PropertyCard = ({ property, viewType }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showControls, setShowControls] = useState(false);
 
+  // Handle image data - convert to array if it's a string
+  const images = Array.isArray(property.image) 
+    ? property.image 
+    : property.image 
+      ? [property.image] 
+      : [];
+
+  // Handle location data - extract string representation
+  const getLocationString = () => {
+    if (typeof property.location === 'string') {
+      return property.location;
+    } else if (property.location && typeof property.location === 'object') {
+      // Handle location object - you can customize this based on your needs
+      if (property.location.address) {
+        return property.location.address;
+      } else if (property.location.city && property.location.state) {
+        return `${property.location.city}, ${property.location.state}`;
+      } else {
+        return 'Location not specified';
+      }
+    }
+    return 'Location not specified';
+  };
+
+  const locationString = getLocationString();
+
   const handleNavigateToDetails = () => {
     navigate(`/properties/single/${property._id}`);
   };
@@ -44,7 +70,7 @@ const PropertyCard = ({ property, viewType }) => {
 
   const handleImageNavigation = (e, direction) => {
     e.stopPropagation();
-    const imagesCount = property.image.length;
+    const imagesCount = images.length;
     if (direction === 'next') {
       setCurrentImageIndex((prev) => (prev + 1) % imagesCount);
     } else {
@@ -71,7 +97,7 @@ const PropertyCard = ({ property, viewType }) => {
         <AnimatePresence mode="wait">
           <motion.img
             key={currentImageIndex}
-            src={property.image[currentImageIndex]}
+            src={images[currentImageIndex] || '/placeholder-image.jpg'}
             alt={property.title}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -82,7 +108,7 @@ const PropertyCard = ({ property, viewType }) => {
         </AnimatePresence>
 
         {/* Image Navigation Controls */}
-        {showControls && property.image.length > 1 && (
+        {showControls && images.length > 1 && (
           <div className="absolute inset-0 flex items-center justify-between px-2">
             <motion.button
               initial={{ opacity: 0 }}
@@ -106,9 +132,9 @@ const PropertyCard = ({ property, viewType }) => {
         )}
 
         {/* Image Indicators */}
-        {property.image.length > 1 && (
+        {images.length > 1 && (
           <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-            {property.image.map((_, index) => (
+            {images.map((_, index) => (
               <div
                 key={index}
                 className={`w-1.5 h-1.5 rounded-full transition-all duration-300
@@ -157,7 +183,7 @@ const PropertyCard = ({ property, viewType }) => {
           <div className="flex items-center justify-between">
             <div className="flex items-center text-gray-500 text-sm">
               <MapPin className="w-4 h-4 mr-2 text-blue-500" />
-              {property.location}
+              {locationString}
             </div>
             <div className="flex items-center gap-1 text-gray-500 text-sm">
               <Eye className="w-4 h-4" />
@@ -169,7 +195,7 @@ const PropertyCard = ({ property, viewType }) => {
             group-hover:text-blue-600 transition-colors">
             {property.title}
           </h3>
- 
+
           <div className="flex items-center gap-2">
             <div className="flex-1">
               <p className="text-sm text-gray-500 mb-1">Price</p>

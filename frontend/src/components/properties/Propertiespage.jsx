@@ -1,4 +1,3 @@
-// src/components/PropertiesPage.jsx
 import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
@@ -6,9 +5,8 @@ import { Grid, List, SlidersHorizontal, MapPin, Home } from "lucide-react";
 import SearchBar from "./Searchbar.jsx";
 import FilterSection from "./Filtersection.jsx";
 import PropertyCard from "./Propertycard.jsx";
-// import { Backendurl } from "../../App.jsx";
 import { getLocalStorage, setLocalStorage } from "../../utils/localStorageUtil.js";
-// import { fetchProperties } from "../api/propertyApi"; // Uncomment when backend API ready
+import { fetchProperties } from "../../services/property-InqueryService.js"; 
 
 const LOCAL_STORAGE_KEY = "properties";
 
@@ -36,10 +34,9 @@ const PropertiesPage = () => {
     sortBy: "",
   });
 
-  const fetchProperties = async () => {
+  const fetchPropertiesHandler = async () => {
     try {
       setPropertyState((prev) => ({ ...prev, loading: true }));
-      // Future: Uncomment to fetch data from backend API
       const propertiesFromAPI = await fetchProperties();
       setPropertyState((prev) => ({
         ...prev,
@@ -72,7 +69,7 @@ const PropertiesPage = () => {
 
   useEffect(() => {
     if (!propertyState.properties || propertyState.properties.length === 0) {
-      fetchProperties();
+      fetchPropertiesHandler();
     }
   }, []);
 

@@ -109,4 +109,23 @@ export const adminAPI = {
     api.patch(`/admin/reject-property/${id}`, { reason }),
 };
 
+
+
+// Payments API calls
+export const paymentsAPI = {
+  // User actions
+  submitProof: (formData) =>
+    api.post('/payment/submit-proof', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+  myPayments: () => api.get('/payment/my-payments'),
+
+  // Admin actions
+  getAll: () => api.get('/payment/admin/all'),
+  approve: (id) => api.patch(`/payment/admin/approve/${id}`),
+  reject: (id, reason) => api.patch(`/payment/admin/reject/${id}`, { reason }),
+};
+
+
 export default api;
+

@@ -281,7 +281,7 @@ const RoleDashboardRedirect = () => {
   if (!user) return <Navigate to="/login" replace />;
   // If user is broker/builder/owner and payment not approved, redirect to payment page
 if (["broker", "builder", "owner"].includes(user.role.toLowerCase())) {
-  if (user.paymentStatus === "approved") {
+  if (user.status === "approved") {
     return <Navigate to={`/${user.role.toLowerCase()}`} replace />;
   } else {
     return <Navigate to="/payment" replace />;

@@ -15,7 +15,7 @@ export interface IAdminRevenue extends Document {
     budget: number;
     adminShare: number; // 33.33% of budget
   }[];
-  totalAdRevenue: number; // Sum of all admin ad shares
+  totalAdRevenue: number; // Sum of all admin  shares
   finalRevenue: number; // totalRegistrationFees + totalAdRevenue
 }
 

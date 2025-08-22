@@ -69,7 +69,7 @@ export const createTopUpRequest = async (req: Request, res: Response) => {
       amount: numericAmount,
       proofUrl: uploaded.secure_url,
       status: "pending",
-      utrNo: utrNo || undefined, //  Optional
+      utrNo: utrNo || undefined, // ✅ Optional
     });
 
     res.status(201).json({
@@ -89,7 +89,7 @@ export const listTopUpRequests = async (req: Request, res: Response) => {
     const { status, utrNo } = req.query as { status?: string; utrNo?: string };
     const query: any = {};
     if (status) query.status = status;
-    if (utrNo) query.utrNo = utrNo; //  Allow filtering by UTR number
+    if (utrNo) query.utrNo = utrNo; // ✅ Allow filtering by UTR number
 
     const requests = await TopUpRequest.find(query)
       .populate("user", "name email")

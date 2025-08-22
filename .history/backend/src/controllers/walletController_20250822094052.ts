@@ -69,7 +69,7 @@ export const createTopUpRequest = async (req: Request, res: Response) => {
       amount: numericAmount,
       proofUrl: uploaded.secure_url,
       status: "pending",
-      utrNo: utrNo || undefined, //  Optional
+      utrNo: utrNo || undefined, // ✅ Optional
     });
 
     res.status(201).json({

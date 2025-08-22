@@ -32,7 +32,7 @@ const TopUpRequestSchema = new Schema<ITopUpRequest>(
     reviewedBy: { type: Schema.Types.ObjectId, ref: "User" },
     reviewedAt: { type: Date },
     reason: { type: String },
-    utrNo: { type: String ,unique: true, sparse: true}, // Optional field
+    utrNo: { type: String }, // Optional field
   },
   { timestamps: true }
 );

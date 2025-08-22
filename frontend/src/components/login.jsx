@@ -104,7 +104,6 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({

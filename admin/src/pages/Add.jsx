@@ -930,7 +930,6 @@ const PropertyForm = () => {
         } else if (key === "location") {
           formPayload.append("location", JSON.stringify(payload.location));
         } else if (["price", "size", "bhk", "bathroom"].includes(key)) {
-          // convert numbers to strings
           formPayload.append(key, payload[key] ? payload[key].toString() : "");
         } else {
           formPayload.append(key, payload[key] || "");

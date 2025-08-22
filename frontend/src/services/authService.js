@@ -4,7 +4,7 @@ import { Backendurl } from "../App";
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 const api = axios.create({
-  baseURL:"http://localhost:5000",
+  baseURL:"http://localhost:12000",
   headers: {
     "Content-Type": "application/json",
   },

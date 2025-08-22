@@ -338,6 +338,37 @@ const Register = () => {
   };
 
   // Submit OTP for verification
+// const handleOtpSubmit = async (e) => {
+//   e.preventDefault();
+
+//   if (otp.some((digit) => !digit)) {
+//     toast.error("Please enter the full OTP");
+//     return;
+//   }
+
+//   setLoading(true);
+
+//   try {
+//     const otpValue = otp.join("");
+//     const response = await axios.post(`${Backendurl}/user/verify-otp`, {
+//       email: formData.email.trim(),
+//       otp: otpValue,
+//       password: formData.password.trim(),
+//        role: formData.role.toLowerCase(),
+//       phone: formData.phone,
+//       name: formData.name,
+//     });
+//       if (response.data.message) {
+//       toast.success("OTP verified successfully");
+//       navigate("/payment");
+//     } else {
+//       toast.error(res.data.message || "OTP verification failed");
+//     }
+//   } catch (err) {
+//     toast.error(err.response?.data?.message || "OTP verification failed");
+//   }
+// };
+
 const handleOtpSubmit = async (e) => {
   e.preventDefault();
 
@@ -354,18 +385,25 @@ const handleOtpSubmit = async (e) => {
       email: formData.email.trim(),
       otp: otpValue,
       password: formData.password.trim(),
-       role: formData.role.toLowerCase(),
+      role: formData.role.toLowerCase(),
       phone: formData.phone,
       name: formData.name,
     });
-      if (response.data.message) {
+
+    if (response.data.message) {
       toast.success("OTP verified successfully");
       navigate("/payment");
     } else {
-      toast.error(res.data.message || "OTP verification failed");
+      toast.error(response.data.message || "OTP verification failed");
+      // Reset OTP inputs on failure so user can try again
+      setOtp(Array(OTP_LENGTH).fill(""));
     }
   } catch (err) {
     toast.error(err.response?.data?.message || "OTP verification failed");
+    // Reset OTP inputs on error so user can try again
+    setOtp(Array(OTP_LENGTH).fill(""));
+  } finally {
+    setLoading(false);
   }
 };
 

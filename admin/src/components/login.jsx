@@ -352,16 +352,18 @@ const Login = () => {
 
         localStorage.setItem("token", token);
         if (["broker", "builder", "owner"].includes(role)) {
-          if (response.data.user.paymentStatus === "approved") {
-            navigate("/dashboard");
-          } else {
-            navigate("/payment");
-          }
-        } else if (role === "admin") {
-          navigate("/admin");
-        } else {
-          navigate("/login");
-        }
+
+if (response.data.user.status === "approved") {
+    navigate("/dashboard");
+  } else {
+    navigate("/payment");
+  }
+} else if (role === "admin") {
+  navigate("/admin");
+} else {
+  navigate("/login");
+}
+
       } else {
         toast.error(response.data.message || "Invalid credentials");
       }

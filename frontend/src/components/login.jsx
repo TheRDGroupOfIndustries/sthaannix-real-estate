@@ -3,64 +3,64 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { 
-  Loader, 
-  Mail, 
-  Lock, 
-  Sparkles, 
-  Shield, 
-  ArrowRight, 
+import {
+  Loader,
+  Mail,
+  Lock,
+  Sparkles,
+  Shield,
+  ArrowRight,
   Home,
   CheckCircle,
   User,
-  Key
+  Key,
 } from "lucide-react";
 // import { Backendurl } from "../App";
 import { toast } from "react-toastify";
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from "../context/AuthContext";
 import { loginUser } from "../services/authService";
 
 // Enhanced Animation Variants
 const containerVariants = {
   hidden: { opacity: 0, y: 30 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     transition: {
       duration: 0.6,
       ease: "easeOut",
       staggerChildren: 0.1,
-      delayChildren: 0.2
-    }
+      delayChildren: 0.2,
+    },
   },
-  exit: { opacity: 0, y: -20 }
+  exit: { opacity: 0, y: -20 },
 };
 
 const cardVariants = {
   hidden: { opacity: 0, scale: 0.95, y: 20 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     scale: 1,
     y: 0,
     transition: {
       type: "spring",
       stiffness: 100,
       damping: 20,
-      duration: 0.8
-    }
-  }
+      duration: 0.8,
+    },
+  },
 };
 
 const inputVariants = {
   hidden: { opacity: 0, x: -20 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     x: 0,
     transition: {
       duration: 0.5,
-      ease: "easeOut"
-    }
-  }
+      ease: "easeOut",
+    },
+  },
 };
 
 const floatingAnimation = {
@@ -68,8 +68,8 @@ const floatingAnimation = {
   transition: {
     duration: 4,
     repeat: Infinity,
-    ease: "easeInOut"
-  }
+    ease: "easeInOut",
+  },
 };
 
 const sparkleAnimation = {
@@ -78,24 +78,23 @@ const sparkleAnimation = {
   transition: {
     duration: 3,
     repeat: Infinity,
-    ease: "easeInOut"
-  }
+    ease: "easeInOut",
+  },
 };
 
 const pulseAnimation = {
   scale: [1, 1.05, 1],
-  transition: { 
+  transition: {
     duration: 2,
     repeat: Infinity,
-    ease: "easeInOut"
-  }
+    ease: "easeInOut",
+  },
 };
-
 
 const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
+    password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -106,10 +105,12 @@ const Login = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
+    console.log(formData.email);
+    console.log(formData.password);
   };
 
   const handleSubmit = async (e) => {
@@ -117,7 +118,7 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await loginUser(formData);
-      if (response.data.success) {
+      if (response.data) {
         await login(response.data.token, response.data.user);
         toast.success("Login successful!");
         navigate("/");
@@ -141,22 +142,22 @@ const Login = () => {
       </div>
 
       {/* Animated Background Elements */}
-      <motion.div 
+      <motion.div
         className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 rounded-full blur-xl"
         animate={floatingAnimation}
       />
-      <motion.div 
+      <motion.div
         className="absolute bottom-32 right-32 w-40 h-40 bg-gradient-to-br from-purple-400/20 to-pink-500/20 rounded-full blur-xl"
         animate={{
           ...floatingAnimation,
-          transition: { ...floatingAnimation.transition, delay: 1 }
+          transition: { ...floatingAnimation.transition, delay: 1 },
         }}
       />
-      <motion.div 
+      <motion.div
         className="absolute top-1/2 left-10 w-24 h-24 bg-gradient-to-br from-green-400/20 to-blue-500/20 rounded-full blur-xl"
         animate={{
           ...floatingAnimation,
-          transition: { ...floatingAnimation.transition, delay: 2 }
+          transition: { ...floatingAnimation.transition, delay: 2 },
         }}
       />
 
@@ -175,27 +176,27 @@ const Login = () => {
             {/* Decorative Elements */}
             <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-blue-500/20 to-indigo-600/20 rounded-full blur-xl"></div>
             <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-gradient-to-br from-purple-500/20 to-pink-600/20 rounded-full blur-xl"></div>
-            
+
             <div className="relative p-8 pt-12">
               {/* Logo & Title Section */}
-              <motion.div 
+              <motion.div
                 className="text-center mb-10"
                 variants={inputVariants}
               >
                 <Link to="/" className="inline-block group">
-                  <motion.div 
+                  <motion.div
                     className="flex items-center justify-center gap-3 mb-6"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <motion.div 
+                    <motion.div
                       className="p-3 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl shadow-lg"
                       animate={pulseAnimation}
                     >
                       <Home className="w-6 h-6 text-white" />
                     </motion.div>
                     <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                     Sthaanix
+                      Sthaanix
                     </h1>
                     <motion.div
                       animate={sparkleAnimation}
@@ -205,13 +206,15 @@ const Login = () => {
                     </motion.div>
                   </motion.div>
                 </Link>
-                
+
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
                 >
-                  <h2 className="text-2xl font-bold text-gray-800 mb-2">Welcome back!</h2>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                    Welcome back!
+                  </h2>
                   <p className="text-gray-600 flex items-center justify-center gap-2">
                     <Shield className="w-4 h-4 text-blue-500" />
                     Sign in to your secure account
@@ -220,17 +223,17 @@ const Login = () => {
               </motion.div>
 
               {/* Enhanced Form */}
-              <motion.form 
-                onSubmit={handleSubmit} 
+              <motion.form
+                onSubmit={handleSubmit}
                 className="space-y-6"
                 variants={inputVariants}
               >
                 {/* Email Field */}
-                <motion.div 
-                  className="space-y-2"
-                  variants={inputVariants}
-                >
-                  <label htmlFor="email" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                <motion.div className="space-y-2" variants={inputVariants}>
+                  <label
+                    htmlFor="email"
+                    className="flex items-center gap-2 text-sm font-semibold text-gray-700"
+                  >
                     <Mail className="w-4 h-4 text-blue-500" />
                     Email address
                   </label>
@@ -248,9 +251,13 @@ const Login = () => {
                       placeholder="name@company.com"
                       whileFocus={{ scale: 1.02 }}
                     />
-                    <motion.div 
+                    <motion.div
                       className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                      animate={emailFocused ? { scale: 1.1, color: "#3B82F6" } : { scale: 1 }}
+                      animate={
+                        emailFocused
+                          ? { scale: 1.1, color: "#3B82F6" }
+                          : { scale: 1 }
+                      }
                     >
                       <User className="w-5 h-5" />
                     </motion.div>
@@ -258,11 +265,11 @@ const Login = () => {
                 </motion.div>
 
                 {/* Password Field */}
-                <motion.div 
-                  className="space-y-2"
-                  variants={inputVariants}
-                >
-                  <label htmlFor="password" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                <motion.div className="space-y-2" variants={inputVariants}>
+                  <label
+                    htmlFor="password"
+                    className="flex items-center gap-2 text-sm font-semibold text-gray-700"
+                  >
                     <Lock className="w-4 h-4 text-blue-500" />
                     Password
                   </label>
@@ -280,9 +287,13 @@ const Login = () => {
                       placeholder="••••••••"
                       whileFocus={{ scale: 1.02 }}
                     />
-                    <motion.div 
+                    <motion.div
                       className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                      animate={passwordFocused ? { scale: 1.1, color: "#3B82F6" } : { scale: 1 }}
+                      animate={
+                        passwordFocused
+                          ? { scale: 1.1, color: "#3B82F6" }
+                          : { scale: 1 }
+                      }
                     >
                       <Key className="w-5 h-5" />
                     </motion.div>
@@ -291,14 +302,18 @@ const Login = () => {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100"
                     >
-                      {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+                      {showPassword ? (
+                        <FaEyeSlash size={18} />
+                      ) : (
+                        <FaEye size={18} />
+                      )}
                     </button>
                   </div>
                 </motion.div>
 
                 {/* Forgot Password Link */}
                 <div className="flex items-center justify-end">
-                  <Link 
+                  <Link
                     to="/forgot-password"
                     className="text-sm text-blue-600 hover:text-blue-700 transition-colors font-medium hover:underline"
                   >

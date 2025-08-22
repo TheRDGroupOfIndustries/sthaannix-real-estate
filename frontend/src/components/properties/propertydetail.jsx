@@ -14,11 +14,13 @@ import {
   ChevronRight,
   Copy,
   Compass,
+  Building,
+  MessageCircle
 } from "lucide-react";
-import { Backendurl } from "../../App.jsx";
+// import { Backendurl } from "../../App.jsx";
 import ScheduleViewing from "./ScheduleViewing";
 import { getLocalStorage, setLocalStorage } from "../../utils/localStorageUtil.js";
-// import { fetchPropertyDetail } from "../api/propertyApi"; // Uncomment when backend ready
+import { fetchPropertyDetail, submitInquiry} from "../../services/property-InqueryService.js"; 
 
 const LOCAL_STORAGE_PREFIX = "propertyDetail_";
 
@@ -40,30 +42,73 @@ const PropertyDetails = () => {
   const [inquirySubmitting, setInquirySubmitting] = useState(false);
   const [inquirySuccess, setInquirySuccess] = useState(false);
 
+  //image data safely
+   const images = property?.image 
+    ? Array.isArray(property.image) 
+      ? property.image 
+      : [property.image]
+    : [];
+
+    // Safely get location string (handle both string and object)
+  const getLocationString = () => {
+    if (!property?.location) return 'Location not specified';
+    
+    if (typeof property.location === 'string') {
+      return property.location;
+    }
+    
+    if (typeof property.location === 'object') {
+      // Handle location object - extract the most relevant field
+      if (property.location.address) return property.location.address;
+      if (property.location.city && property.location.state) {
+        return `${property.location.city}, ${property.location.state}`;
+      }
+      if (property.location.city) return property.location.city;
+      if (property.location.state) return property.location.state;
+      
+      // Fallback: stringify the object (for debugging)
+      return JSON.stringify(property.location);
+    }
+    
+    return String(property.location);
+  };
+
+  const locationString = getLocationString();
+
+    // WhatsApp message template
+  const whatsappMessage = `Hello! I'm interested in your property: ${property?.title || ''} at ${property?.location || ''}. Price: ₹${Number(property?.price || 0).toLocaleString("en-IN")}. Please contact me for more details.`;
+  const encodedMessage = encodeURIComponent(whatsappMessage);
+  const whatsappUrl = `https://wa.me/919876543210?text=${encodedMessage}`;
+
   useEffect(() => {
     const fetchProperty = async () => {
       try {
         setLoading(true);
 
-        // Future backend API fetch
-        // const propertyData = await fetchPropertyDetail(id);
-        // setProperty({
-        //   ...propertyData,
-        //   amenities: parseAmenities(propertyData.amenities),
-        // });
-        // setLocalStorage(localStorageKey, propertyData);
-        // setError(null);
+      const propertyData = await fetchPropertyDetail(id);
+      // setProperty(propertyData);
+      // setLocalStorage(localStorageKey, propertyData);  
 
-        // No backend fallback: use localStorage or error
-        if (!property) {
-          setError("Failed to load property details. No local data found.");
-        } else {
-          setProperty((prev) => ({
-            ...prev,
-            amenities: parseAmenities(prev?.amenities),
-          }));
+        // if (!property) {
+        //   setError("Failed to load property details. No local data found.");
+        // } else {
+        //   setProperty((prev) => ({
+        //     ...prev,
+        //     amenities: parseAmenities(prev?.amenities),
+        //   }));
+        //   setError(null);
+        // }
+
+       if (propertyData) {
+          const processedProperty = {
+            ...propertyData,
+            amenities: parseAmenities(propertyData?.amenities),
+          };
+          setProperty(processedProperty);
           setError(null);
-        }
+        } else {
+          setError("Failed to load property details. No data found.");
+        }  
       } catch (err) {
         console.error("Error fetching property details:", err);
         setError("Failed to load property details. Please try again.");
@@ -75,7 +120,7 @@ const PropertyDetails = () => {
     if (!property) {
       fetchProperty();
     }
-  }, [id]);
+  }, [id, property]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -88,18 +133,41 @@ const PropertyDetails = () => {
     }
   }, [property, localStorageKey]);
 
-  const parseAmenities = (amenities) => {
-    if (!amenities || !Array.isArray(amenities)) return [];
+  // const parseAmenities = (amenities) => {
+  //   if (!amenities || !Array.isArray(amenities)) return [];
 
-    try {
-      if (typeof amenities[0] === "string") {
-        return JSON.parse(amenities[0].replace(/'/g, '"'));
-      }
-      return amenities;
-    } catch (error) {
-      console.error("Error parsing amenities:", error);
-      return [];
+  //   try {
+  //     if (typeof amenities[0] === "string") {
+  //       return JSON.parse(amenities[0].replace(/'/g, '"'));
+  //     }
+  //     return amenities;
+  //   } catch (error) {
+  //     console.error("Error parsing amenities:", error);
+  //     return [];
+  //   }
+  // };
+
+  const parseAmenities = (amenities) => {
+    if (!amenities) return [];
+    
+    if (Array.isArray(amenities)) {
+      // If it's already an array, return it
+      return amenities.filter(amenity => amenity && typeof amenity === 'string');
     }
+    
+    if (typeof amenities === 'string') {
+      try {
+        // Try to parse JSON string
+        const parsed = JSON.parse(amenities.replace(/'/g, '"'));
+        return Array.isArray(parsed) ? parsed : [parsed];
+      } catch (error) {
+        console.error("Error parsing amenities:", error);
+        // If parsing fails, split by comma or return as single item array
+        return amenities.split(',').map(item => item.trim()).filter(Boolean);
+      }
+    }
+    
+    return [];
   };
 
   const handleKeyNavigation = useCallback(
@@ -116,7 +184,7 @@ const PropertyDetails = () => {
         setShowSchedule(false);
       }
     },
-    [property?.image?.length, showSchedule]
+    [images.length, showSchedule]
   );
 
   useEffect(() => {
@@ -129,7 +197,7 @@ const PropertyDetails = () => {
       if (navigator.share) {
         await navigator.share({
           title: property.title,
-          text: `Check out this ${property.type}: ${property.title}`,
+          text: `Check out this ${property.type || 'property'}: ${property.title|| ''}`,
           url: window.location.href,
         });
       } else {
@@ -163,26 +231,11 @@ const PropertyDetails = () => {
     setInquirySubmitting(true);
 
     try {
-      // Future API call to send inquiry
-      // const token = localStorage.getItem("token");
-      // if (!token) {
-      //   alert("Please log in to submit inquiry.");
-      //   setInquirySubmitting(false);
-      //   return;
-      // }
-      // await axios.post(
-      //   `${Backendurl}/api/inquiries`,
-      //   {
-      //     propertyId: property._id,
-      //     ...inquiryData,
-      //   },
-      //   {
-      //     headers: {
-      //       Authorization: `Bearer ${token}`,
-      //       "Content-Type": "application/json",
-      //     },
-      //   }
-      // );
+      await submitInquiry({
+        propertyId: property._id,
+        propertyTitle: property.title,
+        ...inquiryData,
+      });
 
       // For now simulate success
       setInquirySuccess(true);
@@ -206,7 +259,23 @@ const PropertyDetails = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 pt-16">
-        {/* Your existing loading skeleton UI unchanged */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/4 mb-8"></div>
+            <div className="h-96 bg-gray-200 rounded-xl mb-8"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <div className="h-32 bg-gray-200 rounded-lg"></div>
+                <div className="h-24 bg-gray-200 rounded-lg"></div>
+                <div className="h-12 bg-gray-200 rounded-lg"></div>
+              </div>
+              <div className="space-y-6">
+                <div className="h-32 bg-gray-200 rounded-lg"></div>
+                <div className="h-48 bg-gray-200 rounded-lg"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -268,10 +337,12 @@ const PropertyDetails = () => {
         {/* Image gallery */}
         <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
           <div className="relative h-[500px] bg-gray-100 rounded-xl overflow-hidden">
+
+            {images.length > 0 ? (
             <AnimatePresence mode="wait">
               <motion.img
                 key={activeImage}
-                src={property.image[activeImage]}
+                src={images[activeImage]}
                 alt={`${property.title} - View ${activeImage + 1}`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -280,13 +351,18 @@ const PropertyDetails = () => {
                 className="w-full h-full"
               />
             </AnimatePresence>
+               ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                <span className="text-gray-500">No image available</span>
+              </div>
+            )}
 
-            {property.image.length > 1 && (
+            {images.length > 1 && (
               <>
                 <button
                   onClick={() =>
                     setActiveImage((prev) =>
-                      prev === 0 ? property.image.length - 1 : prev - 1
+                      prev === 0 ? images.length - 1 : prev - 1
                     )
                   }
                   className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full
@@ -294,10 +370,11 @@ const PropertyDetails = () => {
                 >
                   <ChevronLeft className="w-6 h-6" />
                 </button>
+
                 <button
                   onClick={() =>
                     setActiveImage((prev) =>
-                      prev === property.image.length - 1 ? 0 : prev + 1
+                      prev === images.length - 1 ? 0 : prev + 1
                     )
                   }
                   className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full
@@ -308,12 +385,14 @@ const PropertyDetails = () => {
               </>
             )}
 
+            {images.length > 0 && (
             <div
               className="absolute bottom-4 left-1/2 -translate-x-1/2 
               bg-black/50 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm"
             >
               {activeImage + 1} / {property.image.length}
             </div>
+            )}
           </div>
         </div>
 
@@ -389,6 +468,20 @@ const PropertyDetails = () => {
               {inquirySuccess && (
                 <p className="mb-4 text-green-600 font-medium">Inquiry sent successfully!</p>
               )}
+
+              {/* WhatsApp Button */}
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full bg-green-600 text-white py-3 rounded-lg 
+                        hover:bg-green-700 transition-colors flex items-center 
+                        justify-center gap-2 mb-6"
+              >
+                <MessageCircle className="w-5 h-5" />
+                Chat on WhatsApp
+              </a>
+
               <form onSubmit={handleInquirySubmit} className="space-y-4">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700">
@@ -475,6 +568,7 @@ const PropertyDetails = () => {
               <p className="text-gray-600 leading-relaxed">{property.description}</p>
             </div>
 
+            {property.amenities && property.amenities.length > 0 && (
             <div className="mb-6">
               <h2 className="text-xl font-semibold mb-4">Amenities</h2>
               <div className="grid grid-cols-2 gap-4">
@@ -486,18 +580,20 @@ const PropertyDetails = () => {
                 ))}
               </div>
             </div>
+            )}
           </div>
-        </div>
+       </div>
 
         {/* Map Location */}
+         {locationString && locationString !== 'Location not specified' && (
         <div className="mt-8 p-6 bg-blue-50 rounded-xl">
           <div className="flex items-center gap-2 text-blue-600 mb-4">
             <Compass className="w-5 h-5" />
             <h3 className="text-lg font-semibold">Location</h3>
           </div>
-          <p className="text-gray-600 mb-4">{property.location}</p>
+          <p className="text-gray-600 mb-4">{locationString}</p>
           <a
-            href={`https://maps.google.com/?q=${encodeURIComponent(property.location)}`}
+            href={`https://maps.google.com/?q=${encodeURIComponent(locationString)}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700"
@@ -506,6 +602,7 @@ const PropertyDetails = () => {
             View on Google Maps
           </a>
         </div>
+        )}
  
         {/* Viewing Modal */}
         <AnimatePresence>
@@ -514,8 +611,8 @@ const PropertyDetails = () => {
               propertyId={property._id}
               onClose={() => setShowSchedule(false)}
               propertyTitle={property.title}
-              propertyLocation={property.location}
-              propertyImage={property.image?.[0]}
+              propertyLocation={locationString}
+              propertyImage={images[0]}
             />
           )}
         </AnimatePresence>

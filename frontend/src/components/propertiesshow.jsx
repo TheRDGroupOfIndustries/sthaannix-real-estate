@@ -14,8 +14,10 @@ import {
   Search
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Backendurl } from '../App';
+// import { Backendurl } from '../App';
 import PropTypes from "prop-types";
+import { fetchProperties } from "../services/property-InqueryService"; 
+
 
 // Sample featured properties for fallback
 const sampleProperties = [
@@ -220,14 +222,13 @@ const PropertiesShow = () => {
   };
 
   useEffect(() => {
-    const fetchProperties = async () => {
+    const loadProperties = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${Backendurl}/api/products/list`);
-        
-        if (response.data.success) {
+         const response = await fetchProperties();        
+        if (response.success) {
           // Take only the first 6 properties for featured section
-          const featuredProperties = response.data.property.slice(0, 6);
+          const featuredProperties = response.property.slice(0, 6);
           setProperties(featuredProperties);
         } else {
           setError('Failed to fetch properties');
@@ -244,7 +245,7 @@ const PropertiesShow = () => {
       }
     };
 
-    fetchProperties();
+   loadProperties();
   }, []);
 
   const filteredProperties = activeCategory === 'all' 

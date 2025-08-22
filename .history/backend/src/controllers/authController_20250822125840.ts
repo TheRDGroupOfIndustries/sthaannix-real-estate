@@ -254,8 +254,11 @@ export const requestRoleUpgrade = async (req: Request, res: Response) => {
   }
 };
 
+// controllers/userController.ts
+import { Request, Response } from "express";
+import bcrypt from "bcrypt";
+import User from "../models/User";
 
-//UPDATE NAME,EMAIL,PASS
 export const updateUserProfile = async (req: Request, res: Response) => {
   try {
     if (!req.user) {
@@ -269,7 +272,7 @@ export const updateUserProfile = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    //  Update allowed fields only
+    // ✅ Update allowed fields only
     if (name) user.name = name;
     if (email) {
       // check if email already taken

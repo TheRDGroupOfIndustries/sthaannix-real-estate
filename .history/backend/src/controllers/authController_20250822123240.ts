@@ -255,59 +255,6 @@ export const requestRoleUpgrade = async (req: Request, res: Response) => {
 };
 
 
-//UPDATE NAME,EMAIL,PASS
-export const updateUserProfile = async (req: Request, res: Response) => {
-  try {
-    if (!req.user) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    const { name, email, password } = req.body;
-
-    const user = await User.findById(req.user.id);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    //  Update allowed fields only
-    if (name) user.name = name;
-    if (email) {
-      // check if email already taken
-      const existing = await User.findOne({ email, _id: { $ne: user._id } });
-      if (existing) {
-        return res.status(400).json({ message: "Email already in use" });
-      }
-      user.email = email;
-    }
-    if (password) {
-      if (password.length < 8) {
-        return res
-          .status(400)
-          .json({ message: "Password must be at least 8 characters long" });
-      }
-      user.password = await bcrypt.hash(password, 10);
-    }
-
-    await user.save();
-
-    res.status(200).json({
-      message: "Profile updated successfully",
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        isVerified: user.isVerified,
-        walletBalance: user.walletBalance,
-        status: user.status,
-      },
-    });
-  } catch (error) {
-    console.error("UpdateUserProfile Error:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-};
-
 
 
 

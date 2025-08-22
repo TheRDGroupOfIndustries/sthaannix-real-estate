@@ -254,8 +254,11 @@ export const requestRoleUpgrade = async (req: Request, res: Response) => {
   }
 };
 
+// controllers/userController.ts
+import { Request, Response } from "express";
+import bcrypt from "bcrypt";
+import User from "../models/User";
 
-//UPDATE NAME,EMAIL,PASS
 export const updateUserProfile = async (req: Request, res: Response) => {
   try {
     if (!req.user) {

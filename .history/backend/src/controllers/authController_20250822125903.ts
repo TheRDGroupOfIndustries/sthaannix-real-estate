@@ -255,7 +255,7 @@ export const requestRoleUpgrade = async (req: Request, res: Response) => {
 };
 
 
-//UPDATE NAME,EMAIL,PASS
+//UPDATE NAME
 export const updateUserProfile = async (req: Request, res: Response) => {
   try {
     if (!req.user) {

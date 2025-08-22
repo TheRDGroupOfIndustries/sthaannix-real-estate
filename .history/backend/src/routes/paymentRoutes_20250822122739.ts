@@ -30,7 +30,6 @@ router.post(
   uploadPaymentProof
 );
 
-
 // route for person who paid to see their payment
 router.get("/my-payments", authenticate, getMyPayments);
 

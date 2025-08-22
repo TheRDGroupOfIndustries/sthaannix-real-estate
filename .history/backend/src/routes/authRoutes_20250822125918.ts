@@ -1,5 +1,5 @@
 import express from "express";
-import { login, register, verifyOtp,getAllUsers,deleteUser ,requestRoleUpgrade,updateUserProfile} from "../controllers/authController";
+import { login, register, verifyOtp,getAllUsers,deleteUser ,requestRoleUpgrade} from "../controllers/authController";
 import { authenticate } from "../middlewares/authenticate";
 import { upload } from "../middlewares/multer";
 
@@ -20,6 +20,6 @@ router.post(
   requestRoleUpgrade
 );
 
-router.put("/profile", authenticate, updateUserProfile);
+
 
 export default router;

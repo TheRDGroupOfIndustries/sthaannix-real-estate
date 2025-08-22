@@ -830,7 +830,6 @@ const PropertyForm = () => {
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
-    console.log(formData.price);
   };
 
   // Image selection handler
@@ -910,10 +909,14 @@ const PropertyForm = () => {
       };
 
       if (
-        !payload.title ||
-        !payload.propertyType ||
-        !payload.transactionType ||
-        !payload.price
+        !payload.title 
+        ||!payload.description
+        ||!payload.propertyType 
+        ||!payload.transactionType
+        ||!payload.price
+        ||!payload.size
+        ||!payload.location
+       
       ) {
         toast.error("Please fill in Title, Type, transactionType, and Price");
         setLoading(false);
@@ -936,7 +939,8 @@ const PropertyForm = () => {
         }
       });
 
-      const response = await http.post("/properties/create", payload);
+      const response = await http.post("/properties/create", formPayload);
+// console.log("properties",response);
 
       toast.success("Property added successfully");
       setFormData({
@@ -1110,6 +1114,38 @@ const PropertyForm = () => {
                 id="location.city"
                 name="location.city"
                 value={formData.location.city}
+                onChange={handleInputChange}
+                className="mt-2 p-2 block w-full rounded-md border border-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="location.pincode"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Pincode
+              </label>
+              <input
+                type="text"
+                id="location.pincode"
+                name="location.pincode"
+                value={formData.location.pincode}
+                onChange={handleInputChange}
+                className="mt-2 p-2 block w-full rounded-md border border-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="location.state"
+                className="block text-sm font-medium text-gray-700"
+              >
+                state
+              </label>
+              <input
+                type="text"
+                id="location.state"
+                name="location.state"
+                value={formData.location.state}
                 onChange={handleInputChange}
                 className="mt-2 p-2 block w-full rounded-md border border-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               />

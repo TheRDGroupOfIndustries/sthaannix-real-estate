@@ -355,7 +355,7 @@ const Login = () => {
         const role = user.role?.toLowerCase();
 
         if (["broker", "builder", "owner"].includes(role)) {
-  if (response.data.user.paymentStatus === "approved") {
+if (response.data.user.status === "approved") {
     navigate("/dashboard");
   } else {
     navigate("/payment");

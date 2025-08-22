@@ -15,9 +15,9 @@
 //     price: '',
 //     location: '',
 //     description: '',
-//     beds: '',
-//     baths: '',
-//     sqft: '',
+//     bhk: '',
+//     bathroom: '',
+//     size: '',
 //     phone: '',
 //     availability: '',
 //     amenities: [],
@@ -81,7 +81,7 @@
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
 //     setLoading(true);
-  
+
 //     try {
 //       const formdata = new FormData();
 //       formdata.append('title', formData.title);
@@ -140,7 +140,7 @@
 //     <div className="min-h-screen pt-10 px-4 bg-gray-50">
 //       <div className="max-w-3xl mx-auto rounded-lg shadow-xl bg-white p-6">
 //         <h2 className="text-2xl font-bold text-gray-900 mb-6">Add New Property</h2>
-        
+
 //         <form onSubmit={handleSubmit} className="space-y-6">
 //           {/* Basic Information */}
 //           <div className="space-y-5">
@@ -422,7 +422,6 @@
 // };
 
 // export default PropertyForm;
-
 
 // import { useState } from 'react';
 // import { toast } from 'react-hot-toast';
@@ -782,86 +781,87 @@
 
 // export default PropertyForm;
 
+import { useState } from "react";
+import { toast } from "react-hot-toast";
+import { Upload, X } from "lucide-react";
+import { propertiesAPI } from "../api/api";
+import axios from "axios";
+import http from "../api/http";
 
-
-import { useState } from 'react';
-import { toast } from 'react-hot-toast';
-import { Upload, X } from 'lucide-react';
-import { propertiesAPI } from '../api/api';
-
-const PROPERTY_TYPES = ['house', 'apartment', 'commercial', 'villa', 'plot'];
-const AVAILABILITY_TYPES = ['buy', 'rent', 'lease'];
+const PROPERTY_TYPES = ["house", "apartment", "commercial", "villa", "plot"];
+const AVAILABILITY_TYPES = ["buy", "rent", "lease"];
 
 const PropertyForm = () => {
   const [formData, setFormData] = useState({
-    title: '',
-    type: '',
-    price: '',
+    title: "",
+    propertyType: "",
+    price: "",
     location: {
-      address: '',
-      city: '',
-      state: '',
-      pincode: '',
-      coordinates: { type: 'Point', coordinates: [0, 0] },
+      address: "",
+      city: "",
+      state: "",
+      pincode: "",
+      coordinates: { type: "Point", coordinates: [0, 0] },
     },
-    description: '',
-    beds: '',
-    baths: '',
-    sqft: '',
-    phone: '',
-    availability: '',
+    description: "",
+    bhk: "",
+    bathroom: "",
+    size: "",
+    phone: "",
+    transactionType: "",
     amenities: [],
     images: [],
   });
 
   const [previewUrls, setPreviewUrls] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [newAmenity, setNewAmenity] = useState('');
+  const [newAmenity, setNewAmenity] = useState("");
 
   // Handle input change (including nested location fields)
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
-    if (name.startsWith('location.')) {
-      const locKey = name.split('.')[1];
-      setFormData(prev => ({
+    if (name.startsWith("location.")) {
+      const locKey = name.split(".")[1];
+      setFormData((prev) => ({
         ...prev,
-        location: { ...prev.location, [locKey]: value }
+        location: { ...prev.location, [locKey]: value },
       }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
+    console.log(formData.price);
   };
 
   // Image selection handler
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     if (files.length + previewUrls.length > 4) {
-      alert('Maximum 4 images allowed');
+      alert("Maximum 4 images allowed");
       return;
     }
-    const newPreviewUrls = files.map(file => URL.createObjectURL(file));
-    setPreviewUrls(prev => [...prev, ...newPreviewUrls]);
-    setFormData(prev => ({ ...prev, images: [...prev.images, ...files] }));
+    const newPreviewUrls = files.map((file) => URL.createObjectURL(file));
+    setPreviewUrls((prev) => [...prev, ...newPreviewUrls]);
+    setFormData((prev) => ({ ...prev, images: [...prev.images, ...files] }));
   };
 
   // Remove image preview and file
   const removeImage = (index) => {
-    setPreviewUrls(prev => prev.filter((_, i) => i !== index));
-    setFormData(prev => ({
+    setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
+    setFormData((prev) => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index)
+      images: prev.images.filter((_, i) => i !== index),
     }));
   };
 
   // Add new amenity (optional)
   const handleAddAmenity = () => {
     if (newAmenity && !formData.amenities.includes(newAmenity)) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        amenities: [...prev.amenities, newAmenity]
+        amenities: [...prev.amenities, newAmenity],
       }));
-      setNewAmenity('');
+      setNewAmenity("");
     }
   };
 
@@ -869,54 +869,101 @@ const PropertyForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    console.log(formData.price);
+
+    // logs for debug
+    {
+      console.log("Title:", formData.title);
+      console.log("Description:", formData.description);
+      console.log("Property Type:", formData.propertyType);
+      console.log("Transaction Type:", formData.transactionType);
+      console.log("Price:", formData.price);
+      console.log("Size:", formData.size);
+      console.log("BHK:", formData.bhk);
+      console.log("Bathroom:", formData.bathroom);
+      console.log("Location:", formData.location);
+      console.log("Is Promoted:", formData.isPromoted);
+      console.log("Phone:", formData.phone);
+    }
+
+    const price = Number(formData.price);
+    if (!price || isNaN(price)) {
+      toast.error("Price must be a valid number");
+      setLoading(false);
+      return;
+    }
+
     try {
       // Map frontend to backend field names and types
       const payload = {
-        title: formData.title,
-        description: formData.description,
-        propertyType: formData.type.toLowerCase(),
-        transactionType: formData.availability.toLowerCase(),
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        propertyType: formData.propertyType.toLowerCase(),
+        transactionType: formData.transactionType.toLowerCase(),
         price: Number(formData.price),
-        size: Number(formData.sqft),
-        bhk: Number(formData.beds),
+        size: formData.size ? Number(formData.size) : undefined,
+        bhk: formData.bhk ? Number(formData.bhk) : undefined,
+        bathroom: formData.bathroom ? Number(formData.bathroom) : undefined,
+
         location: formData.location,
-        // Amenities excluded as backend doesn't have schema for it currently
         images: formData.images,
       };
 
+      if (
+        !payload.title ||
+        !payload.propertyType ||
+        !payload.transactionType ||
+        !payload.price
+      ) {
+        toast.error("Please fill in Title, Type, transactionType, and Price");
+        setLoading(false);
+        return;
+      }
+
       // Build multipart form data
       const formPayload = new FormData();
-      Object.keys(payload).forEach(key => {
-        if (key === 'images') {
-          payload.images.forEach(image => formPayload.append('images', image));
-        } else if (key === 'location') {
-          formPayload.append('location', JSON.stringify(payload.location));
+      Object.keys(payload).forEach((key) => {
+        if (key === "images") {
+          payload.images.forEach((image) =>
+            formPayload.append("images", image)
+          );
+        } else if (key === "location") {
+          formPayload.append("location", JSON.stringify(payload.location));
+        } else if (["price", "size", "bhk", "bathroom"].includes(key)) {
+          // convert numbers to strings
+          formPayload.append(key, payload[key] ? payload[key].toString() : "");
         } else {
-          formPayload.append(key, payload[key]);
+          formPayload.append(key, payload[key] || "");
         }
       });
 
-      await propertiesAPI.create(formPayload);
+      const response = await http.post("/properties/create", payload);
 
-      toast.success('Property added successfully');
+      toast.success("Property added successfully");
       setFormData({
-        title: '',
-        type: '',
-        price: '',
-        location: { address: '', city: '', state: '', pincode: '', coordinates: { type: 'Point', coordinates: [0, 0] } },
-        description: '',
-        beds: '',
-        baths: '',
-        sqft: '',
-        phone: '',
-        availability: '',
+        title: "",
+        propertyType: "",
+        price: "",
+        location: {
+          address: "",
+          city: "",
+          state: "",
+          pincode: "",
+          coordinates: { type: "Point", coordinates: [0, 0] },
+        },
+        description: "",
+        bhk: "",
+        bathroom: "",
+        size: "",
+        phone: "",
+        transactionType: "",
         amenities: [],
         images: [],
       });
       setPreviewUrls([]);
     } catch (error) {
-      console.error('Error adding property:', error);
-      toast.error('An error occurred. Please try again.');
+      console.error("Error adding property:", error);
+      toast.error("An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -925,12 +972,18 @@ const PropertyForm = () => {
   return (
     <div className="min-h-screen pt-10 px-4 bg-gray-50">
       <div className="max-w-3xl mx-auto rounded-lg shadow-xl bg-white p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Add New Property</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          Add New Property
+        </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
-
           {/* Title */}
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700">Property Title</label>
+            <label
+              htmlFor="title"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Property Title
+            </label>
             <input
               type="text"
               id="title"
@@ -944,7 +997,12 @@ const PropertyForm = () => {
 
           {/* Description */}
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Description
+            </label>
             <textarea
               id="description"
               name="description"
@@ -955,37 +1013,51 @@ const PropertyForm = () => {
             />
           </div>
 
-          {/* Property Type & Availability */}
+          {/* Property Type & transactionType */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="type" className="block text-sm font-medium text-gray-700">Property Type</label>
+              <label
+                htmlFor="type"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Property Type
+              </label>
               <select
-                id="type"
-                name="type"
+                id="propertyType"
+                name="propertyType" // ✅ matches state
                 required
-                value={formData.type}
+                value={formData.propertyType} // ✅ correct
                 onChange={handleInputChange}
                 className="mt-2 p-2 block w-full rounded-md border border-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               >
                 <option value="">Select Type</option>
                 {PROPERTY_TYPES.map((type) => (
-                  <option key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>
+                  <option key={type} value={type}>
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                  </option>
                 ))}
               </select>
             </div>
             <div>
-              <label htmlFor="availability" className="block text-sm font-medium text-gray-700">Availability</label>
+              <label
+                htmlFor="transactionType"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Transaction Type
+              </label>
               <select
-                id="availability"
-                name="availability"
+                id="transactionType"
+                name="transactionType"
                 required
-                value={formData.availability}
+                value={formData.transactionType}
                 onChange={handleInputChange}
                 className="mt-2 p-2 block w-full rounded-md border border-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               >
-                <option value="">Select Availability</option>
+                <option value="">Select Transaction Type</option>
                 {AVAILABILITY_TYPES.map((type) => (
-                  <option key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>
+                  <option key={type} value={type}>
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                  </option>
                 ))}
               </select>
             </div>
@@ -994,7 +1066,12 @@ const PropertyForm = () => {
           {/* Price & Location inputs */}
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price</label>
+              <label
+                htmlFor="price"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Price
+              </label>
               <input
                 type="number"
                 id="price"
@@ -1007,7 +1084,12 @@ const PropertyForm = () => {
               />
             </div>
             <div>
-              <label htmlFor="location.address" className="block text-sm font-medium text-gray-700">Address</label>
+              <label
+                htmlFor="location.address"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Address
+              </label>
               <input
                 type="text"
                 id="location.address"
@@ -1018,7 +1100,12 @@ const PropertyForm = () => {
               />
             </div>
             <div>
-              <label htmlFor="location.city" className="block text-sm font-medium text-gray-700">City</label>
+              <label
+                htmlFor="location.city"
+                className="block text-sm font-medium text-gray-700"
+              >
+                City
+              </label>
               <input
                 type="text"
                 id="location.city"
@@ -1030,40 +1117,55 @@ const PropertyForm = () => {
             </div>
           </div>
 
-          {/* Beds, Baths, Sqft */}
+          {/* bhk, bathroom, size */}
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label htmlFor="beds" className="block text-sm font-medium text-gray-700">Bedrooms</label>
+              <label
+                htmlFor="bhk"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Bedrooms
+              </label>
               <input
                 type="number"
-                id="beds"
-                name="beds"
+                id="bhk"
+                name="bhk"
                 min="0"
-                value={formData.beds}
+                value={formData.bhk}
                 onChange={handleInputChange}
                 className="mt-2 p-2 block w-full rounded-md border border-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               />
             </div>
             <div>
-              <label htmlFor="baths" className="block text-sm font-medium text-gray-700">Bathrooms</label>
+              <label
+                htmlFor="bathroom"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Bathrooms
+              </label>
               <input
                 type="number"
-                id="baths"
-                name="baths"
+                id="bathroom"
+                name="bathroom"
                 min="0"
-                value={formData.baths}
+                value={formData.bathroom}
                 onChange={handleInputChange}
                 className="mt-2 p-2 block w-full rounded-md border border-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               />
             </div>
             <div>
-              <label htmlFor="sqft" className="block text-sm font-medium text-gray-700">Square Feet</label>
+              <label
+                htmlFor="size"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Square Feet
+              </label>
               <input
                 type="number"
-                id="sqft"
-                name="sqft"
+                id="size"
+                name="size"
                 min="0"
-                value={formData.sqft}
+                value={formData.size}
                 onChange={handleInputChange}
                 className="mt-2 p-2 block w-full rounded-md border border-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               />
@@ -1072,7 +1174,12 @@ const PropertyForm = () => {
 
           {/* Phone */}
           <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Contact Phone</label>
+            <label
+              htmlFor="phone"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Contact Phone
+            </label>
             <input
               type="tel"
               id="phone"
@@ -1085,11 +1192,17 @@ const PropertyForm = () => {
 
           {/* Images */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Property Images (Max 4)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Property Images (Max 4)
+            </label>
             <div className="grid grid-cols-2 gap-4 mb-4">
               {previewUrls.map((url, index) => (
                 <div key={index} className="relative">
-                  <img src={url} alt={`Preview ${index + 1}`} className="h-40 w-full object-cover rounded-lg" />
+                  <img
+                    src={url}
+                    alt={`Preview ${index + 1}`}
+                    className="h-40 w-full object-cover rounded-lg"
+                  />
                   <button
                     type="button"
                     onClick={() => removeImage(index)}
@@ -1106,7 +1219,10 @@ const PropertyForm = () => {
                 <div className="space-y-1 text-center">
                   <Upload className="mx-auto h-12 w-12 text-gray-400" />
                   <div className="flex text-sm text-gray-600">
-                    <label htmlFor="images" className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500">
+                    <label
+                      htmlFor="images"
+                      className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500"
+                    >
                       <span>Upload images</span>
                       <input
                         id="images"
@@ -1119,7 +1235,9 @@ const PropertyForm = () => {
                       />
                     </label>
                   </div>
-                  <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                  <p className="text-xs text-gray-500">
+                    PNG, JPG, GIF up to 10MB
+                  </p>
                 </div>
               </div>
             )}
@@ -1132,7 +1250,7 @@ const PropertyForm = () => {
               disabled={loading}
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              {loading ? 'Submitting...' : 'Submit Property'}
+              {loading ? "Submitting..." : "Submit Property"}
             </button>
           </div>
         </form>

@@ -6,20 +6,139 @@ import TopUpRequest from "../models/TopUpRequest";
 import mongoose from "mongoose";
 
 
+// export const uploadPaymentProof = async (req: Request, res: Response) => {
+//   try {
+//     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+
+//     const { amount, purpose, utrNumber, proof } = req.body; // proof can be URL
+//     const user = await User.findById(req.user.id);
+
+//     if (!user) return res.status(404).json({ message: "User not found" });
+
+//     if (purpose === "registration" && amount < 1500) {
+//       return res
+//         .status(400)
+//         .json({ message: "Registration fee must be ₹1500 or higher" });
+//     }
+
+//     let screenshot = "";
+
+//     // Case 1: File uploaded
+//     if (req.file) {
+//       const uploaded = await uploadFile(req.file.buffer, "payments/proofs");
+//       screenshot = uploaded.secure_url;
+//     }
+//     // Case 2: Proof URL provided in JSON
+//     else if (proof) {
+//       screenshot = proof;
+//     } else {
+//       return res.status(400).json({ message: "Proof image required (file or URL)" });
+//     }
+
+//     const payment = await Payment.create({
+//       user: user._id,
+//       amount,
+//       purpose,
+//       utrNumber,
+//       screenshot,
+//       status: "pending",
+//     });
+
+//     res.status(201).json({ message: "Payment proof submitted for approval", payment });
+//   } catch (error) {
+//     res.status(500).json({ message: "Payment submission failed", error });
+//   }
+// };
+
+// export const approvePayment = async (req: Request, res: Response) => {
+//   const session = await mongoose.startSession();
+//   session.startTransaction();
+//   try {
+//     if (!req.user || req.user.role !== "admin") {
+//       return res.status(403).json({ message: "Admin access required" });
+//     }
+
+//     const { id } = req.params;
+//     const payment = await Payment.findById(id).session(session);
+
+//     if (!payment) {
+//       await session.abortTransaction();
+//       return res.status(404).json({ message: "Payment not found" });
+//     }
+
+//     if (payment.status !== "pending") {
+//       await session.abortTransaction();
+//       return res.status(400).json({ message: "Payment already processed" });
+//     }
+
+//     const user = await User.findById(payment.user).session(session);
+//     if (!user) {
+//       await session.abortTransaction();
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     payment.status = "approved";
+//     payment.approvedBy = new mongoose.Types.ObjectId(req.user.id);
+//     payment.reviewedAt = new Date(); //  track review date
+//     await payment.save({ session });
+
+//     if (payment.purpose === "registration") {
+//       user.role = "broker";
+//       await user.save({ session });
+//     }
+
+//     if (payment.purpose === "promotion") {
+//       user.walletBalance += payment.amount;
+//       await user.save({ session });
+
+//       await TopUpRequest.create(
+//         [ 
+//           {
+//             user: user._id,
+//             amount: payment.amount,
+//             type: "credit",
+//             note: "Manual top-up approval",
+//             balanceAfter: user.walletBalance,
+//           },
+//         ],
+//         { session }
+//       );
+//     }
+
+//     await session.commitTransaction();
+//     res.json({ message: "Payment approved", payment });
+//   } catch (error) {
+//     await session.abortTransaction();
+//     res.status(500).json({ message: "Approval failed", error });
+//   } finally {
+//     session.endSession();
+//   }
+// };
+
 
 export const uploadPaymentProof = async (req: Request, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
-    const { amount, purpose, utrNumber, proof } = req.body; // proof can be URL
+    const { amount, purpose, utrNumber, proof, requestedRole } = req.body;
     const user = await User.findById(req.user.id);
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
+    // Validate amounts
     if (purpose === "registration" && amount < 1500) {
       return res
         .status(400)
         .json({ message: "Registration fee must be ₹1500 or higher" });
+    }
+
+    // Validate requested role if role-upgrade
+    if (purpose === "role-upgrade") {
+      if (!requestedRole || !["broker", "builder", "owner"].includes(requestedRole)) {
+        return res
+          .status(400)
+          .json({ message: "Valid requestedRole (broker, builder, owner) is required for role-upgrade" });
+      }
     }
 
     let screenshot = "";
@@ -43,9 +162,13 @@ export const uploadPaymentProof = async (req: Request, res: Response) => {
       utrNumber,
       screenshot,
       status: "pending",
+      meta: purpose === "role-upgrade" ? { requestedRole } : undefined,
     });
 
-    res.status(201).json({ message: "Payment proof submitted for approval", payment });
+    res.status(201).json({
+      message: "Payment proof submitted for approval",
+      payment,
+    });
   } catch (error) {
     res.status(500).json({ message: "Payment submission failed", error });
   }
@@ -78,14 +201,18 @@ export const approvePayment = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Approve payment
     payment.status = "approved";
     payment.approvedBy = new mongoose.Types.ObjectId(req.user.id);
-    payment.reviewedAt = new Date(); //  track review date
+    payment.reviewedAt = new Date();
     await payment.save({ session });
 
+    // Handle purposes
     if (payment.purpose === "registration") {
-      user.role = "broker";
-      await user.save({ session });
+      if (req.body.role) {
+        user.role = req.body.role;
+        await user.save({ session });
+      }
     }
 
     if (payment.purpose === "promotion") {
@@ -93,7 +220,7 @@ export const approvePayment = async (req: Request, res: Response) => {
       await user.save({ session });
 
       await TopUpRequest.create(
-        [ 
+        [
           {
             user: user._id,
             amount: payment.amount,
@@ -106,8 +233,26 @@ export const approvePayment = async (req: Request, res: Response) => {
       );
     }
 
+    if (payment.purpose === "role-upgrade") {
+      const requestedRole = payment.meta?.requestedRole;
+      if (requestedRole && ["broker", "builder", "owner"].includes(requestedRole)) {
+        user.role = requestedRole;
+        user.status = "approved"; //  or "pending" if you want extra verification
+        await user.save({ session });
+      }
+    }
+
     await session.commitTransaction();
-    res.json({ message: "Payment approved", payment });
+    res.json({
+      message: "Payment approved successfully",
+      payment,
+      user: {
+        id: user._id,
+        role: user.role,
+        status: user.status,
+        walletBalance: user.walletBalance,
+      },
+    });
   } catch (error) {
     await session.abortTransaction();
     res.status(500).json({ message: "Approval failed", error });
@@ -115,6 +260,7 @@ export const approvePayment = async (req: Request, res: Response) => {
     session.endSession();
   }
 };
+
 
 export const rejectPayment = async (req: Request, res: Response) => {
   try {

@@ -642,7 +642,9 @@ const PropertyListings = () => {
   const fetchProperties = async () => {
     try {
       setLoading(true);
-      const response = await propertiesAPI.get({ status: "approved" }); // Fetch approved properties
+      const response = await propertiesAPI.get({ status: "approved" }); 
+      console.log("res: ",response);
+      
       if (response.data) {
         const parsedProperties = response.data.map(property => ({
           _id: property._id,

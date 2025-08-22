@@ -15,19 +15,27 @@ import {
   Copy,
   Compass,
   Building,
-  MessageCircle
+  MessageCircle,
 } from "lucide-react";
 // import { Backendurl } from "../../App.jsx";
 import ScheduleViewing from "./ScheduleViewing";
-import { getLocalStorage, setLocalStorage } from "../../utils/localStorageUtil.js";
-import { fetchPropertyDetail, submitInquiry} from "../../services/property-InqueryService.js"; 
+import {
+  getLocalStorage,
+  setLocalStorage,
+} from "../../utils/localStorageUtil.js";
+import {
+  fetchPropertyDetail,
+  submitInquiry,
+} from "../../services/property-InqueryService.js";
 
 const LOCAL_STORAGE_PREFIX = "propertyDetail_";
 
 const PropertyDetails = () => {
   const { id } = useParams();
   const localStorageKey = `${LOCAL_STORAGE_PREFIX}${id}`;
-  const [property, setProperty] = useState(() => getLocalStorage(localStorageKey));
+  const [property, setProperty] = useState(() =>
+    getLocalStorage(localStorageKey)
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showSchedule, setShowSchedule] = useState(false);
@@ -43,21 +51,21 @@ const PropertyDetails = () => {
   const [inquirySuccess, setInquirySuccess] = useState(false);
 
   //image data safely
-   const images = property?.image 
-    ? Array.isArray(property.image) 
-      ? property.image 
-      : [property.image]
-    : [];
+  const images = property?.images
+  ? Array.isArray(property.images)
+    ? property.images
+    : [property.images]
+  : [];
 
-    // Safely get location string (handle both string and object)
+  // Safely get location string (handle both string and object)
   const getLocationString = () => {
-    if (!property?.location) return 'Location not specified';
-    
-    if (typeof property.location === 'string') {
+    if (!property?.location) return "Location not specified";
+
+    if (typeof property.location === "string") {
       return property.location;
     }
-    
-    if (typeof property.location === 'object') {
+
+    if (typeof property.location === "object") {
       // Handle location object - extract the most relevant field
       if (property.location.address) return property.location.address;
       if (property.location.city && property.location.state) {
@@ -65,18 +73,22 @@ const PropertyDetails = () => {
       }
       if (property.location.city) return property.location.city;
       if (property.location.state) return property.location.state;
-      
+
       // Fallback: stringify the object (for debugging)
       return JSON.stringify(property.location);
     }
-    
+
     return String(property.location);
   };
 
   const locationString = getLocationString();
 
-    // WhatsApp message template
-  const whatsappMessage = `Hello! I'm interested in your property: ${property?.title || ''} at ${property?.location || ''}. Price: ₹${Number(property?.price || 0).toLocaleString("en-IN")}. Please contact me for more details.`;
+  // WhatsApp message template
+  const whatsappMessage = `Hello! I'm interested in your property: ${
+    property?.title || ""
+  } at ${property?.location || ""}. Price: ₹${Number(
+    property?.price || 0
+  ).toLocaleString("en-IN")}. Please contact me for more details.`;
   const encodedMessage = encodeURIComponent(whatsappMessage);
   const whatsappUrl = `https://wa.me/919876543210?text=${encodedMessage}`;
 
@@ -85,9 +97,9 @@ const PropertyDetails = () => {
       try {
         setLoading(true);
 
-      const propertyData = await fetchPropertyDetail(id);
-      // setProperty(propertyData);
-      // setLocalStorage(localStorageKey, propertyData);  
+        const propertyData = await fetchPropertyDetail(id);
+        // setProperty(propertyData);
+        // setLocalStorage(localStorageKey, propertyData);
 
         // if (!property) {
         //   setError("Failed to load property details. No local data found.");
@@ -99,7 +111,7 @@ const PropertyDetails = () => {
         //   setError(null);
         // }
 
-       if (propertyData) {
+        if (propertyData) {
           const processedProperty = {
             ...propertyData,
             amenities: parseAmenities(propertyData?.amenities),
@@ -108,7 +120,7 @@ const PropertyDetails = () => {
           setError(null);
         } else {
           setError("Failed to load property details. No data found.");
-        }  
+        }
       } catch (err) {
         console.error("Error fetching property details:", err);
         setError("Failed to load property details. Please try again.");
@@ -149,13 +161,15 @@ const PropertyDetails = () => {
 
   const parseAmenities = (amenities) => {
     if (!amenities) return [];
-    
+
     if (Array.isArray(amenities)) {
       // If it's already an array, return it
-      return amenities.filter(amenity => amenity && typeof amenity === 'string');
+      return amenities.filter(
+        (amenity) => amenity && typeof amenity === "string"
+      );
     }
-    
-    if (typeof amenities === 'string') {
+
+    if (typeof amenities === "string") {
       try {
         // Try to parse JSON string
         const parsed = JSON.parse(amenities.replace(/'/g, '"'));
@@ -163,29 +177,31 @@ const PropertyDetails = () => {
       } catch (error) {
         console.error("Error parsing amenities:", error);
         // If parsing fails, split by comma or return as single item array
-        return amenities.split(',').map(item => item.trim()).filter(Boolean);
+        return amenities
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean);
       }
     }
-    
+
     return [];
   };
 
   const handleKeyNavigation = useCallback(
-    (e) => {
-      if (e.key === "ArrowLeft") {
-        setActiveImage((prev) =>
-          prev === 0 ? property.image.length - 1 : prev - 1
-        );
-      } else if (e.key === "ArrowRight") {
-        setActiveImage((prev) =>
-          prev === property.image.length - 1 ? 0 : prev + 1
-        );
-      } else if (e.key === "Escape" && showSchedule) {
-        setShowSchedule(false);
-      }
-    },
-    [images.length, showSchedule]
-  );
+  (e) => {
+    if (!images.length) return;
+
+    if (e.key === "ArrowLeft") {
+      setActiveImage((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+    } else if (e.key === "ArrowRight") {
+      setActiveImage((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+    } else if (e.key === "Escape" && showSchedule) {
+      setShowSchedule(false);
+    }
+  },
+  [images.length, showSchedule]
+);
+
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyNavigation);
@@ -197,7 +213,9 @@ const PropertyDetails = () => {
       if (navigator.share) {
         await navigator.share({
           title: property.title,
-          text: `Check out this ${property.type || 'property'}: ${property.title|| ''}`,
+          text: `Check out this ${property.type || "property"}: ${
+            property.title || ""
+          }`,
           url: window.location.href,
         });
       } else {
@@ -337,21 +355,20 @@ const PropertyDetails = () => {
         {/* Image gallery */}
         <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
           <div className="relative h-[500px] bg-gray-100 rounded-xl overflow-hidden">
-
             {images.length > 0 ? (
-            <AnimatePresence mode="wait">
-              <motion.img
-                key={activeImage}
-                src={images[activeImage]}
-                alt={`${property.title} - View ${activeImage + 1}`}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="w-full h-full"
-              />
-            </AnimatePresence>
-               ) : (
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={activeImage}
+                  src={images[activeImage]}
+                  alt={`${property.title} - View ${activeImage + 1}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="w-full h-full"
+                />
+              </AnimatePresence>
+            ) : (
               <div className="w-full h-full flex items-center justify-center bg-gray-200">
                 <span className="text-gray-500">No image available</span>
               </div>
@@ -386,12 +403,12 @@ const PropertyDetails = () => {
             )}
 
             {images.length > 0 && (
-            <div
-              className="absolute bottom-4 left-1/2 -translate-x-1/2 
+              <div
+                className="absolute bottom-4 left-1/2 -translate-x-1/2 
               bg-black/50 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm"
-            >
-              {activeImage + 1} / {property.image.length}
-            </div>
+              >
+                {activeImage + 1} / {images.length}
+              </div>
             )}
           </div>
         </div>
@@ -404,7 +421,9 @@ const PropertyDetails = () => {
               <p className="text-3xl font-bold text-blue-600 mb-2">
                 ₹{Number(property.price).toLocaleString("en-IN")}
               </p>
-              <p className="text-gray-600">Available for {property.availability}</p>
+              <p className="text-gray-600">
+                Available for {property.availability}
+              </p>
 
               {/* Buy, Rent, Lease Buttons */}
               <div className="flex gap-4 mt-4">
@@ -466,7 +485,9 @@ const PropertyDetails = () => {
             <div className="bg-white rounded-lg p-6 shadow">
               <h2 className="text-xl font-semibold mb-4">Send Inquiry</h2>
               {inquirySuccess && (
-                <p className="mb-4 text-green-600 font-medium">Inquiry sent successfully!</p>
+                <p className="mb-4 text-green-600 font-medium">
+                  Inquiry sent successfully!
+                </p>
               )}
 
               {/* WhatsApp Button */}
@@ -484,7 +505,10 @@ const PropertyDetails = () => {
 
               <form onSubmit={handleInquirySubmit} className="space-y-4">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -500,7 +524,10 @@ const PropertyDetails = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Email <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -516,7 +543,10 @@ const PropertyDetails = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="phone"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Phone <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -532,7 +562,10 @@ const PropertyDetails = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="message"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Message
                   </label>
                   <textarea
@@ -565,45 +598,52 @@ const PropertyDetails = () => {
           <div>
             <div className="mb-6">
               <h2 className="text-xl font-semibold mb-4">Description</h2>
-              <p className="text-gray-600 leading-relaxed">{property.description}</p>
+              <p className="text-gray-600 leading-relaxed">
+                {property.description}
+              </p>
             </div>
 
             {property.amenities && property.amenities.length > 0 && (
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold mb-4">Amenities</h2>
-              <div className="grid grid-cols-2 gap-4">
-                {property.amenities.map((amenity, index) => (
-                  <div key={index} className="flex items-center text-gray-600">
-                    <Building className="w-4 h-4 mr-2 text-blue-600" />
-                    {amenity}
-                  </div>
-                ))}
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold mb-4">Amenities</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  {property.amenities.map((amenity, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center text-gray-600"
+                    >
+                      <Building className="w-4 h-4 mr-2 text-blue-600" />
+                      {amenity}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
             )}
           </div>
-       </div>
+        </div>
 
         {/* Map Location */}
-         {locationString && locationString !== 'Location not specified' && (
-        <div className="mt-8 p-6 bg-blue-50 rounded-xl">
-          <div className="flex items-center gap-2 text-blue-600 mb-4">
-            <Compass className="w-5 h-5" />
-            <h3 className="text-lg font-semibold">Location</h3>
+        {locationString && locationString !== "Location not specified" && (
+          <div className="mt-8 p-6 bg-blue-50 rounded-xl">
+            <div className="flex items-center gap-2 text-blue-600 mb-4">
+              <Compass className="w-5 h-5" />
+              <h3 className="text-lg font-semibold">Location</h3>
+            </div>
+            <p className="text-gray-600 mb-4">{locationString}</p>
+            <a
+              href={`https://maps.google.com/?q=${encodeURIComponent(
+                locationString
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700"
+            >
+              <MapPin className="w-4 h-4" />
+              View on Google Maps
+            </a>
           </div>
-          <p className="text-gray-600 mb-4">{locationString}</p>
-          <a
-            href={`https://maps.google.com/?q=${encodeURIComponent(locationString)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700"
-          >
-            <MapPin className="w-4 h-4" />
-            View on Google Maps
-          </a>
-        </div>
         )}
- 
+
         {/* Viewing Modal */}
         <AnimatePresence>
           {showSchedule && (

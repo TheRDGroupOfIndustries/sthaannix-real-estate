@@ -52,7 +52,7 @@ const sampleProperties = [
     price: 12000000,
     beds: 3,
     baths: 2.5,
-    sqft: 2200,
+    sqft: 2200, 
     type: "House",
     availability: "Buy",
     image: ["https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"]

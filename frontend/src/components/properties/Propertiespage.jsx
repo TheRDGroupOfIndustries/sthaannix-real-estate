@@ -5,8 +5,11 @@ import { Grid, List, SlidersHorizontal, MapPin, Home } from "lucide-react";
 import SearchBar from "./Searchbar.jsx";
 import FilterSection from "./Filtersection.jsx";
 import PropertyCard from "./Propertycard.jsx";
-import { getLocalStorage, setLocalStorage } from "../../utils/localStorageUtil.js";
-import { fetchProperties } from "../../services/property-InqueryService.js"; 
+import {
+  getLocalStorage,
+  setLocalStorage,
+} from "../../utils/localStorageUtil.js";
+import { fetchProperties } from "../../services/property-InqueryService.js";
 
 const LOCAL_STORAGE_KEY = "properties";
 
@@ -23,7 +26,7 @@ const PropertiesPage = () => {
     error: null,
     selectedProperty: null,
   });
- 
+
   const [filters, setFilters] = useState({
     propertyType: "",
     priceRange: [0, Number.MAX_SAFE_INTEGER],
@@ -287,11 +290,17 @@ const PropertiesPage = () => {
             )}
           </AnimatePresence>
 
-          <div className={`${viewState.showFilters ? "lg:col-span-3" : "lg:col-span-4"}`}>
+          <div
+            className={`${
+              viewState.showFilters ? "lg:col-span-3" : "lg:col-span-4"
+            }`}
+          >
             <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
               <div className="flex flex-col sm:flex-row items-center gap-4">
                 <SearchBar
-                  onSearch={(query) => setFilters((prev) => ({ ...prev, searchQuery: query }))}
+                  onSearch={(query) =>
+                    setFilters((prev) => ({ ...prev, searchQuery: query }))
+                  }
                   className="flex-1"
                 />
 
@@ -326,17 +335,25 @@ const PropertiesPage = () => {
                       <SlidersHorizontal className="w-5 h-5" />
                     </button>
                     <button
-                      onClick={() => setViewState((prev) => ({ ...prev, isGridView: true }))}
+                      onClick={() =>
+                        setViewState((prev) => ({ ...prev, isGridView: true }))
+                      }
                       className={`p-2 rounded-lg ${
-                        viewState.isGridView ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100"
+                        viewState.isGridView
+                          ? "bg-blue-100 text-blue-600"
+                          : "hover:bg-gray-100"
                       }`}
                     >
                       <Grid className="w-5 h-5" />
                     </button>
                     <button
-                      onClick={() => setViewState((prev) => ({ ...prev, isGridView: false }))}
+                      onClick={() =>
+                        setViewState((prev) => ({ ...prev, isGridView: false }))
+                      }
                       className={`p-2 rounded-lg ${
-                        !viewState.isGridView ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100"
+                        !viewState.isGridView
+                          ? "bg-blue-100 text-blue-600"
+                          : "hover:bg-gray-100"
                       }`}
                     >
                       <List className="w-5 h-5" />
@@ -349,7 +366,9 @@ const PropertiesPage = () => {
             <motion.div
               layout
               className={`grid gap-6 ${
-                viewState.isGridView ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1"
+                viewState.isGridView
+                  ? "grid-cols-1 md:grid-cols-2"
+                  : "grid-cols-1"
               }`}
             >
               <AnimatePresence>
@@ -369,8 +388,12 @@ const PropertiesPage = () => {
                     className="col-span-full text-center py-12 bg-white rounded-lg shadow-sm"
                   >
                     <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No properties found</h3>
-                    <p className="text-gray-600">Try adjusting your filters or search criteria</p>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      No properties found
+                    </h3>
+                    <p className="text-gray-600">
+                      Try adjusting your filters or search criteria
+                    </p>
                   </motion.div>
                 )}
               </AnimatePresence>

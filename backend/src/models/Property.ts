@@ -1,6 +1,11 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export type PropertyType = "plot" | "apartment" | "commercial" | "villa" | "house";
+export type PropertyType =
+  | "plot"
+  | "apartment"
+  | "commercial"
+  | "villa"
+  | "house";
 export type TxType = "buy" | "rent" | "lease";
 export type PropertyStatus = "pending" | "approved" | "rejected";
 
@@ -11,8 +16,9 @@ export interface IProperty extends Document {
   propertyType: PropertyType;
   transactionType: TxType;
   price: number;
-  size?: number; 
-  bhk?: number; 
+  size?: number;
+  bhk?: number;
+  bathroom?: number;
   images: string[];
   videos: string[];
   location: {
@@ -20,11 +26,11 @@ export interface IProperty extends Document {
     city?: string;
     state?: string;
     pincode?: string;
-    coordinates?: { type: "Point"; coordinates: [number, number] }; 
+    coordinates?: { type: "Point"; coordinates: [number, number] };
   };
   isPromoted: boolean;
   status: PropertyStatus;
-} 
+}
 
 const LocationSchema = new Schema({
   address: String,
@@ -39,25 +45,49 @@ const LocationSchema = new Schema({
 
 const PropertySchema = new Schema<IProperty>(
   {
-    owner: { type: Schema.Types.ObjectId, ref: "User", required: true, index: true },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
     title: { type: String, required: true },
     description: { type: String },
-    propertyType: { type: String, enum: ["plot", "apartment", "commercial", "villa", "house"], required: true },
-    transactionType: { type: String, enum: ["buy", "rent", "lease"], required: true },
+    propertyType: {
+      type: String,
+      enum: ["plot", "apartment", "commercial", "villa", "house"],
+      required: true,
+    },
+    transactionType: {
+      type: String,
+      enum: ["buy", "rent", "lease"],
+      required: true,
+    },
     price: { type: Number, required: true, index: true },
     size: { type: Number },
     bhk: { type: Number },
+    bathroom: { type: Number },
     images: { type: [String], default: [] },
     videos: { type: [String], default: [] },
     location: { type: LocationSchema, default: {} },
     isPromoted: { type: Boolean, default: false },
-    status: { type: String, enum: ["pending", "approved", "rejected"], default: "pending", index: true },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+      index: true,
+    },
   },
   { timestamps: true }
 );
 
 // text index for keyword search
-PropertySchema.index({ title: "text", description: "text", "location.address": "text", "location.city": "text" });
+PropertySchema.index({
+  title: "text",
+  description: "text",
+  "location.address": "text",
+  "location.city": "text",
+});
 // fast sort by newest
 PropertySchema.index({ createdAt: -1 });
 

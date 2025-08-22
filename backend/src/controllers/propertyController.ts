@@ -39,7 +39,7 @@ const isOwnerOrAdmin = (
 //     //     message:
 //     //       "Your account is pending approval. You cannot create properties yet.",
 //     //   });
-//     // }  
+//     // }
 //     const {
 //       title,
 //       description,
@@ -83,8 +83,6 @@ const isOwnerOrAdmin = (
 //   }
 // };
 
-
-
 export const createProperty = async (req: Request, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
@@ -99,12 +97,30 @@ export const createProperty = async (req: Request, res: Response) => {
       price,
       size,
       bhk,
+      bathroom,
       location,
       isPromoted,
     } = req.body;
 
-    // Parse location JSON string if necessary
-    const parsedLocation = typeof location === "string" ? JSON.parse(location) : location;
+    console.log(
+      "Data: ",
+      title,
+      description,
+      propertyType,
+      transactionType,
+      price,
+      size,
+      bhk,
+      bathroom,
+      location,
+      isPromoted
+    );
+
+    if (isNaN(price)) {
+      return res.status(400).json({ message: "Price must be a valid number" });
+    }
+    const parsedLocation =
+      typeof location === "string" ? JSON.parse(location) : location;
 
     const uploadedImages: string[] = [];
     if (req.files && Array.isArray(req.files)) {
@@ -122,6 +138,7 @@ export const createProperty = async (req: Request, res: Response) => {
       price: Number(price),
       size: size ? Number(size) : undefined,
       bhk: bhk ? Number(bhk) : undefined,
+      bathroom: bhk ? Number(bathroom) : undefined,
       location: parsedLocation,
       isPromoted: isPromoted === "true" || isPromoted === true,
       owner: req.user.id,
@@ -136,7 +153,6 @@ export const createProperty = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Failed to create property", error });
   }
 };
-
 
 export const getProperties = async (req: Request, res: Response) => {
   try {

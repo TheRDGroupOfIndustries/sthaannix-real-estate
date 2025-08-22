@@ -7,7 +7,7 @@
 // import { Backendurl } from "../config/constants.js"
 
 // const Login = () => {
-  
+
 //   const [email, setEmail] = useState("");
 //   const [password, setPassword] = useState("");
 //   const [loading, setLoading] = useState(false);
@@ -34,7 +34,6 @@
 //         password,
 //       });
 //       console.log("res: ",response);
-      
 
 //       if (response.status==200) {
 //         setUserSession(response.data.token, response.data.user);
@@ -151,7 +150,6 @@
 // };
 
 // export default Login;
-
 
 // import { useState } from "react";
 // import { useNavigate, Link } from "react-router-dom";
@@ -309,8 +307,6 @@
 
 // export default Login;
 
-
-
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -354,22 +350,25 @@ const Login = () => {
 
         const role = user.role?.toLowerCase();
 
+        localStorage.setItem("token", token);
         if (["broker", "builder", "owner"].includes(role)) {
-  if (response.data.user.paymentStatus === "approved") {
-    navigate("/dashboard");
-  } else {
-    navigate("/payment");
-  }
-} else if (role === "admin") {
-  navigate("/admin");
-} else {
-  navigate("/login");
-}
+          if (response.data.user.paymentStatus === "approved") {
+            navigate("/dashboard");
+          } else {
+            navigate("/payment");
+          }
+        } else if (role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/login");
+        }
       } else {
         toast.error(response.data.message || "Invalid credentials");
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "An error occurred during login");
+      toast.error(
+        error.response?.data?.message || "An error occurred during login"
+      );
     } finally {
       setLoading(false);
     }
@@ -387,7 +386,9 @@ const Login = () => {
           <div className="space-y-4">
             {/* Email Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">Email address</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Email address
+              </label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Mail className="h-5 w-5 text-gray-400" />
@@ -405,7 +406,9 @@ const Login = () => {
 
             {/* Password Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">Password</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5 text-gray-400" />
@@ -446,7 +449,10 @@ const Login = () => {
 
         <div className="text-center text-sm">
           <span className="text-gray-600">Don't have an account? </span>
-          <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
+          <Link
+            to="/register"
+            className="font-medium text-blue-600 hover:text-blue-500"
+          >
             Register here
           </Link>
         </div>

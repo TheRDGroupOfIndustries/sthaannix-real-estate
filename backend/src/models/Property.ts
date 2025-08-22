@@ -12,7 +12,7 @@ export interface IProperty extends Document {
   transactionType: TxType;
   price: number;
   size?: number; 
-  bhk?: number;
+  bhk?: number; 
   images: string[];
   videos: string[];
   location: {

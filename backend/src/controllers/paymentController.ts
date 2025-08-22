@@ -6,7 +6,6 @@ import TopUpRequest from "../models/TopUpRequest";
 import mongoose from "mongoose";
 
 
-
 export const uploadPaymentProof = async (req: Request, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });

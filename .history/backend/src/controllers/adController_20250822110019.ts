@@ -5,7 +5,6 @@ import User from "../models/User";
 import mongoose from "mongoose";
 
 // User submits ad request → default status = pending
-
 // export const submitAdRequest = async (req: Request, res: Response) => {
 //   const session = await mongoose.startSession();
 //   session.startTransaction();

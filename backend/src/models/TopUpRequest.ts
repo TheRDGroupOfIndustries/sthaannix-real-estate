@@ -10,6 +10,7 @@ export interface ITopUpRequest extends Document {
   reviewedBy?: mongoose.Types.ObjectId;
   reviewedAt?: Date;
   reason?: string;
+  utrNo?: string; // Optional UTR number
 }
 
 const TopUpRequestSchema = new Schema<ITopUpRequest>(
@@ -18,7 +19,7 @@ const TopUpRequestSchema = new Schema<ITopUpRequest>(
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      index: true, 
+      index: true,
     },
     amount: { type: Number, required: true },
     proofUrl: { type: String, required: true },
@@ -31,6 +32,7 @@ const TopUpRequestSchema = new Schema<ITopUpRequest>(
     reviewedBy: { type: Schema.Types.ObjectId, ref: "User" },
     reviewedAt: { type: Date },
     reason: { type: String },
+    utrNo: { type: String ,unique: true, sparse: true}, // Optional field
   },
   { timestamps: true }
 );

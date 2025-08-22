@@ -5,7 +5,6 @@ import User from "../models/User";
 import mongoose from "mongoose";
 
 // User submits ad request → default status = pending
-
 // export const submitAdRequest = async (req: Request, res: Response) => {
 //   const session = await mongoose.startSession();
 //   session.startTransaction();
@@ -157,7 +156,7 @@ export const submitAdRequest = async (req: Request, res: Response) => {
       campaign: newCampaign,
       previousBalance,              // balance before deduction
       deductedAmount: budget,       // clarity on deduction
-      remainingBalance: user.walletBalance, // after deduction
+      remainingBalance: user.walletBalance, // ✅ after deduction
     });
   } catch (error: any) {
     await session.abortTransaction();

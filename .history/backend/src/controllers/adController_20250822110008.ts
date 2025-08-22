@@ -5,7 +5,6 @@ import User from "../models/User";
 import mongoose from "mongoose";
 
 // User submits ad request → default status = pending
-
 // export const submitAdRequest = async (req: Request, res: Response) => {
 //   const session = await mongoose.startSession();
 //   session.startTransaction();
@@ -155,9 +154,9 @@ export const submitAdRequest = async (req: Request, res: Response) => {
       success: true,
       message: "Ad request submitted successfully & wallet updated",
       campaign: newCampaign,
-      previousBalance,              // balance before deduction
-      deductedAmount: budget,       // clarity on deduction
-      remainingBalance: user.walletBalance, // after deduction
+      previousBalance,              // ✅ balance before deduction
+      deductedAmount: budget,       // ✅ clarity on deduction
+      remainingBalance: user.walletBalance, // ✅ after deduction
     });
   } catch (error: any) {
     await session.abortTransaction();

@@ -1,10 +1,10 @@
 import axios from "axios";
-import { Backendurl } from "../App";
 
-const API_URL = import.meta.env.VITE_API_BASE_URL;
+const Backendurl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:12000';
 
 const api = axios.create({
-  baseURL:"http://localhost:5000",
+  // baseURL:"http://localhost:12000",
+  baseURL: Backendurl ,
   headers: {
     "Content-Type": "application/json",
   },

@@ -449,7 +449,7 @@ const Blog = () => {
 // PropTypes for BlogCard component
 BlogCard.propTypes = {
   post: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     title: PropTypes.string.isRequired,
     excerpt: PropTypes.string.isRequired,
     image: PropTypes.string.isRequired,

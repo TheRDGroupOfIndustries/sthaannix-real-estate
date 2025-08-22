@@ -247,7 +247,7 @@ const Navbar = () => {
                       </div>
                       <div className="hidden lg:flex flex-col items-start">
                         <span className="text-sm font-semibold text-gray-700">{user?.name}</span>
-                        <span className="text-xs text-gray-500">Premium Member</span>
+                        {/* <span className="text-xs text-gray-500">Premium Member</span> */}
                       </div>
                       <motion.div
                         animate={{ rotate: isDropdownOpen ? 180 : 0 }}

@@ -642,15 +642,16 @@ const PropertyListings = () => {
   const fetchProperties = async () => {
     try {
       setLoading(true);
-      const response = await propertiesAPI.get({ status: "approved" }); 
-      console.log("res: ",response);
+      const response = await propertiesAPI.get(); 
+      console.log("res: ",response.data);
       
       if (response.data) {
         const parsedProperties = response.data.map(property => ({
           _id: property._id,
           title: property.title,
+          description:property.description,
           location: typeof property.location === "object" 
-            ? `${property.location.city}, ${property.location.state || ""}` 
+            ? `${property.location.address}, ${property.location.city},${property.location.pincode}, ${property.location.state || ""}` 
             : property.location,
           type: property.propertyType,
           availability: property.transactionType,
@@ -819,7 +820,7 @@ const PropertyListings = () => {
         >
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
             <div className="space-y-2">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent ">
                 Property Management
               </h1>
               <div className="flex items-center gap-4 text-sm text-gray-600">
@@ -1120,9 +1121,10 @@ const PropertyListings = () => {
                     <div className={`p-6 flex-1 ${viewMode === 'list' ? 'flex flex-col justify-between' : ''}`}>
                       <div>
                         <div className="mb-4">
-                          <h3 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-2">
+                          <h3 className="text-xl font-semibold text-gray-900  line-clamp-2">
                             {property.title}
                           </h3>
+                          <p className="mb-2">{property.description}</p>
                           <div className="flex items-center text-gray-600 mb-3">
                             <MapPin className="w-4 h-4 mr-2 text-gray-400" />
                             <span className="text-sm">{property.location}</span>

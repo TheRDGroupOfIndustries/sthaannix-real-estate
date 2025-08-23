@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { motion } from "framer-motion";
 import {
   Calendar,
@@ -16,6 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import {Backendurl } from "../config/constants";
+import http from "../api/http";
 
 const Appointments = () => {
   const [appointments, setAppointments] = useState([]);
@@ -25,17 +25,17 @@ const Appointments = () => {
   const [editingMeetingLink, setEditingMeetingLink] = useState(null);
   const [meetingLink, setMeetingLink] = useState("");
 
+  const [loadingAction, setLoadingAction] = useState(null);
   const fetchAppointments = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${backendurl}/api/appointments/all`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-
-      if (response.data.success) {
+      const response= await http.get(`${Backendurl}/leads/my-properties`);
+      console.log("fetchAppointments:",response.data);
+      
+      if (response.status==200) {
         // Filter out appointments with missing user data
-        const validAppointments = response.data.appointments.filter(
-          (apt) => apt.userId && apt.propertyId
+        const validAppointments = response.data.filter(
+          (apt) => apt.buyer._id && apt.property._id
         );
         setAppointments(validAppointments);
       } else {
@@ -49,20 +49,17 @@ const Appointments = () => {
     }
   };
 
-  const handleStatusChange = async (appointmentId, newStatus) => {
+  const handleStatusChange = async ( id,newStatus,responseMessage) => {
     try {
-      const response = await axios.put(
-        `${Backendurl}/api/appointments/status`,
+       setLoadingAction({ id, status: newStatus }); 
+      const response = await http.put(
+        `${Backendurl}/leads/${id}/status`,
         {
-          appointmentId,
           status: newStatus,
-        },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          responseMessage:responseMessage
         }
       );
-
-      if (response.data.success) {
+      if (response.status==200) {
         toast.success(`Appointment ${newStatus} successfully`);
         fetchAppointments();
       } else {
@@ -72,63 +69,68 @@ const Appointments = () => {
       console.error("Error updating appointment:", error);
       toast.error("Failed to update appointment status");
     }
-  };
-
-  const handleMeetingLinkUpdate = async (appointmentId) => {
-    try {
-      if (!meetingLink) {
-        toast.error("Please enter a meeting link");
-        return;
-      }
-
-      const response = await axios.put(
-        `${backendurl}/api/appointments/update-meeting`,
-        {
-          appointmentId,
-          meetingLink,
-        },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
-
-      if (response.data.success) {
-        toast.success("Meeting link sent successfully");
-        setEditingMeetingLink(null);
-        setMeetingLink("");
-        fetchAppointments();
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error) {
-      console.error("Error updating meeting link:", error);
-      toast.error("Failed to update meeting link");
+    finally{
+      setLoadingAction(null);
     }
   };
+
+  // const handleMeetingLinkUpdate = async (appointmentId) => {
+  //   try {
+  //     if (!meetingLink) {
+  //       toast.error("Please enter a meeting link");
+  //       return;
+  //     }
+
+  //     const response = await axios.put(
+  //       `${Backendurl}/api/appointments/update-meeting`,
+  //       {
+  //         appointmentId,
+  //         meetingLink,
+  //       },
+  //       {
+  //         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+  //       }
+  //     );
+
+  //     if (response.data.success) {
+  //       toast.success("Meeting link sent successfully");
+  //       setEditingMeetingLink(null);
+  //       setMeetingLink("");
+  //       fetchAppointments();
+  //     } else {
+  //       toast.error(response.data.message);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating meeting link:", error);
+  //     toast.error("Failed to update meeting link");
+  //   }
+  // };
 
   useEffect(() => {
     fetchAppointments();
   }, []);
 
   const filteredAppointments = appointments.filter((apt) => {
-    const matchesSearch =
-      searchTerm === "" ||
-      apt.propertyId?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      apt.userId?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      apt.userId?.email?.toLowerCase().includes(searchTerm.toLowerCase());
+  const search = searchTerm.toLowerCase();
 
-    const matchesFilter = filter === "all" || apt.status === filter;
+  const matchesSearch =
+    searchTerm === "" ||
+    (apt.property?.title?.toLowerCase().includes(search)) ||
+    (apt.buyer?.name?.toLowerCase().includes(search)) ||
+    (apt.buyer?.email?.toLowerCase().includes(search));
 
-    return matchesSearch && matchesFilter;
-  });
+  const matchesFilter = filter === "all" || apt.status === filter;
+
+  return matchesSearch && matchesFilter;
+});
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "confirmed":
+      // case "open":
+      //   return "bg-yellow-100 text-yellow-800";
+      case "open":
         return "bg-green-100 text-green-800";
-      case "cancelled":
+      case "closed":
         return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
@@ -176,10 +178,10 @@ const Appointments = () => {
                 onChange={(e) => setFilter(e.target.value)}
                 className="rounded-lg border border-gray-200 px-4 py-2 focus:ring-2 focus:ring-blue-500"
               >
-                <option value="all">All Leads</option>
-                <option value="pending">Pending</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="cancelled">Cancelled</option>
+                <option value="all" >All Leads</option>
+                {/* <option value="pending">Pending</option> */}
+                <option value="open">Open</option>
+                <option value="closed">Closed</option>
               </select>
             </div>
           </div>
@@ -223,11 +225,12 @@ const Appointments = () => {
                       <div className="flex items-center">
                         <Home className="w-5 h-5 text-gray-400 mr-2" />
                         <div>
-                          <p className="font-medium text-gray-900">
-                            {appointment.propertyId.title}
+                          <p className="font-medium text-gray-900 ">
+                            {appointment.property.title}
                           </p>
                           <p className="text-sm text-gray-500">
-                            {appointment.propertyId.location}
+                            {appointment.property.location.city}
+
                           </p>
                         </div>
                       </div>
@@ -239,10 +242,10 @@ const Appointments = () => {
                         <User className="w-5 h-5 text-gray-400 mr-2" />
                         <div>
                           <p className="font-medium text-gray-900">
-                            {appointment.userId?.name || "Unknown"}
+                            {appointment.buyer?.name || "Unknown"}
                           </p>
                           <p className="text-sm text-gray-500">
-                            {appointment.userId?.email || "Unknown"}
+                            {appointment.buyer?.email || "Unknown"}
                           </p>
                         </div>
                       </div>
@@ -254,11 +257,15 @@ const Appointments = () => {
                         <Calendar className="w-5 h-5 text-gray-400 mr-2" />
                         <div>
                           <p className="font-medium text-gray-900">
-                            {new Date(appointment.date).toLocaleDateString()}
+                            {new Date(appointment.createdAt).toLocaleDateString()}
                           </p>
                           <div className="flex items-center text-sm text-gray-500">
-                            <Clock className="w-4 h-4 mr-1" />
-                            {appointment.time}
+                            {/* <Clock className="w-4 h-4 mr-1" /> */}
+                            {new Date(appointment.createdAt).toLocaleTimeString('en-US', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              hour12: true
+                            })}
                           </div>
                         </div>
                       </div>
@@ -277,7 +284,7 @@ const Appointments = () => {
                     </td>
 
                     {/* Meeting Link */}
-                    <td className="px-6 py-4">
+                    {/* <td className="px-6 py-4">
                       {editingMeetingLink === appointment._id ? (
                         <div className="flex items-center gap-2">
                           <input
@@ -333,30 +340,41 @@ const Appointments = () => {
                           )}
                         </div>
                       )}
-                    </td>
+                    </td> */}
 
                     {/* Actions */}
                     <td className="px-6 py-4">
-                      {appointment.status === "pending" && (
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() =>
-                              handleStatusChange(appointment._id, "confirmed")
+                              handleStatusChange( appointment._id,"open",appointment.message)
                             }
+                             disabled={loadingAction?.id === appointment._id && loadingAction?.status === "open"}
                             className="p-1 bg-green-500 text-white rounded hover:bg-green-600"
+                             title="Open"
                           >
-                            <Check className="w-4 h-4" />
+                            {loadingAction?.id === appointment._id && loadingAction?.status === "open" ? (
+    <Loader className="animate-spin w-4 h-4" />
+  ) : (
+    <Check className="w-4 h-4" />
+  )}
+                                                            
                           </button>
                           <button
                             onClick={() =>
-                              handleStatusChange(appointment._id, "cancelled")
+                              handleStatusChange( appointment._id,"closed", "cancelled")
                             }
+                        disabled={loadingAction?.id === appointment._id && loadingAction?.status === "closed"}
                             className="p-1 bg-red-500 text-white rounded hover:bg-red-600"
+                             title="Close"
                           >
-                            <X className="w-4 h-4" />
+                          {loadingAction?.id === appointment._id && loadingAction?.status === "closed" ? (
+    <Loader className="animate-spin w-4 h-4" />
+  ) : (
+    <X className="w-4 h-4" />
+  )}
                           </button>
                         </div>
-                      )}
                     </td>
                   </motion.tr>
                 ))}

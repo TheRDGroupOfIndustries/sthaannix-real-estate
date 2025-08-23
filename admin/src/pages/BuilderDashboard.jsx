@@ -4,6 +4,7 @@ import { Plus, Edit3, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { motion } from "framer-motion";
 import axios from "axios";
+import api from "../api/api";
 
 const BuilderDashboard = () => {
   const navigate = useNavigate();

@@ -83,26 +83,6 @@ const BrokerDashboard = () => {
 //   }
 // };
  
-const loadPayments = async (email) => {
-  setLoading(true);
-  try {
-    const res = await paymentsAPI.myPayments();
-
-    if (res.data?.success) {
-      setPayments(res.data.transactions); // <-- use transactions, not payments
-    } else {
-      toast.error("Failed to load payments");
-      setPayments([]);
-    }
-  } catch (error) {
-    console.error("Load payments error:", error);
-    toast.error("Failed to load payments from server");
-    setPayments([]);
-  } finally {
-    setLoading(false);
-  }
-};
-
 
   const handleDeleteProperty = async (id) => {
     if (window.confirm("Are you sure you want to delete this property?")) {
@@ -264,16 +244,9 @@ const loadPayments = async (email) => {
               {payments.map((payment, idx) => (
                 <tr key={payment.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">{idx + 1}</td>
-                  <td className="px-6 py-4 font-mono text-sm whitespace-nowrap">
-                        {payment.utrNumber || "-"}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {new Date(payment.createdAt).toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {payment.purpose || "Wallet Top-up"}
-                      </td>
-
+                  <td className="px-6 py-4 font-mono text-sm whitespace-nowrap">{payment.paymentRef}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{new Date(payment.timestamp).toLocaleString()}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{payment.paymentMethod}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-center">
                     <button
                       onClick={() => handleDeletePayment(payment.id)}

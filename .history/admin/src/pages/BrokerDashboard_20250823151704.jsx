@@ -265,14 +265,14 @@ const loadPayments = async (email) => {
                 <tr key={payment.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">{idx + 1}</td>
                   <td className="px-6 py-4 font-mono text-sm whitespace-nowrap">
-                        {payment.utrNumber || "-"}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {new Date(payment.createdAt).toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {payment.purpose || "Wallet Top-up"}
-                      </td>
+  {payment.utrNumber || "-"}
+</td>
+<td className="px-6 py-4 whitespace-nowrap">
+  {new Date(payment.createdAt).toLocaleString()}
+</td>
+<td className="px-6 py-4 whitespace-nowrap">
+  {payment.purpose || "Wallet Top-up"}
+</td>
 
                   <td className="px-6 py-4 whitespace-nowrap text-center">
                     <button

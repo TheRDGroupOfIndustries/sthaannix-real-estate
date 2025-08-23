@@ -1,3 +1,5 @@
+export const Backendurl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:12000';
+
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
@@ -22,7 +24,6 @@ import 'react-toastify/dist/ReactToastify.css';
 
 
 
-export const Backendurl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:12000';
 
 const App = () => {
   return (

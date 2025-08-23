@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { User, Camera } from "lucide-react";
+import { fetchUserProfile, updateUserProfile } from "../services/userService";
 
-const USER_PROFILE_KEY = "userProfile";
+// const USER_PROFILE_KEY = "userProfile";
 
 const UserProfile = () => {
   const [formData, setFormData] = useState({
@@ -16,10 +17,12 @@ const UserProfile = () => {
 
   // Load user profile from localStorage on mount
   useEffect(() => {
-    const storedProfile = localStorage.getItem(USER_PROFILE_KEY);
-    if (storedProfile) {
-      try {
-        const profile = JSON.parse(storedProfile);
+    async function loadProfile() {
+    try {
+    const profile = await fetchUserProfile();   
+    //  if (storedProfile) {
+    //   try {
+        // const profile = JSON.parse(storedProfile);
         setFormData({
           name: profile.name || "",
           email: profile.email || "",
@@ -27,9 +30,10 @@ const UserProfile = () => {
         });
         setProfileImage(profile.profileImage || "");
       } catch {
-        // ignore parsing errors
+         toast.error("Failed to load profile");
       }
     }
+     loadProfile();
   }, []);
 
   const handleChange = (e) => {
@@ -51,17 +55,22 @@ const UserProfile = () => {
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit =async (e) => {
     e.preventDefault();
     setSaving(true);
 
-    // Save profile data to localStorage
-    const profile = { ...formData, profileImage };
-    localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profile));
+     try {
+      const updatedProfile = { ...formData, profileImage };
+      await updateUserProfile(updatedProfile);
 
-    alert("Profile saved locally!");
-    setEditMode(false);
-    setSaving(false);
+      toast.success("Profile updated successfully!");
+      setEditMode(false);
+
+    } catch (error) {
+      toast.error("Failed to update profile");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (

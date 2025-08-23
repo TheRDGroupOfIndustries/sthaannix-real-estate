@@ -277,8 +277,8 @@ const Navbar = () => {
                                 <p className="text-sm font-bold text-gray-900">{user?.name}</p>
                                 <p className="text-xs text-gray-600 truncate">{user?.email}</p>
                                 <div className="flex items-center gap-1 mt-1">
-                                  <Crown className="w-3 h-3 text-yellow-500" />
-                                  <span className="text-xs text-yellow-600 font-medium">Premium</span>
+                                  {/* <Crown className="w-3 h-3 text-yellow-500" /> */}
+                                  {/* <span className="text-xs text-yellow-600 font-medium">Premium</span> */}
                                 </div>
                               </div>
                             </div>
@@ -345,7 +345,7 @@ const Navbar = () => {
                       to="/signup"
                       className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white px-6 py-2.5 rounded-xl hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl shadow-blue-500/30 font-semibold overflow-hidden"
                     >
-                      <span className="relative z-10">Get Started</span>
+                      <span className="relative z-10">Sign up</span>
                       <motion.div
                         animate={sparkleVariants.animate}
                         className="absolute top-1 right-1"
@@ -633,10 +633,7 @@ const MobileNavLinks = ({
                 <div className="flex-1">
                   <p className="text-lg font-bold text-gray-900">{user?.name}</p>
                   <p className="text-sm text-gray-600 truncate">{user?.email}</p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Crown className="w-4 h-4 text-yellow-500" />
-                    <span className="text-xs text-yellow-600 font-semibold">Premium Member</span>
-                  </div>
+                  
                 </div>
               </div>
               {/* Background decoration */}

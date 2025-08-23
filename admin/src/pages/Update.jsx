@@ -542,18 +542,29 @@ const Update = () => {
       formdata.append('bhk', formData.bhk);
       formdata.append('bathroom', formData.bathroom);
       formdata.append('size', formData.size);
-      // formdata.append('phone', formData.phone);
       formdata.append('transactionType', formData.transactionType);
+      // formdata.append('phone', formData.phone);
       // formdata.append('amenities', JSON.stringify(formData.amenities));
       formdata.append('location', JSON.stringify(formData.location));
 
-      formData.images.forEach((img, idx) => {
-        if (typeof img !== 'string') {
-          formdata.append(`image${idx + 1}`, img);
-        }
-      });
+      // formData.images.forEach((img, idx) => {
+      //   if (typeof img !== 'string') {
+      //     formdata.append(`image${idx + 1}`, img);
+      //   }
+      // });
 
+       formData.images.forEach((imgObj) => {
+      if (imgObj.type === "file") {
+        formdata.append('images', imgObj.value); // appends as file
+      } else if (imgObj.type === "url") {
+        formdata.append('existingImages', imgObj.value); // appends as string URL for backend
+      }
+    });
+    console.log("formdata: ",formData);
+    
       const res = await http.put(`${Backendurl}/properties/update/${id}`, formdata);
+      console.log("backend res: ",res);
+      
       if (res.status === 200) {
         toast.success('Property updated successfully!');
         navigate('/list');

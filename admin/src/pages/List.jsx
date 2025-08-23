@@ -643,7 +643,7 @@ const PropertyListings = () => {
     try {
       setLoading(true);
       const response = await propertiesAPI.get(); 
-      console.log("res: ",response.data);
+      // console.log("res: ",response.data);
       
       if (response.data) {
         const parsedProperties = response.data.map(property => ({

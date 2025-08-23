@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Plus, Edit3, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import axios from "axios";
+import { paymentsAPI } from '../api/api';
 
 const BrokerDashboard = () => {
   const navigate = useNavigate();
@@ -83,16 +84,34 @@ const BrokerDashboard = () => {
   };
 
   // Load payments for the broker
-  const loadPayments = (email) => {
-    setLoading(true);
+  const loadPayments = async (email) => {
+  setLoading(true);
+  try {
+    const data = await paymentsAPI.myPayments();
+    if (data.success) {
+      setPayments(data.payments);
+    } else {
+      toast.error('Failed to load payments');
+      // Fallback to localStorage
+      const allPayments = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
+      const userPayments = allPayments.filter(
+        (p) => p.status === "approved" && p.user.email === email
+      );
+      setPayments(userPayments);
+    }
+  } catch (error) {
+    toast.error('Failed to load payments from server');
+    // Fallback to localStorage
     const allPayments = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
-    // Filter payments approved and by this user's email
     const userPayments = allPayments.filter(
       (p) => p.status === "approved" && p.user.email === email
     );
     setPayments(userPayments);
+  } finally {
     setLoading(false);
-  };
+  }
+};
+ 
 
   const handleDeleteProperty = async (id) => {
     if (window.confirm("Are you sure you want to delete this property?")) {

@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Upload, ChevronDown, ClipboardCopy } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { submitPaymentProof } from "../api/paymentService";
+import { paymentsAPI } from '../api/api';
 
 const WHATSAPP_LINK = "https://api.whatsapp.com/send?phone=997690669";
 
@@ -66,6 +66,13 @@ const Payment = () => {
   const handlePaymentSubmit = async (e) => {
     e.preventDefault();
     
+  const token = localStorage.getItem('token');
+  if (!token) {
+    toast.error("Please login first");
+    navigate("/login");
+    return;
+  }
+
     if (!paymentRef.trim()) {
       toast.error("Please enter Unique Transaction Reference");
       return;
@@ -91,7 +98,7 @@ const Payment = () => {
       status: "pending",
     };
 
-    const response = await submitPaymentProof(paymentData);
+    const response = await paymentsAPI.submitProof(paymentData);
     if (response.success) {
         toast.success("Payment submitted successfully! Your account will be activated after verification.");
         navigate("/login");

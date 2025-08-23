@@ -236,7 +236,7 @@ import Add from "./pages/Add";
 import Update from "./pages/Update";
 import Appointments from "./pages/Appointments";
 
-export const Backendurl = import.meta.env.REACT_APP_API_BASE_URL;
+export const Backendurl = import.meta.env.VITE_API_BASE_URL;
 
 const pageVariants = {
   initial: { opacity: 0, y: 20 },

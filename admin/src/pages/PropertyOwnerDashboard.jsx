@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Plus, Edit3, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { motion } from "framer-motion";
+import { paymentsAPI } from '../api/api';
+
 
 const PropertyOwnerDashboard = () => {
   const navigate = useNavigate();
@@ -28,9 +30,20 @@ const PropertyOwnerDashboard = () => {
   ]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    console.log("PropertyOwnerDashboard: ",user);
+    
+    if (!user || user.role !== "owner") {
+      toast.error("Unauthorized. Please login as Owner.");
+      navigate("/login");
+      return;
+    }
+
     if (activeTab === "properties") {
       fetchProperties();
+    } else {
+      loadPayments(user.email);
     }
   }, [activeTab]);
 
@@ -97,11 +110,41 @@ const PropertyOwnerDashboard = () => {
     }
   };
 
-  const handleDeletePayment = (ref) => {
-    if (window.confirm("Are you sure to delete this payment record?")) {
-      setPayments((p) => p.filter((pay) => pay.uniqueTransactionRef !== ref));
+  const loadPayments = async (email) => {
+  setLoading(true);
+  try {
+    const data = await paymentsAPI.myPayments();
+    if (data.success) {
+      setPayments(data.payments);
+    } else {
+      toast.error('Failed to load payments');
+      // Fallback to localStorage
+      const allPayments = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
+      const userPayments = allPayments.filter(
+        (p) => p.status === "approved" && p.user.email === email
+      );
+      setPayments(userPayments);
+    }
+  } catch (error) {
+    toast.error('Failed to load payments from server');
+    // Fallback to localStorage
+    const allPayments = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
+    const userPayments = allPayments.filter(
+      (p) => p.status === "approved" && p.user.email === email
+    );
+    setPayments(userPayments);
+  } finally {
+    setLoading(false);
+  }
+};
+
+ const handleDeletePayment = (id) => {
+    if (window.confirm("Are you sure you want to delete this payment record?")) {
+      const allPayments = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
+      const updatedPayments = allPayments.filter(p => p.id !== id);
+      localStorage.setItem("paymentRecords", JSON.stringify(updatedPayments));
+      setPayments(updatedPayments.filter(p => p.user.email === (JSON.parse(localStorage.getItem("user") || "{}")).email));
       toast.success("Payment record deleted");
-      // Also call backend API to delete payment if needed
     }
   };
 

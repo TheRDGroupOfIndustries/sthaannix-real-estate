@@ -89,14 +89,13 @@ useEffect(() => {
       }
     }
   };
-
 const loadPayments = async (email) => {
   setLoading(true);
   try {
     const res = await paymentsAPI.myPayments();
 
     if (res.data?.success) {
-      setPayments(res.data.transactions); 
+      setPayments(res.data.transactions); // <-- use transactions, not payments
     } else {
       toast.error("Failed to load payments");
       setPayments([]);

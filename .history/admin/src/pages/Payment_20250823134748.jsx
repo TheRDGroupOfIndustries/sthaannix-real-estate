@@ -63,58 +63,58 @@ const Payment = () => {
     setShowUpiDetails(false);
   };
 
-  // const handlePaymentSubmit = async (e) => {
-  //   e.preventDefault();
+  const handlePaymentSubmit = async (e) => {
+    e.preventDefault();
     
-  // const token = localStorage.getItem('token');
-  // if (!token) {
-  //   toast.error("Please login first");
-  //   navigate("/login");
-  //   return;
-  // }
+  const token = localStorage.getItem('token');
+  if (!token) {
+    toast.error("Please login first");
+    navigate("/login");
+    return;
+  }
 
-  //   if (!paymentRef.trim()) {
-  //     toast.error("Please enter Unique Transaction Reference");
-  //     return;
-  //   }
-  //   if (images.length === 0) {
-  //     toast.error("Please upload payment proof images");
-  //     return;
-  //   }
+    if (!paymentRef.trim()) {
+      toast.error("Please enter Unique Transaction Reference");
+      return;
+    }
+    if (images.length === 0) {
+      toast.error("Please upload payment proof images");
+      return;
+    }
 
-  //   setLoading(true);
+    setLoading(true);
     
-  //   // Save payment record in localStorage (append)
-  //   // const paymentRecords = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
-  //    try {
-  //   const paymentData = {
-  //     id: Date.now().toString(),
-  //     amount: 1500,
-  //     user: formData,
-  //     paymentRef: paymentRef.trim(),
-  //     paymentMethod: selectedMethod,
-  //     timestamp: new Date().toISOString(),
-  //     images: images.map(file => URL.createObjectURL(file)),
-  //     status: "pending",
-  //   };
+    // Save payment record in localStorage (append)
+    // const paymentRecords = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
+     try {
+    const paymentData = {
+      id: Date.now().toString(),
+      amount: 1500,
+      user: formData,
+      paymentRef: paymentRef.trim(),
+      paymentMethod: selectedMethod,
+      timestamp: new Date().toISOString(),
+      images: images.map(file => URL.createObjectURL(file)),
+      status: "pending",
+    };
 
-  //   const response = await paymentsAPI.submitProof(paymentData);
-  //   if (response.success) {
-  //       toast.success("Payment submitted successfully! Your account will be activated after verification.");
-  //       navigate("/login");
-  //     } 
-  //     else {
-  //       toast.error(response.message || "Payment submission failed");
-  //     }
-  //   } 
-  //   catch (error) {
-  //     console.error("Payment submission error:", error);
-  //     toast.error(error.response?.data?.message || "Failed to submit payment. Please try again.");
-  //   }
-  //    finally {
-  //     setLoading(false);
-  //   }
-  // };
+    const response = await paymentsAPI.submitProof(paymentData);
+    if (response.success) {
+        toast.success("Payment submitted successfully! Your account will be activated after verification.");
+        navigate("/login");
+      } 
+      else {
+        toast.error(response.message || "Payment submission failed");
+      }
+    } 
+    catch (error) {
+      console.error("Payment submission error:", error);
+      toast.error(error.response?.data?.message || "Failed to submit payment. Please try again.");
+    }
+     finally {
+      setLoading(false);
+    }
+  };
 
   //   paymentRecords.push(newPayment);
   //   localStorage.setItem("paymentRecords", JSON.stringify(paymentRecords));
@@ -125,58 +125,6 @@ const Payment = () => {
   //     navigate("/login");
   //   }, 1500);
   // };
-
-const handlePaymentSubmit = async (e) => {
-  e.preventDefault();
-
-  const token = localStorage.getItem("token");
-  if (!token) {
-    toast.error("Please login first");
-    navigate("/login");
-    return;
-  }
-
-  const utrNumber = paymentRef?.trim();
-  if (!utrNumber) {
-    toast.error("Please enter Unique Transaction Reference");
-    return;
-  }
-
-  if (!images || images.length === 0) {
-    toast.error("Please upload payment proof images");
-    return;
-  }
-
-  setLoading(true);
-
-  try {
-    const formDataToSend = new FormData();
-    formDataToSend.append("amount", formData?.amount || "0");
-    formDataToSend.append("purpose", "registration"); // or "role-upgrade"
-    formDataToSend.append("utrNumber", utrNumber);
-
-    // append multiple images
-    images.forEach((file) => {
-      formDataToSend.append("screenshot", file); // if backend expects array, use "screenshot[]"
-    });
-
-    const response = await paymentsAPI.submitProof(formDataToSend, token);
-
-      if (response?.status === 201 || response?.data?.payment) {
-      toast.success("Payment submitted successfully! Your account will be activated after verification.");
-      navigate("/login");
-    } else {
-      toast.error(response?.data?.message || "Payment submission failed");
-    }
-
-  } catch (error) {
-    console.error("Payment submission error:", error);
-    toast.error(error?.response?.data?.message || "Failed to submit payment. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
-
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">

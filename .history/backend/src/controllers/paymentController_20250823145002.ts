@@ -174,7 +174,7 @@ export const uploadPaymentProof = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error("Upload Payment Proof Error:", error);
 
-    //  Handle duplicate UTR gracefully
+    // 👇 Handle duplicate UTR gracefully
     if (error.code === 11000 && error.keyPattern?.utrNumber) {
       return res.status(400).json({
         success: false,

@@ -140,17 +140,17 @@ export const uploadPaymentProof = async (req: Request, res: Response) => {
           .json({ message: "Valid requestedRole (broker, builder, owner) is required for role-upgrade" });
       }
     }
-    
-    let screenshots: string[] = [];
 
-    if (req.files && Array.isArray(req.files)) {
-      for (const file of req.files) {
-        console.log("Multer parsed file:", file.originalname);
-        const uploaded = await uploadFile(file.buffer, "payments/proofs");
-        screenshots.push(uploaded.secure_url);
-      }
-    } else if (proof) {
-      screenshots.push(proof);
+    let screenshot = "";
+
+    // Case 1: File uploaded
+    if (req.file) {
+      const uploaded = await uploadFile(req.file.buffer, "payments/proofs");
+      screenshot = uploaded.secure_url;
+    }
+    // Case 2: Proof URL provided in JSON
+    else if (proof) {
+      screenshot = proof;
     } else {
       return res.status(400).json({ message: "Proof image required (file or URL)" });
     }
@@ -160,36 +160,19 @@ export const uploadPaymentProof = async (req: Request, res: Response) => {
       amount,
       purpose,
       utrNumber,
-      screenshot: screenshots.length === 1 ? screenshots[0] : screenshots, // support single or multiple
+      screenshot,
       status: "pending",
       meta: purpose === "role-upgrade" ? { requestedRole } : undefined,
     });
 
     res.status(201).json({
-      success: true,
       message: "Payment proof submitted for approval",
       payment,
     });
-
-  } catch (error: any) {
-    console.error("Upload Payment Proof Error:", error);
-
-    //  Handle duplicate UTR gracefully
-    if (error.code === 11000 && error.keyPattern?.utrNumber) {
-      return res.status(400).json({
-        success: false,
-        message: "This UTR number has already been used. Please provide a unique transaction reference.",
-      });
-    }
-
-    res.status(500).json({ 
-      success: false,
-      message: "Payment submission failed. Please try again later.",
-      error: error.message, // only safe message
-    });
+  } catch (error) {
+    res.status(500).json({ message: "Payment submission failed", error });
   }
 };
-
 
 export const approvePayment = async (req: Request, res: Response) => {
   const session = await mongoose.startSession();

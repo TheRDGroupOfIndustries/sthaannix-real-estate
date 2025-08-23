@@ -392,7 +392,7 @@ const handleOtpSubmit = async (e) => {
 
     if (response.data.message) {
       toast.success("OTP verified successfully");
-      navigate("/login");
+      navigate("/log");
     } else {
       toast.error(response.data.message || "OTP verification failed");
       // Reset OTP inputs on failure so user can try again

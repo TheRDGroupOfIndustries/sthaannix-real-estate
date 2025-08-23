@@ -1,42 +1,24 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Plus, Edit3, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { motion } from "framer-motion";
+import axios from "axios";
 import api from "../api/api";
 import { paymentsAPI } from '../api/api';
 
-
-const PropertyOwnerDashboard = () => {
+const BrokerDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("properties");
   const [properties, setProperties] = useState([]);
-  const [payments, setPayments] = useState([
-    {
-      no: 1,
-      uniqueTransactionRef: "TXN123456",
-      date: "2024-05-01",
-      time: "14:30",
-      paymentMethod: "Bank Account",
-     
-    },
-    {
-      no: 2,
-      uniqueTransactionRef: "TXN789012",
-      date: "2024-05-15",
-      time: "10:45",
-      paymentMethod: "UPI",
-      
-    }
-  ]);
+  const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
 
-useEffect(() => {
+  useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    console.log("PropertyOwnerDashboard: ",user);
+    console.log("BrokerDashboard: ",user);
     
-    if (!user || user.role !== "owner") {
-      toast.error("Unauthorized. Please login as Owner.");
+    if (!user || user.role !== "broker") {
+      toast.error("Unauthorized. Please login as Broker.");
       navigate("/login");
       return;
     }
@@ -47,6 +29,60 @@ useEffect(() => {
       loadPayments(user.email);
     }
   }, [activeTab]);
+
+  // Fetch properties for Broker
+  // const fetchProperties = async () => {
+  //   setLoading(true);
+  //   try {
+  //     // Replace this with actual API call if available
+  //     // const response = await axios.get(`${backendurl}/api/products/list?role=broker`);
+  //     // Mocked property data:
+  //     const response = {
+  //       data: {
+  //         success: true,
+  //         property: [
+  //           {
+  //             _id: "1",
+  //             title: "Luxury Villa",
+  //             location: "Los Angeles",
+  //             price: 500000,
+  //             beds: 4,
+  //             baths: 3,
+  //             sqft: 3500,
+  //             availability: "rent",
+  //             type: "Villa",
+  //             image: ["https://images.pexels.com/photos/186077/pexels-photo-186077.jpeg?cs=srgb&dl=pexels-binyaminmellish-186077.jpg&fm=jpg"],
+  //             amenities: ["Pool", "Garage"],
+  //             createdAt: new Date().toISOString(),
+  //           },
+  //           {
+  //             _id: "2",
+  //             title: "Modern Apartment",
+  //             location: "New York",
+  //             price: 300000,
+  //             beds: 2,
+  //             baths: 2,
+  //             sqft: 1200,
+  //             availability: "buy",
+  //             type: "Apartment",
+  //             image: ["https://images.pexels.com/photos/186077/pexels-photo-186077.jpeg?cs=srgb&dl=pexels-binyaminmellish-186077.jpg&fm=jpg"],
+  //             amenities: ["Gym", "Security system"],
+  //             createdAt: new Date().toISOString(),
+  //           },
+  //         ],
+  //       },
+  //     };
+  //     if (response.data.success) {
+  //       setProperties(response.data.property);
+  //     } else {
+  //       toast.error("Failed to fetch properties");
+  //     }
+  //   } catch (error) {
+  //     toast.error("Failed to fetch properties");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const fetchProperties = async () => {
   setLoading(true);
@@ -72,24 +108,7 @@ useEffect(() => {
   }
 };
 
-  const handleDeleteProperty = async (id) => {
-    if (window.confirm("Are you sure you want to delete this property?")) {
-      try {
-        const token = localStorage.getItem("token");
-        await api.delete(`/properties/delete/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        setProperties((prev) => prev.filter((p) => p._id !== id));
-        toast.success("Property deleted successfully");
-      } catch (error) {
-        toast.error("Failed to delete property");
-      }
-    }
-  };
-
+  // Load payments for the broker
   const loadPayments = async (email) => {
   setLoading(true);
   try {
@@ -117,8 +136,28 @@ useEffect(() => {
     setLoading(false);
   }
 };
+ 
 
- const handleDeletePayment = (id) => {
+  const handleDeleteProperty = async (id) => {
+    if (window.confirm("Are you sure you want to delete this property?")) {
+      try {
+        const token = localStorage.getItem("token");
+        await api.delete(`/properties/delete/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setProperties((prev) => prev.filter((p) => p._id !== id));
+        toast.success("Property deleted successfully");
+      } catch (error) {
+        toast.error("Failed to delete property");
+      }
+    }
+  };
+
+
+  const handleDeletePayment = (id) => {
     if (window.confirm("Are you sure you want to delete this payment record?")) {
       const allPayments = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
       const updatedPayments = allPayments.filter(p => p.id !== id);
@@ -131,7 +170,7 @@ useEffect(() => {
   return (
     <div className="min-h-screen pt-16 px-6 bg-gray-50 max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Property Owner Dashboard</h1>
+        <h1 className="text-3xl font-bold">Broker Dashboard</h1>
         {activeTab === "properties" && (
           <button
             onClick={() => navigate("/add")}
@@ -163,13 +202,13 @@ useEffect(() => {
               : "bg-white text-gray-700 hover:bg-gray-100"
           }`}
         >
-          Payment History
+           Payment History
         </button>
       </div>
 
       {/* Tab Content */}
-      {loading && activeTab === "properties" ? (
-        <div className="text-center py-20 text-lg">Loading properties...</div>
+      {loading ? (
+        <div className="text-center py-20 text-lg">Loading...</div>
       ) : activeTab === "properties" ? (
         properties.length === 0 ? (
           <div className="text-center py-20 text-lg">No properties found.</div>
@@ -180,8 +219,7 @@ useEffect(() => {
                 key={property._id}
                 className="bg-white p-4 rounded-lg shadow group hover:shadow-lg transition relative"
               >
-                
-            <img
+             <img
             src={
               property.images && property.images.length > 0
                 ? property.images[0]
@@ -198,7 +236,6 @@ useEffect(() => {
               </p>
               <div className="flex justify-between text-sm text-gray-500 mb-3">
                 <span>{property.bhk} BHK</span>
-                <span>{property.bathroom} Baths</span>
                 <span>{property.size} Sq Ft</span>
               </div>
 
@@ -218,8 +255,8 @@ useEffect(() => {
                     )}
                   </div>
                 )}
-                </div>
 
+                </div>
                 <div className="flex justify-end space-x-2 opacity-0 group-hover:opacity-100 transition">
                   <button
                     onClick={() => navigate(`/update/${property._id}`)}
@@ -241,40 +278,37 @@ useEffect(() => {
           </div>
         )
       ) : payments.length === 0 ? (
-        <div className="text-center py-20 text-lg text-gray-600">
+        <div className="text-center py-20 text-lg text-gray-500">
           No payment records found.
         </div>
       ) : (
-        <div className="overflow-x-auto bg-white rounded-xl shadow-md border border-gray-200">
-          <table className="min-w-full">
-            <thead className="bg-gray-100">
+        <div className="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
               <tr>
-                {["No", "Unique Transaction Reference", "Date", "Time", "Method", "Action"].map((head) => (
-                  <th key={head} className="text-left p-3 border-b border-gray-300">
-                    {head}
-                  </th>
-                ))}
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unique Transaction Reference</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
               </tr>
             </thead>
-            <tbody>
-              {payments.map((payment) => (
-                <tr key={payment.uniqueTransactionRef} className="hover:bg-gray-50 transition-colors">
-                  <td className="p-3 border-b">{payment.no}</td>
-                  <td className="p-3 border-b font-mono text-sm">{payment.uniqueTransactionRef}</td>
-                  <td className="p-3 border-b">{payment.date}</td>
-                  <td className="p-3 border-b">{payment.time}</td>
-                  <td className="p-3 border-b">{payment.paymentMethod}</td>
-                 
-                  <td className="p-3 border-b">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => handleDeletePayment(payment.uniqueTransactionRef)}
-                      className="px-3 py-1 rounded bg-red-600 text-white flex items-center gap-1 text-sm"
+            <tbody className="divide-y divide-gray-100">
+              {payments.map((payment, idx) => (
+                <tr key={payment.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">{idx + 1}</td>
+                  <td className="px-6 py-4 font-mono text-sm whitespace-nowrap">{payment.paymentRef}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{new Date(payment.timestamp).toLocaleString()}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{payment.paymentMethod}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <button
+                      onClick={() => handleDeletePayment(payment.id)}
+                      className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-red-600 text-white hover:bg-red-700 transition"
+                      title="Delete Payment"
                     >
-                      <Trash2 size={16} />
+                      <Trash2 className="w-4 h-4" />
                       Delete
-                    </motion.button>
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -286,4 +320,4 @@ useEffect(() => {
   );
 };
 
-export default PropertyOwnerDashboard;
+export default BrokerDashboard;

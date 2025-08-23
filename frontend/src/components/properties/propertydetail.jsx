@@ -27,6 +27,7 @@ import {
   fetchPropertyDetail,
   submitInquiry,
 } from "../../services/property-InqueryService.js";
+import http from "../../api/http.js";
 
 const LOCAL_STORAGE_PREFIX = "propertyDetail_";
 
@@ -50,12 +51,15 @@ const PropertyDetails = () => {
   const [inquirySubmitting, setInquirySubmitting] = useState(false);
   const [inquirySuccess, setInquirySuccess] = useState(false);
 
+  // newly added
+  const [user, setUser] = useState(null);
+  const [whatsappNum, setWhatsappNum] = useState(null);
   //image data safely
   const images = property?.images
-  ? Array.isArray(property.images)
-    ? property.images
-    : [property.images]
-  : [];
+    ? Array.isArray(property.images)
+      ? property.images
+      : [property.images]
+    : [];
 
   // Safely get location string (handle both string and object)
   const getLocationString = () => {
@@ -90,7 +94,7 @@ const PropertyDetails = () => {
     property?.price || 0
   ).toLocaleString("en-IN")}. Please contact me for more details.`;
   const encodedMessage = encodeURIComponent(whatsappMessage);
-  const whatsappUrl = `https://wa.me/919876543210?text=${encodedMessage}`;
+  const whatsappUrl = `https://wa.me/${whatsappNum}?text=${encodedMessage}`;
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -135,6 +139,24 @@ const PropertyDetails = () => {
   }, [id, property]);
 
   useEffect(() => {
+    if (!property || !property.owner) return; // ✅ guard
+
+    const fetchPropertyOwner = async () => {
+      try {
+        const res = await http.get(`/user/get-by-id/${property.owner}`);
+        if (!res.data.user) return;
+
+        setUser(res.data.user);
+        setWhatsappNum(res.data.user.phone);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchPropertyOwner();
+  }, [property]);
+
+  useEffect(() => {
     window.scrollTo(0, 0);
     setActiveImage(0);
   }, [id]);
@@ -144,6 +166,8 @@ const PropertyDetails = () => {
       setLocalStorage(localStorageKey, property);
     }
   }, [property, localStorageKey]);
+
+ 
 
   // const parseAmenities = (amenities) => {
   //   if (!amenities || !Array.isArray(amenities)) return [];
@@ -188,20 +212,19 @@ const PropertyDetails = () => {
   };
 
   const handleKeyNavigation = useCallback(
-  (e) => {
-    if (!images.length) return;
+    (e) => {
+      if (!images.length) return;
 
-    if (e.key === "ArrowLeft") {
-      setActiveImage((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-    } else if (e.key === "ArrowRight") {
-      setActiveImage((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-    } else if (e.key === "Escape" && showSchedule) {
-      setShowSchedule(false);
-    }
-  },
-  [images.length, showSchedule]
-);
-
+      if (e.key === "ArrowLeft") {
+        setActiveImage((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+      } else if (e.key === "ArrowRight") {
+        setActiveImage((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+      } else if (e.key === "Escape" && showSchedule) {
+        setShowSchedule(false);
+      }
+    },
+    [images.length, showSchedule]
+  );
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyNavigation);
@@ -629,7 +652,7 @@ const PropertyDetails = () => {
               <Compass className="w-5 h-5" />
               <h3 className="text-lg font-semibold">Location</h3>
             </div>
-            <p className="text-gray-600 mb-4">{locationString}</p>
+            <p className="text-gray-600 mb-4">{property.location.state}</p>
             <a
               href={`https://maps.google.com/?q=${encodeURIComponent(
                 locationString

@@ -15,7 +15,7 @@ import {
   Send,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
-// import { backendurl } from "../config/constants";
+import {Backendurl } from "../config/constants";
 
 const Appointments = () => {
   const [appointments, setAppointments] = useState([]);
@@ -52,7 +52,7 @@ const Appointments = () => {
   const handleStatusChange = async (appointmentId, newStatus) => {
     try {
       const response = await axios.put(
-        `${backendurl}/api/appointments/status`,
+        `${Backendurl}/api/appointments/status`,
         {
           appointmentId,
           status: newStatus,

@@ -201,26 +201,6 @@ export const getProperties = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Failed to fetch properties", error });
   }
 };
-
-export const getPropertyById = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Invalid property ID" });
-    }
-
-    const property = await Property.findById(id);
-    if (!property) {
-      return res.status(404).json({ message: "Property not found" });
-    }
-
-    res.json(property);
-  } catch (error) {
-    console.error("Get Property By ID Error:", error);
-    res.status(500).json({ message: "Failed to fetch property", error });
-  }
-};
-
 export const updateProperty = async (req: Request, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
@@ -241,22 +221,91 @@ export const updateProperty = async (req: Request, res: Response) => {
         .json({ message: "You cannot update this property" });
     }
 
-    const { title, description, price, size, bhk, location, isPromoted } =
-      req.body;
+    // Extract fields from req.body
+    const {
+      title,
+      description,
+      price,
+      size,
+      bhk,
+      bathroom,
+      location,
+      isPromoted,
+      propertyType,
+      transactionType,
+      existingImages, // <-- frontend will send this
+    } = req.body;
 
+    // Handle new uploaded images
+    const uploadedImages: string[] = [];
+    if (req.files && Array.isArray(req.files)) {
+      for (const file of req.files as Express.Multer.File[]) {
+        const result = await uploadFile(file.buffer, "properties/images");
+        uploadedImages.push(result.secure_url);
+      }
+    }
+
+    // Merge existing + new images
+    let finalImages: string[] = [];
+    if (existingImages) {
+      if (Array.isArray(existingImages)) {
+        finalImages = existingImages;
+      } else {
+        finalImages = [existingImages]; // single string case
+      }
+    }
+    finalImages = [...finalImages, ...uploadedImages];
+
+    // Update fields if provided
     if (title !== undefined) property.title = title;
     if (description !== undefined) property.description = description;
-    if (price !== undefined) property.price = price;
-    if (size !== undefined) property.size = size;
-    if (bhk !== undefined) property.bhk = bhk;
-    if (location !== undefined) property.location = location;
-    if (isPromoted !== undefined) property.isPromoted = isPromoted;
+    if (price !== undefined) property.price = Number(price);
+    if (size !== undefined) property.size = Number(size);
+    if (bhk !== undefined) property.bhk = Number(bhk);
+    if (bathroom !== undefined) property.bathroom = Number(bathroom);
+    if (propertyType !== undefined) property.propertyType = propertyType;
+    if (transactionType !== undefined)
+      property.transactionType = transactionType;
+
+    if (location !== undefined) {
+      property.location =
+        typeof location === "string" ? JSON.parse(location) : location;
+    }
+
+    if (isPromoted !== undefined) {
+      property.isPromoted = isPromoted === "true" || isPromoted === true;
+    }
+
+    // Update images (only if provided, else keep old ones)
+    if (finalImages.length > 0) {
+      property.images = finalImages;
+    }
 
     await property.save();
-    res.json(property);
+
+    res.json({ message: "Property updated successfully", property });
   } catch (error) {
     console.error("Update Property Error:", error);
     res.status(500).json({ message: "Failed to update property", error });
+  }
+};
+
+export const getPropertyById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid property ID" });
+    }
+
+    const property = await Property.findById(id);
+    if (!property) {
+      return res.status(404).json({ message: "Property not found" });
+    }
+
+    res.json(property);
+  } catch (error) {
+    console.error("Get Property By ID Error:", error);
+    res.status(500).json({ message: "Failed to fetch property", error });
   }
 };
 
@@ -285,5 +334,38 @@ export const deleteProperty = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Delete Property Error:", error);
     res.status(500).json({ message: "Failed to delete property", error });
+  }
+};
+
+export const myProperties = async (req: Request, res: Response) => {
+  try {
+    if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+
+    const { sort, status } = req.query as {
+      sort?: string;
+      status?: string;
+    };
+
+    const filter: Record<string, any> = { owner: req.user.id };
+
+    if (status) {
+      const allowedStatuses = ["pending", "approved", "rejected"];
+      if (allowedStatuses.includes(status)) {
+        filter.status = status;
+      } else {
+        return res.status(400).json({ message: `Invalid status: ${status}` });
+      }
+    }
+
+    const sortOptions: Record<string, any> = {};
+    if (sort === "newest") sortOptions.createdAt = -1;
+    if (sort === "cheapest") sortOptions.price = 1;
+
+    const properties = await Property.find(filter).sort(sortOptions).exec();
+
+    res.json(properties);
+  } catch (error) {
+    console.error("My Properties Error:", error);
+    res.status(500).json({ message: "Failed to fetch your properties", error });
   }
 };

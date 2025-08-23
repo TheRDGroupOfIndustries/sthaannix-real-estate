@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Plus, Edit3, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { motion } from "framer-motion";
+import api from "../api/api";
 import { paymentsAPI } from '../api/api';
 
 
@@ -48,60 +49,39 @@ useEffect(() => {
   }, [activeTab]);
 
   const fetchProperties = async () => {
-    setLoading(true);
-    try {
-      // Replace with API call
-      const response = {
-        data: {
-          success: true,
-          property: [
-            {
-              _id: "1",
-              title: "Luxury Villa",
-              location: "Mumbai",
-              price: 25000000,
-              beds: 4,
-              baths: 3,
-              sqft: 3500,
-              availability: "rent",
-              type: "Villa",
-              image: ["https://images.unsplash.com/photo-1580587771525-78b9dba3b914"],
-              amenities: ["Pool", "Gym", "Security"],
-              createdAt: new Date().toISOString(),
-            },
-            {
-              _id: "2",
-              title: "Modern Apartment",
-              location: "Bangalore",
-              price: 12000000,
-              beds: 3,
-              baths: 2,
-              sqft: 1800,
-              availability: "sale",
-              type: "Apartment",
-              image: ["https://images.unsplash.com/photo-1493809842364-78817add7ffb"],
-              amenities: ["Parking", "Lift", "24/7 Water"],
-              createdAt: new Date().toISOString(),
-            }
-          ],
-        },
-      };
-      if (response.data.success) {
-        setProperties(response.data.property);
-      } else {
-        toast.error("Failed to fetch properties");
-      }
-    } catch (error) {
+  setLoading(true);
+  try {
+    const token = localStorage.getItem("token"); // if you store JWT in localStorage
+
+    const response = await api.get("/properties/my-properties", {
+      headers: {
+        Authorization: `Bearer ${token}`, // backend expects req.user
+      },
+    });
+
+    if (response.status === 200) {
+      setProperties(response.data); // backend returns array of properties
+    } else {
       toast.error("Failed to fetch properties");
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch (error) {
+    console.error("Fetch properties error:", error);
+    toast.error("Failed to fetch properties");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleDeleteProperty = async (id) => {
     if (window.confirm("Are you sure you want to delete this property?")) {
       try {
-        // API call to remove
+        const token = localStorage.getItem("token");
+        await api.delete(`/properties/delete/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
         setProperties((prev) => prev.filter((p) => p._id !== id));
         toast.success("Property deleted successfully");
       } catch (error) {
@@ -200,32 +180,46 @@ useEffect(() => {
                 key={property._id}
                 className="bg-white p-4 rounded-lg shadow group hover:shadow-lg transition relative"
               >
-                <img
-                  src={property.image[0] || "/placeholder.jpg"}
-                  alt={property.title}
-                  className="w-full h-48 object-cover rounded-lg mb-4"
-                />
-                <h2 className="font-semibold text-lg mb-1">{property.title}</h2>
-                <p className="text-gray-600 mb-1">{property.location}</p>
-                <p className="text-blue-600 font-bold mb-2">₹{property.price.toLocaleString()}</p>
-                <div className="flex justify-between text-sm text-gray-500 mb-3">
-                  <span>{property.beds} Beds</span>
-                  <span>{property.baths} Baths</span>
-                  <span>{property.sqft} Sq Ft</span>
-                </div>
+                
+            <img
+            src={
+              property.images && property.images.length > 0
+                ? property.images[0]
+                : "/placeholder.jpg"
+            }
+            alt={property.title}
+            className="w-full h-48 object-cover rounded-lg mb-4"
+          />
+
+            <h2 className="font-semibold text-lg mb-1">{property.title}</h2>
+              <p className="text-gray-600 mb-1">{property.location?.address}</p>
+              <p className="text-blue-600 font-bold mb-2">
+                ₹{property.price.toLocaleString()}
+              </p>
+              <div className="flex justify-between text-sm text-gray-500 mb-3">
+                <span>{property.bhk} BHK</span>
+                <span>{property.baths} Baths</span>
+                <span>{property.size} Sq Ft</span>
+              </div>
+
                 <div className="flex space-x-2 mb-3 flex-wrap">
-                  {property.amenities.slice(0, 4).map((a, idx) => (
-                    <span
-                      key={idx}
-                      className="bg-blue-100 text-blue-700 px-2 rounded-full text-xs"
-                    >
-                      {a}
-                    </span>
-                  ))}
-                  {property.amenities.length > 4 && (
-                    <span className="text-gray-400 text-xs">{`+${property.amenities.length - 4} more`}</span>
-                  )}
+                 {property.amenities && property.amenities.length > 0 && (
+                  <div className="flex space-x-2 mb-3 flex-wrap">
+                    {property.amenities.slice(0, 4).map((a, idx) => (
+                      <span
+                        key={idx}
+                        className="bg-blue-100 text-blue-700 px-2 rounded-full text-xs"
+                      >
+                        {a}
+                      </span>
+                    ))}
+                    {property.amenities.length > 4 && (
+                      <span className="text-gray-400 text-xs">{`+${property.amenities.length - 4} more`}</span>
+                    )}
+                  </div>
+                )}
                 </div>
+
                 <div className="flex justify-end space-x-2 opacity-0 group-hover:opacity-100 transition">
                   <button
                     onClick={() => navigate(`/update/${property._id}`)}

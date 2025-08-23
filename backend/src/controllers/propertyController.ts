@@ -201,7 +201,6 @@ export const getProperties = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Failed to fetch properties", error });
   }
 };
-
 export const updateProperty = async (req: Request, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
@@ -222,6 +221,7 @@ export const updateProperty = async (req: Request, res: Response) => {
         .json({ message: "You cannot update this property" });
     }
 
+    // Extract fields from req.body
     const {
       title,
       description,
@@ -231,8 +231,11 @@ export const updateProperty = async (req: Request, res: Response) => {
       bathroom,
       location,
       isPromoted,
+      propertyType,
+      transactionType,
     } = req.body;
 
+    // Handle uploaded images
     const uploadedImages: string[] = [];
     if (req.files && Array.isArray(req.files)) {
       for (const file of req.files as Express.Multer.File[]) {
@@ -241,12 +244,16 @@ export const updateProperty = async (req: Request, res: Response) => {
       }
     }
 
+    // Update fields if provided
     if (title !== undefined) property.title = title;
     if (description !== undefined) property.description = description;
     if (price !== undefined) property.price = Number(price);
     if (size !== undefined) property.size = Number(size);
     if (bhk !== undefined) property.bhk = Number(bhk);
     if (bathroom !== undefined) property.bathroom = Number(bathroom);
+    if (propertyType !== undefined) property.propertyType = propertyType;
+    if (transactionType !== undefined)
+      property.transactionType = transactionType;
 
     if (location !== undefined) {
       property.location =
@@ -254,8 +261,7 @@ export const updateProperty = async (req: Request, res: Response) => {
     }
 
     if (isPromoted !== undefined) {
-      property.isPromoted =
-        isPromoted === "true" || isPromoted === true ? true : false;
+      property.isPromoted = isPromoted === "true" || isPromoted === true;
     }
 
     if (uploadedImages.length > 0) {
@@ -263,6 +269,7 @@ export const updateProperty = async (req: Request, res: Response) => {
     }
 
     await property.save();
+
     res.json({ message: "Property updated successfully", property });
   } catch (error) {
     console.error("Update Property Error:", error);

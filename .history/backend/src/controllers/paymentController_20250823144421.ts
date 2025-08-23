@@ -6,7 +6,6 @@ import TopUpRequest from "../models/TopUpRequest";
 import mongoose from "mongoose";
 
 
-
 // export const uploadPaymentProof = async (req: Request, res: Response) => {
 //   try {
 //     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
@@ -141,56 +140,45 @@ export const uploadPaymentProof = async (req: Request, res: Response) => {
           .json({ message: "Valid requestedRole (broker, builder, owner) is required for role-upgrade" });
       }
     }
-    
-    let screenshots: string[] = [];
 
-    if (req.files && Array.isArray(req.files)) {
-      for (const file of req.files) {
-        console.log("Multer parsed file:", file.originalname);
-        const uploaded = await uploadFile(file.buffer, "payments/proofs");
-        screenshots.push(uploaded.secure_url);
-      }
-    } else if (proof) {
-      screenshots.push(proof);
-    } else {
-      return res.status(400).json({ message: "Proof image required (file or URL)" });
-    }
+let screenshots: string[] = [];
 
-    const payment = await Payment.create({
-      user: user._id,
-      amount,
-      purpose,
-      utrNumber,
-      screenshot: screenshots.length === 1 ? screenshots[0] : screenshots, // support single or multiple
-      status: "pending",
-      meta: purpose === "role-upgrade" ? { requestedRole } : undefined,
-    });
+if (req.files && Array.isArray(req.files)) {
+  for (const file of req.files) {
+    console.log("Multer parsed file:", file.originalname);
+    const uploaded = await uploadFile(file.buffer, "payments/proofs");
+    screenshots.push(uploaded.secure_url);
+  }
+} else if (proof) {
+  screenshots.push(proof);
+} else {
+  return res.status(400).json({ message: "Proof image required (file or URL)" });
+}
+
+const payment = await Payment.create({
+  user: user._id,
+  amount,
+  purpose,
+  utrNumber,
+  screenshot: screenshots.length === 1 ? screenshots[0] : screenshots, // support single or multiple
+  status: "pending",
+  meta: purpose === "role-upgrade" ? { requestedRole } : undefined,
+});
+
 
     res.status(201).json({
-      success: true,
       message: "Payment proof submitted for approval",
       payment,
     });
+  } } catch (error) {
+  console.error("Upload Payment Proof Error:", error); // log full error to backend console
+  res.status(500).json({ 
+    message: "Payment submission failed", 
+    error: (error as Error).message // only send message
+  });
+}
 
-  } catch (error: any) {
-    console.error("Upload Payment Proof Error:", error);
-
-    //  Handle duplicate UTR gracefully
-    if (error.code === 11000 && error.keyPattern?.utrNumber) {
-      return res.status(400).json({
-        success: false,
-        message: "This UTR number has already been used. Please provide a unique transaction reference.",
-      });
-    }
-
-    res.status(500).json({ 
-      success: false,
-      message: "Payment submission failed. Please try again later.",
-      error: error.message, // only safe message
-    });
-  }
 };
-
 
 export const approvePayment = async (req: Request, res: Response) => {
   const session = await mongoose.startSession();
@@ -306,34 +294,11 @@ export const getMyPayments = async (req: Request, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
-    // Get normal payments
     const payments = await Payment.find({ user: req.user.id }).sort({
       createdAt: -1,
     });
-
-    // Get wallet top-ups
-    const topUps = await TopUpRequest.find({ user: req.user.id }).sort({
-      createdAt: -1,
-    });
-
-    // Combine both with a tag to distinguish them
-    const allTransactions = [
-      ...payments.map((p) => ({
-        ...p.toObject(),
-        type: "payment", // tag it
-      })),
-      ...topUps.map((t) => ({
-        ...t.toObject(),
-        type: "wallet-topup", // tag it
-      })),
-    ].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
-
-    res.json({
-      success: true,
-      transactions: allTransactions,
-    });
+    res.json(payments);
   } catch (error) {
-    console.error("getMyPayments error:", error);
     res.status(500).json({ message: "Failed to fetch payments", error });
   }
 };

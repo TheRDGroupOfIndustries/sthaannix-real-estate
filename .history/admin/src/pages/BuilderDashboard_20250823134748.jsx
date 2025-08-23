@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Plus, Edit3, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { motion } from "framer-motion";
+import axios from "axios";
 import api from "../api/api";
 import { paymentsAPI } from '../api/api';
 
 
-const PropertyOwnerDashboard = () => {
+const BuilderDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("properties");
   const [properties, setProperties] = useState([]);
@@ -18,25 +19,16 @@ const PropertyOwnerDashboard = () => {
       date: "2024-05-01",
       time: "14:30",
       paymentMethod: "Bank Account",
-     
     },
-    {
-      no: 2,
-      uniqueTransactionRef: "TXN789012",
-      date: "2024-05-15",
-      time: "10:45",
-      paymentMethod: "UPI",
-      
-    }
-  ]);
+]);
   const [loading, setLoading] = useState(true);
 
-useEffect(() => {
+  useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    console.log("PropertyOwnerDashboard: ",user);
+    console.log("BuilderDashboard: ",user);
     
-    if (!user || user.role !== "owner") {
-      toast.error("Unauthorized. Please login as Owner.");
+    if (!user || user.role !== "builder") {
+      toast.error("Unauthorized. Please login as Builder.");
       navigate("/login");
       return;
     }
@@ -47,6 +39,7 @@ useEffect(() => {
       loadPayments(user.email);
     }
   }, [activeTab]);
+
 
   const fetchProperties = async () => {
   setLoading(true);
@@ -72,6 +65,7 @@ useEffect(() => {
   }
 };
 
+
   const handleDeleteProperty = async (id) => {
     if (window.confirm("Are you sure you want to delete this property?")) {
       try {
@@ -90,27 +84,35 @@ useEffect(() => {
     }
   };
 
-const loadPayments = async (email) => {
+    const loadPayments = async (email) => {
   setLoading(true);
   try {
-    const res = await paymentsAPI.myPayments();
-
-    if (res.data?.success) {
-      setPayments(res.data.transactions); 
+    const data = await paymentsAPI.myPayments();
+    if (data.success) {
+      setPayments(data.payments);
     } else {
-      toast.error("Failed to load payments");
-      setPayments([]);
+      toast.error('Failed to load payments');
+      // Fallback to localStorage
+      const allPayments = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
+      const userPayments = allPayments.filter(
+        (p) => p.status === "approved" && p.user.email === email
+      );
+      setPayments(userPayments);
     }
   } catch (error) {
-    console.error("Load payments error:", error);
-    toast.error("Failed to load payments from server");
-    setPayments([]);
+    toast.error('Failed to load payments from server');
+    // Fallback to localStorage
+    const allPayments = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
+    const userPayments = allPayments.filter(
+      (p) => p.status === "approved" && p.user.email === email
+    );
+    setPayments(userPayments);
   } finally {
     setLoading(false);
   }
 };
 
- const handleDeletePayment = (id) => {
+  const handleDeletePayment = (id) => {
     if (window.confirm("Are you sure you want to delete this payment record?")) {
       const allPayments = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
       const updatedPayments = allPayments.filter(p => p.id !== id);
@@ -123,7 +125,7 @@ const loadPayments = async (email) => {
   return (
     <div className="min-h-screen pt-16 px-6 bg-gray-50 max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Property Owner Dashboard</h1>
+        <h1 className="text-3xl font-bold">Builder Dashboard</h1>
         {activeTab === "properties" && (
           <button
             onClick={() => navigate("/add")}
@@ -155,7 +157,7 @@ const loadPayments = async (email) => {
               : "bg-white text-gray-700 hover:bg-gray-100"
           }`}
         >
-          Payment History
+           Payment History
         </button>
       </div>
 
@@ -172,7 +174,6 @@ const loadPayments = async (email) => {
                 key={property._id}
                 className="bg-white p-4 rounded-lg shadow group hover:shadow-lg transition relative"
               >
-                
             <img
             src={
               property.images && property.images.length > 0
@@ -182,15 +183,13 @@ const loadPayments = async (email) => {
             alt={property.title}
             className="w-full h-48 object-cover rounded-lg mb-4"
           />
-
-            <h2 className="font-semibold text-lg mb-1">{property.title}</h2>
+                <h2 className="font-semibold text-lg mb-1">{property.title}</h2>
               <p className="text-gray-600 mb-1">{property.location?.address}</p>
               <p className="text-blue-600 font-bold mb-2">
                 ₹{property.price.toLocaleString()}
               </p>
               <div className="flex justify-between text-sm text-gray-500 mb-3">
                 <span>{property.bhk} BHK</span>
-                <span>{property.bathroom} Baths</span>
                 <span>{property.size} Sq Ft</span>
               </div>
 
@@ -234,14 +233,14 @@ const loadPayments = async (email) => {
         )
       ) : payments.length === 0 ? (
         <div className="text-center py-20 text-lg text-gray-600">
-          No payment records found.
+         No payment records found.
         </div>
       ) : (
         <div className="overflow-x-auto bg-white rounded-xl shadow-md border border-gray-200">
           <table className="min-w-full">
             <thead className="bg-gray-100">
               <tr>
-                {["No", "Unique Transaction Reference", "Date", "Time", "Method", "Action"].map((head) => (
+                {["No", "Unique Transaction Ref", "Date", "Time", "Payment Method", "Action"].map((head) => (
                   <th key={head} className="text-left p-3 border-b border-gray-300">
                     {head}
                   </th>
@@ -249,28 +248,23 @@ const loadPayments = async (email) => {
               </tr>
             </thead>
             <tbody>
-              {payments.map((payment, idx) => (
-                <tr key={payment.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">{idx + 1}</td>
-                  <td className="px-6 py-4 font-mono text-sm whitespace-nowrap">
-                        {payment.utrNumber || "-"}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {new Date(payment.createdAt).toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {payment.purpose || "Wallet Top-up"}
-                      </td>
-
-                  <td className="px-6 py-4 whitespace-nowrap text-center">
-                    <button
-                      onClick={() => handleDeletePayment(payment.id)}
-                      className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-red-600 text-white hover:bg-red-700 transition"
-                      title="Delete Payment"
+              {payments.map((payment) => (
+                <tr key={payment.uniqueTransactionRef} className="hover:bg-gray-50 transition-colors">
+                  <td className="p-3 border-b">{payment.no}</td>
+                  <td className="p-3 border-b">{payment.uniqueTransactionRef}</td>
+                  <td className="p-3 border-b">{payment.date}</td>
+                  <td className="p-3 border-b">{payment.time}</td>
+                  <td className="p-3 border-b">{payment.paymentMethod}</td>
+                  <td className="p-3 border-b">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleDeletePayment(payment.uniqueTransactionRef)}
+                      className="px-4 py-1 rounded bg-red-600 text-white flex items-center gap-1"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 size={16} />
                       Delete
-                    </button>
+                    </motion.button>
                   </td>
                 </tr>
               ))}
@@ -282,4 +276,4 @@ const loadPayments = async (email) => {
   );
 };
 
-export default PropertyOwnerDashboard;
+export default BuilderDashboard;

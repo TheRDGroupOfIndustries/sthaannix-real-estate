@@ -90,21 +90,29 @@ useEffect(() => {
     }
   };
 
-const loadPayments = async (email) => {
+  const loadPayments = async (email) => {
   setLoading(true);
   try {
-    const res = await paymentsAPI.myPayments();
-
-    if (res.data?.success) {
-      setPayments(res.data.transactions); 
+    const data = await paymentsAPI.myPayments();
+    if (data.success) {
+      setPayments(data.payments);
     } else {
-      toast.error("Failed to load payments");
-      setPayments([]);
+      toast.error('Failed to load payments');
+      // Fallback to localStorage
+      const allPayments = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
+      const userPayments = allPayments.filter(
+        (p) => p.status === "approved" && p.user.email === email
+      );
+      setPayments(userPayments);
     }
   } catch (error) {
-    console.error("Load payments error:", error);
-    toast.error("Failed to load payments from server");
-    setPayments([]);
+    toast.error('Failed to load payments from server');
+    // Fallback to localStorage
+    const allPayments = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
+    const userPayments = allPayments.filter(
+      (p) => p.status === "approved" && p.user.email === email
+    );
+    setPayments(userPayments);
   } finally {
     setLoading(false);
   }

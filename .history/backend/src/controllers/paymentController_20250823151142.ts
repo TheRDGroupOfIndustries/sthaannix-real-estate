@@ -324,7 +324,7 @@ export const getMyPayments = async (req: Request, res: Response) => {
       })),
       ...topUps.map((t) => ({
         ...t.toObject(),
-        type: "wallet-topup", // tag it
+        type: "wallet-topup", // 🔑 tag it
       })),
     ].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
 

@@ -90,21 +90,29 @@ useEffect(() => {
     }
   };
 
-const loadPayments = async (email) => {
+  const loadPayments = async (email) => {
   setLoading(true);
   try {
-    const res = await paymentsAPI.myPayments();
-
-    if (res.data?.success) {
-      setPayments(res.data.transactions); 
+    const data = await paymentsAPI.myPayments();
+    if (data.success) {
+      setPayments(data.payments);
     } else {
-      toast.error("Failed to load payments");
-      setPayments([]);
+      toast.error('Failed to load payments');
+      // Fallback to localStorage
+      const allPayments = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
+      const userPayments = allPayments.filter(
+        (p) => p.status === "approved" && p.user.email === email
+      );
+      setPayments(userPayments);
     }
   } catch (error) {
-    console.error("Load payments error:", error);
-    toast.error("Failed to load payments from server");
-    setPayments([]);
+    toast.error('Failed to load payments from server');
+    // Fallback to localStorage
+    const allPayments = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
+    const userPayments = allPayments.filter(
+      (p) => p.status === "approved" && p.user.email === email
+    );
+    setPayments(userPayments);
   } finally {
     setLoading(false);
   }
@@ -249,28 +257,24 @@ const loadPayments = async (email) => {
               </tr>
             </thead>
             <tbody>
-              {payments.map((payment, idx) => (
-                <tr key={payment.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">{idx + 1}</td>
-                  <td className="px-6 py-4 font-mono text-sm whitespace-nowrap">
-                        {payment.utrNumber || "-"}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {new Date(payment.createdAt).toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {payment.purpose || "Wallet Top-up"}
-                      </td>
-
-                  <td className="px-6 py-4 whitespace-nowrap text-center">
-                    <button
-                      onClick={() => handleDeletePayment(payment.id)}
-                      className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-red-600 text-white hover:bg-red-700 transition"
-                      title="Delete Payment"
+              {payments.map((payment) => (
+                <tr key={payment.uniqueTransactionRef} className="hover:bg-gray-50 transition-colors">
+                  <td className="p-3 border-b">{payment.no}</td>
+                  <td className="p-3 border-b font-mono text-sm">{payment.uniqueTransactionRef}</td>
+                  <td className="p-3 border-b">{payment.date}</td>
+                  <td className="p-3 border-b">{payment.time}</td>
+                  <td className="p-3 border-b">{payment.paymentMethod}</td>
+                 
+                  <td className="p-3 border-b">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleDeletePayment(payment.uniqueTransactionRef)}
+                      className="px-3 py-1 rounded bg-red-600 text-white flex items-center gap-1 text-sm"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 size={16} />
                       Delete
-                    </button>
+                    </motion.button>
                   </td>
                 </tr>
               ))}

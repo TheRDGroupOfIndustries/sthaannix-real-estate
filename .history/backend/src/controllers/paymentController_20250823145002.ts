@@ -6,7 +6,6 @@ import TopUpRequest from "../models/TopUpRequest";
 import mongoose from "mongoose";
 
 
-
 // export const uploadPaymentProof = async (req: Request, res: Response) => {
 //   try {
 //     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
@@ -175,7 +174,7 @@ export const uploadPaymentProof = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error("Upload Payment Proof Error:", error);
 
-    //  Handle duplicate UTR gracefully
+    // 👇 Handle duplicate UTR gracefully
     if (error.code === 11000 && error.keyPattern?.utrNumber) {
       return res.status(400).json({
         success: false,
@@ -306,34 +305,11 @@ export const getMyPayments = async (req: Request, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
-    // Get normal payments
     const payments = await Payment.find({ user: req.user.id }).sort({
       createdAt: -1,
     });
-
-    // Get wallet top-ups
-    const topUps = await TopUpRequest.find({ user: req.user.id }).sort({
-      createdAt: -1,
-    });
-
-    // Combine both with a tag to distinguish them
-    const allTransactions = [
-      ...payments.map((p) => ({
-        ...p.toObject(),
-        type: "payment", // tag it
-      })),
-      ...topUps.map((t) => ({
-        ...t.toObject(),
-        type: "wallet-topup", // tag it
-      })),
-    ].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
-
-    res.json({
-      success: true,
-      transactions: allTransactions,
-    });
+    res.json(payments);
   } catch (error) {
-    console.error("getMyPayments error:", error);
     res.status(500).json({ message: "Failed to fetch payments", error });
   }
 };

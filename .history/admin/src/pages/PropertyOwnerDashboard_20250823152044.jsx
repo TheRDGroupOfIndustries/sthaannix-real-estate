@@ -96,7 +96,7 @@ const loadPayments = async (email) => {
     const res = await paymentsAPI.myPayments();
 
     if (res.data?.success) {
-      setPayments(res.data.transactions); 
+      setPayments(res.data.transactions); // <-- us
     } else {
       toast.error("Failed to load payments");
       setPayments([]);

@@ -164,7 +164,7 @@ const handlePaymentSubmit = async (e) => {
 
       if (response?.status === 201 || response?.data?.payment) {
       toast.success("Payment submitted successfully! Your account will be activated after verification.");
-      navigate("/register");
+      navigate("/re");
     } else {
       toast.error(response?.data?.message || "Payment submission failed");
     }

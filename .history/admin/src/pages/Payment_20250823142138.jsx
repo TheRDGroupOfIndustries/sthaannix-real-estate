@@ -136,13 +136,11 @@ const handlePaymentSubmit = async (e) => {
     return;
   }
 
-  const utrNumber = paymentRef?.trim();
-  if (!utrNumber) {
+  if (!paymentRef.trim()) {
     toast.error("Please enter Unique Transaction Reference");
     return;
   }
-
-  if (!images || images.length === 0) {
+  if (images.length === 0) {
     toast.error("Please upload payment proof images");
     return;
   }
@@ -151,27 +149,25 @@ const handlePaymentSubmit = async (e) => {
 
   try {
     const formDataToSend = new FormData();
-    formDataToSend.append("amount", formData?.amount || "0");
+    formDataToSend.append("amount", formData.amount);
     formDataToSend.append("purpose", "registration"); // or "role-upgrade"
-    formDataToSend.append("utrNumber", utrNumber);
+    formDataToSend.append("utrNumber", paymentRef.trim());
 
-    // append multiple images
+    // 👇 append actual files
     images.forEach((file) => {
-      formDataToSend.append("screenshot", file); // if backend expects array, use "screenshot[]"
+      formDataToSend.append("screenshot", file); 
     });
 
     const response = await paymentsAPI.submitProof(formDataToSend, token);
-
-      if (response?.status === 201 || response?.data?.payment) {
+    if (response.success) {
       toast.success("Payment submitted successfully! Your account will be activated after verification.");
-      navigate("/register");
+      navigate("/login");
     } else {
-      toast.error(response?.data?.message || "Payment submission failed");
+      toast.error(response.message || "Payment submission failed");
     }
-
   } catch (error) {
     console.error("Payment submission error:", error);
-    toast.error(error?.response?.data?.message || "Failed to submit payment. Please try again.");
+    toast.error(error.response?.data?.message || "Failed to submit payment. Please try again.");
   } finally {
     setLoading(false);
   }

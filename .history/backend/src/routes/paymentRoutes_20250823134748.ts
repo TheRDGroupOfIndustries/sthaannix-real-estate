@@ -18,7 +18,7 @@ router.post(
   "/submit-proof",
   authenticate,
   (req, res, next) => {
-    upload.array("screenshot", 5)(req, res, (err) => { // 👈 allow up to 5 files
+    upload.single("screenshot")(req, res, (err) => {
       if (err instanceof multer.MulterError) {
         return res.status(400).json({ message: err.message });
       } else if (err) {
@@ -29,7 +29,6 @@ router.post(
   },
   uploadPaymentProof
 );
-
 
 
 // route for person who paid to see their payment

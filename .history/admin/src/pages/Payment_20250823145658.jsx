@@ -162,12 +162,12 @@ const handlePaymentSubmit = async (e) => {
 
     const response = await paymentsAPI.submitProof(formDataToSend, token);
 
-      if (response?.status === 201 || response?.data?.payment) {
-      toast.success("Payment submitted successfully! Your account will be activated after verification.");
-      navigate("/register");
-    } else {
-      toast.error(response?.data?.message || "Payment submission failed");
-    }
+  if (response?.status === 201 || response?.data?.payment) {
+  toast.success("Payment submitted successfully! Your account will be activated after verification.");
+  navigate("/login");
+} else {
+  toast.error(response?.data?.message || "Payment submission failed");
+}
 
   } catch (error) {
     console.error("Payment submission error:", error);

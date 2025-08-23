@@ -37,7 +37,6 @@ export const register = async (req: Request, res: Response) => {
     }
 
     const generatedOTP = generateOTP().toString();
-    console.log("Generated OTP for", email, ":", generatedOTP); // 👈 console log here
 
     await Otp.create({
       email,

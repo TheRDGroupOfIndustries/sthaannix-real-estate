@@ -55,37 +55,21 @@ const PropertyDetails = () => {
   const [user, setUser] = useState(null);
   const [whatsappNum, setWhatsappNum] = useState(null);
   //image data safely
-  const images = property?.images
-    ? Array.isArray(property.images)
-      ? property.images
-      : [property.images]
-    : [];
+  const images = React.useMemo(() => {
+    if (!property?.images) return [];
+    return Array.isArray(property.images) ? property.images : [property.images];
+  }, [property]);
 
   // Safely get location string (handle both string and object)
-  const getLocationString = () => {
-    if (!property?.location) return "Location not specified";
+  const getFullLocationString = () => {
+    if (!property?.location) return "";
 
-    if (typeof property.location === "string") {
-      return property.location;
-    }
+    const { address, city, state, pincode } = property.location;
 
-    if (typeof property.location === "object") {
-      // Handle location object - extract the most relevant field
-      if (property.location.address) return property.location.address;
-      if (property.location.city && property.location.state) {
-        return `${property.location.city}, ${property.location.state}`;
-      }
-      if (property.location.city) return property.location.city;
-      if (property.location.state) return property.location.state;
-
-      // Fallback: stringify the object (for debugging)
-      return JSON.stringify(property.location);
-    }
-
-    return String(property.location);
+    return [address, city, state, pincode].filter(Boolean).join(", ");
   };
 
-  const locationString = getLocationString();
+  const locationString = getFullLocationString();
 
   // WhatsApp message template
   const whatsappMessage = `Hello! I'm interested in your property: ${
@@ -100,27 +84,14 @@ const PropertyDetails = () => {
     const fetchProperty = async () => {
       try {
         setLoading(true);
-
         const propertyData = await fetchPropertyDetail(id);
-        // setProperty(propertyData);
-        // setLocalStorage(localStorageKey, propertyData);
-
-        // if (!property) {
-        //   setError("Failed to load property details. No local data found.");
-        // } else {
-        //   setProperty((prev) => ({
-        //     ...prev,
-        //     amenities: parseAmenities(prev?.amenities),
-        //   }));
-        //   setError(null);
-        // }
-
         if (propertyData) {
           const processedProperty = {
             ...propertyData,
             amenities: parseAmenities(propertyData?.amenities),
           };
           setProperty(processedProperty);
+          setLocalStorage(localStorageKey, processedProperty); // overwrite old cache
           setError(null);
         } else {
           setError("Failed to load property details. No data found.");
@@ -133,10 +104,8 @@ const PropertyDetails = () => {
       }
     };
 
-    if (!property) {
-      fetchProperty();
-    }
-  }, [id, property]);
+    fetchProperty();
+  }, [id]);
 
   useEffect(() => {
     if (!property || !property.owner) return; // ✅ guard
@@ -165,9 +134,8 @@ const PropertyDetails = () => {
     if (property) {
       setLocalStorage(localStorageKey, property);
     }
+    console.log(property);
   }, [property, localStorageKey]);
-
- 
 
   // const parseAmenities = (amenities) => {
   //   if (!amenities || !Array.isArray(amenities)) return [];
@@ -297,6 +265,27 @@ const PropertyDetails = () => {
     }
   };
 
+  // Preload images safely
+  useEffect(() => {
+    if (!images || !images.length) return; // ✅ check if images exist
+
+    images.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, [images]);
+
+  // Auto-play safely
+  useEffect(() => {
+    if (!images || images.length < 2) return; // ✅ ensure there are at least 2 images
+
+    const interval = setInterval(() => {
+      setActiveImage((prev) => (prev + 1) % images.length);
+    }, 5000); // change 5000 to desired interval (ms)
+
+    return () => clearInterval(interval);
+  }, [images]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 pt-16">
@@ -381,14 +370,14 @@ const PropertyDetails = () => {
             {images.length > 0 ? (
               <AnimatePresence mode="wait">
                 <motion.img
-                  key={activeImage}
+                  key={images[activeImage]} // ensures correct exit/enter animations
                   src={images[activeImage]}
                   alt={`${property.title} - View ${activeImage + 1}`}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="w-full h-full"
+                  transition={{ duration: 0.5 }}
+                  className="w-full h-full object-cover"
                 />
               </AnimatePresence>
             ) : (
@@ -406,19 +395,17 @@ const PropertyDetails = () => {
                     )
                   }
                   className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full
-                    bg-white/80 backdrop-blur-sm hover:bg-white transition-colors"
+            bg-white/80 backdrop-blur-sm hover:bg-white transition-colors"
                 >
                   <ChevronLeft className="w-6 h-6" />
                 </button>
 
                 <button
                   onClick={() =>
-                    setActiveImage((prev) =>
-                      prev === images.length - 1 ? 0 : prev + 1
-                    )
+                    setActiveImage((prev) => (prev + 1) % images.length)
                   }
                   className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full
-                    bg-white/80 backdrop-blur-sm hover:bg-white transition-colors"
+            bg-white/80 backdrop-blur-sm hover:bg-white transition-colors"
                 >
                   <ChevronRight className="w-6 h-6" />
                 </button>
@@ -428,7 +415,7 @@ const PropertyDetails = () => {
             {images.length > 0 && (
               <div
                 className="absolute bottom-4 left-1/2 -translate-x-1/2 
-              bg-black/50 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm"
+        bg-black/50 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm"
               >
                 {activeImage + 1} / {images.length}
               </div>
@@ -445,25 +432,29 @@ const PropertyDetails = () => {
                 ₹{Number(property.price).toLocaleString("en-IN")}
               </p>
               <p className="text-gray-600">
-                Available for {property.availability}
+                Available for {property.transactionType}
               </p>
 
               {/* Buy, Rent, Lease Buttons */}
               <div className="flex gap-4 mt-4">
-                {["Buy", "Rent", "Lease"].map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    disabled={property.availability !== option}
-                    className={`flex-1 py-2 rounded-lg text-white font-semibold transition-colors ${
-                      property.availability === option
-                        ? "bg-blue-600 hover:bg-blue-700 cursor-pointer"
-                        : "bg-gray-300 cursor-not-allowed"
-                    }`}
-                  >
-                    {option}
-                  </button>
-                ))}
+                {["buy", "rent", "lease"].map((option) => {
+                  const isActive = property.transactionType === option;
+
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      disabled={!isActive}
+                      className={`flex-1 py-2 rounded-lg text-white font-semibold transition-colors ${
+                        isActive
+                          ? "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                          : "bg-gray-300 cursor-not-allowed"
+                      }`}
+                    >
+                      {option.charAt(0).toUpperCase() + option.slice(1)}{" "}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -471,18 +462,19 @@ const PropertyDetails = () => {
               <div className="bg-gray-50 p-4 rounded-lg text-center">
                 <BedDouble className="w-6 h-6 text-blue-600 mx-auto mb-2" />
                 <p className="text-sm text-gray-600">
-                  {property.beds} {property.beds > 1 ? "Beds" : "Bed"}
+                  {property.bhk} {property.bhk > 1 ? "Bedrooms" : "Bedroom"}
                 </p>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg text-center">
                 <Bath className="w-6 h-6 text-blue-600 mx-auto mb-2" />
                 <p className="text-sm text-gray-600">
-                  {property.baths} {property.baths > 1 ? "Baths" : "Bath"}
+                  {property.bathroom}{" "}
+                  {property.bathroom > 1 ? "Bathrooms" : "Bathroom"}
                 </p>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg text-center">
                 <Maximize className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                <p className="text-sm text-gray-600">{property.sqft} sqft</p>
+                <p className="text-sm text-gray-600">{property.size} sqft</p>
               </div>
             </div>
 
@@ -652,7 +644,13 @@ const PropertyDetails = () => {
               <Compass className="w-5 h-5" />
               <h3 className="text-lg font-semibold">Location</h3>
             </div>
-            <p className="text-gray-600 mb-4">{property.location.state}</p>
+            <p className="text-gray-600 ">{property.location.address}</p>
+            <p className="text-gray-600 ">{property.location.city}</p>
+            <p className="text-gray-600 ">{property.location.state}</p>
+            <p className="text-gray-600 mb-4">
+              Pincode: {property.location.pincode}
+            </p>
+
             <a
               href={`https://maps.google.com/?q=${encodeURIComponent(
                 locationString

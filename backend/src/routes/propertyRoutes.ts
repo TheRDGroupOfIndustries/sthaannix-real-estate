@@ -1,8 +1,8 @@
 import { Router } from "express";
 import {
-  createProperty, 
+  createProperty,
   getProperties,
-  getPropertyById, 
+  getPropertyById,
   updateProperty,
   deleteProperty,
 } from "../controllers/propertyController";
@@ -18,8 +18,20 @@ router.get("/get", getProperties);
 router.get("/get-by-id/:id", getPropertyById);
 
 // Protected routes
-router.post("/create", authenticate,checkUserApproval, upload.array("images", 10), createProperty);
-router.put("/update/:id", authenticate,checkUserApproval, updateProperty);
-router.delete("/delete/:id", authenticate,checkUserApproval, deleteProperty);
+router.post(
+  "/create",
+  authenticate,
+  checkUserApproval,
+  upload.array("images", 10),
+  createProperty
+);
+router.put(
+  "/update/:id",
+  authenticate,
+  checkUserApproval,
+  upload.array("images", 10),
+  updateProperty
+);
+router.delete("/delete/:id", authenticate, checkUserApproval, deleteProperty);
 
 export default router;

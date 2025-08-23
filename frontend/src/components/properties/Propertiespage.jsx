@@ -93,23 +93,37 @@ const PropertiesPage = () => {
               field?.toLowerCase().includes(filters.searchQuery.toLowerCase())
           );
 
+        // const typeMatch =
+        //   !filters.propertyType ||
+        //   property.type?.toLowerCase() === filters.propertyType.toLowerCase();
+        
         const typeMatch =
           !filters.propertyType ||
-          property.type?.toLowerCase() === filters.propertyType.toLowerCase();
+          property.propertyType?.toLowerCase() ===
+            filters.propertyType.toLowerCase();
 
         const priceMatch =
           property.price >= filters.priceRange[0] &&
           property.price <= filters.priceRange[1];
 
+        // const bedroomsMatch =
+        //   !filters.bedrooms ||
+        //   filters.bedrooms === "0" ||
+        //   property.beds >= parseInt(filters.bedrooms);
+
+        // const bathroomsMatch =
+        //   !filters.bathrooms ||
+        //   filters.bathrooms === "0" ||
+        //   property.baths >= parseInt(filters.bathrooms);
         const bedroomsMatch =
           !filters.bedrooms ||
           filters.bedrooms === "0" ||
-          property.beds >= parseInt(filters.bedrooms);
+          property.bhk >= parseInt(filters.bedrooms);
 
         const bathroomsMatch =
           !filters.bathrooms ||
           filters.bathrooms === "0" ||
-          property.baths >= parseInt(filters.bathrooms);
+          property.bathroom >= parseInt(filters.bathrooms);
 
         const availabilityMatch =
           !filters.availability ||

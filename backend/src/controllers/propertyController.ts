@@ -221,44 +221,7 @@ export const getPropertyById = async (req: Request, res: Response) => {
   }
 };
 
-export const updateProperty = async (req: Request, res: Response) => {
-  try {
-    if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
-    const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Invalid property ID" });
-    }
-
-    const property = await Property.findById(id);
-    if (!property) {
-      return res.status(404).json({ message: "Property not found" });
-    }
-
-    if (!isOwnerOrAdmin(req.user.id, property.owner, req.user.role)) {
-      return res
-        .status(403)
-        .json({ message: "You cannot update this property" });
-    }
-
-    const { title, description, price, size, bhk, location, isPromoted } =
-      req.body;
-
-    if (title !== undefined) property.title = title;
-    if (description !== undefined) property.description = description;
-    if (price !== undefined) property.price = price;
-    if (size !== undefined) property.size = size;
-    if (bhk !== undefined) property.bhk = bhk;
-    if (location !== undefined) property.location = location;
-    if (isPromoted !== undefined) property.isPromoted = isPromoted;
-
-    await property.save();
-    res.json(property);
-  } catch (error) {
-    console.error("Update Property Error:", error);
-    res.status(500).json({ message: "Failed to update property", error });
-  }
-};
 
 export const deleteProperty = async (req: Request, res: Response) => {
   try {

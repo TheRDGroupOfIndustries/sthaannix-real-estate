@@ -97,26 +97,55 @@ const AdminDashboard = () => {
   };
 
   // Payment actions
-  const approvePayment = (id) => {
-    const updated = payments.map(p =>
-      p.id === id ? { ...p, status: "approved", approvalTimestamp: new Date().toISOString() } : p
-    );
-    setPayments(updated);
-    localStorage.setItem("paymentRecords", JSON.stringify(updated));
-    toast.success("Payment approved");
-  };
+  // const approvePayment = (id) => {
+  //   const updated = payments.map(p =>
+  //     p.id === id ? { ...p, status: "approved", approvalTimestamp: new Date().toISOString() } : p
+  //   );
+  //   setPayments(updated);
+  //   localStorage.setItem("paymentRecords", JSON.stringify(updated));
+  //   toast.success("Payment approved");
+  // };
 
-  const cancelPayment = (id) => {
-    const updated = payments.map(p =>
-      p.id === id ? { ...p, status: "canceled", approvalTimestamp: null } : p
-    );
-    setPayments(updated);
-    localStorage.setItem("paymentRecords", JSON.stringify(updated));
-    toast.success("Payment canceled");
-  };
+const approvePayment = async (id) => {
+  try {
+    const res = await paymentsAPI.approve(id);
+
+    if (res.status === 200) {
+    
+      const updatedRes = await paymentsAPI.getAll();
+      setPayments(updatedRes.data);
+      toast.success("Payment approved successfully");
+    } else {
+      toast.error("Failed to approve payment");
+    }
+  } catch (error) {
+    toast.error(error.response?.data?.message || "Error approving payment");
+  }
+};
+
+
+
+const cancelPayment = async (id, reason) => {
+  try {
+    // Call backend reject API with reason
+    const res = await paymentsAPI.reject(id, reason);
+
+    if (res.status === 200) {
+      const updatedRes = await paymentsAPI.getAll();
+      setPayments(updatedRes.data);
+
+      toast.success("Payment rejected");
+    } else {
+      toast.error("Failed to reject payment");
+    }
+  } catch (error) {
+    console.error("Reject payment error:", error);
+    toast.error(error.response?.data?.message || "Error rejecting payment");
+  }
+};
 
   const pendingPayments = payments.filter(p => p.status === "pending");
-  const canceledPayments = payments.filter(p => p.status === "canceled");
+  const canceledPayments = payments.filter(p => p.status === "rejected");
 
   const loading = activeTab === "users" ? usersLoading : paymentsLoading;
 
@@ -385,7 +414,7 @@ const AdminDashboard = () => {
                   <tbody className="divide-y divide-gray-100">
                     {pendingPayments.map((payment, idx) => (
                       <motion.tr
-                        key={payment.id}
+                        key={payment._id}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.05 }}
@@ -396,23 +425,23 @@ const AdminDashboard = () => {
                         <td className="px-6 py-4 whitespace-nowrap">{payment.user.role}</td>
                         <td className="px-6 py-4 whitespace-nowrap">{payment.user.email}</td>
                         <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">
-                          {payment.paymentRef}
+                          {payment.utrNumber}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          {new Date(payment.timestamp).toLocaleString()}
+                          {new Date(payment.createdAt).toLocaleString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">{payment.paymentMethod}</td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex gap-2">
-                            {payment.images?.map((imgUrl, i) => (
+                            {/* {payment.images?.map((imgUrl, i) => (
                               <div
                                 key={i}
                                 className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
                                 title="View Image"
-                                onClick={() => window.open(imgUrl, '_blank')}
+                                onClick={() => window.open(payment.screenshot, '_blank')}
                               >
                                 <img
-                                  src={imgUrl}
+                                  src={payment.screenshot}
                                   alt={`payment-proof-${i}`}
                                   className="w-full h-full object-cover"
                                 />
@@ -420,20 +449,31 @@ const AdminDashboard = () => {
                                   <Image className="w-4 h-4" />
                                 </div>
                               </div>
-                            ))}
+                            ))} */}
+                            {
+                              <div
+                                key={payment._id}
+                                className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
+                                title="View Image"
+                                onClick={() => window.open(payment.screenshot, '_blank')}
+                              >
+                                <img
+                                  src={payment.screenshot}
+                                  alt={`payment-proof`}
+                                  className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
+                                  <Image className="w-4 h-4" />
+                                </div>
+                              </div>
+                              
+                              }
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-center space-x-2">
                           <button
                             onClick={() => {
-                              approvePayment(payment.id);
-                              const approvedUser = {
-                                ...payment.user, 
-                                paymentRef: payment.paymentRef, 
-                                paymentMethod: payment.paymentMethod, 
-                                timestamp: payment.timestamp
-                              };
-                              localStorage.setItem("approvedUser", JSON.stringify(approvedUser));
+                              approvePayment(payment._id);
                             }}
                             className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-green-600 text-white hover:bg-green-700 transition"
                             title="Approve Payment"
@@ -442,7 +482,7 @@ const AdminDashboard = () => {
                             Approve
                           </button>
                           <button
-                            onClick={() => cancelPayment(payment.id)}
+                            onClick={() => cancelPayment(payment._id,"Payment Rejected")}
                             className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-red-600 text-white hover:bg-red-700 transition"
                             title="Cancel Payment"
                           >
@@ -583,7 +623,7 @@ const AdminDashboard = () => {
                     <tbody className="divide-y divide-gray-100">
                       {canceledPayments.map((payment, idx) => (
                         <motion.tr
-                          key={payment.id}
+                          key={payment._id}
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: idx * 0.05 }}
@@ -594,15 +634,17 @@ const AdminDashboard = () => {
                           <td className="px-6 py-4 whitespace-nowrap">{payment.user.role}</td>
                           <td className="px-6 py-4 whitespace-nowrap">{payment.user.email}</td>
                           <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">
-                            {payment.paymentRef}
+                            {payment.utrNumber}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            {new Date(payment.timestamp).toLocaleString()}
+                            {new Date(payment.updatedAt).toLocaleString()}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">{payment.paymentMethod}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {/* {payment.utrNumber} */}
+                            </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex gap-2">
-                              {payment.images?.map((imgUrl, i) => (
+                              {/* {payment.images?.map((imgUrl, i) => (
                                 <div
                                   key={i}
                                   className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
@@ -618,7 +660,26 @@ const AdminDashboard = () => {
                                     <Image className="w-4 h-4" />
                                   </div>
                                 </div>
-                              ))}
+                              ))} */}
+
+                               {
+                              <div
+                                key={payment._id}
+                                className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
+                                title="View Image"
+                                onClick={() => window.open(payment.screenshot, '_blank')}
+                              >
+                                <img
+                                  src={payment.screenshot}
+                                  alt={`payment-proof`}
+                                  className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
+                                  <Image className="w-4 h-4" />
+                                </div>
+                              </div>
+                              
+                              }
                             </div>
                           </td>
                         </motion.tr>

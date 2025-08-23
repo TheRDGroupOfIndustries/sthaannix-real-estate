@@ -807,7 +807,7 @@ const PropertyForm = () => {
     bhk: "",
     bathroom: "",
     size: "",
-    phone: "",
+    // phone: "",
     transactionType: "",
     amenities: [],
     images: [],
@@ -882,7 +882,7 @@ const PropertyForm = () => {
       console.log("Bathroom:", formData.bathroom);
       console.log("Location:", formData.location);
       console.log("Is Promoted:", formData.isPromoted);
-      console.log("Phone:", formData.phone);
+      // console.log("Phone:", formData.phone);
     }
 
     const price = Number(formData.price);
@@ -940,7 +940,7 @@ const PropertyForm = () => {
       });
 
       const response = await http.post("/properties/create", formPayload);
-// console.log("properties",response);
+console.log("properties",response);
 
       toast.success("Property added successfully");
       setFormData({
@@ -958,7 +958,7 @@ const PropertyForm = () => {
         bhk: "",
         bathroom: "",
         size: "",
-        phone: "",
+        // phone: "",
         transactionType: "",
         amenities: [],
         images: [],
@@ -1208,7 +1208,7 @@ const PropertyForm = () => {
           </div>
 
           {/* Phone */}
-          <div>
+          {/* <div>
             <label
               htmlFor="phone"
               className="block text-sm font-medium text-gray-700"
@@ -1223,7 +1223,7 @@ const PropertyForm = () => {
               onChange={handleInputChange}
               className="mt-2 p-2 block w-full rounded-md border border-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             />
-          </div>
+          </div> */}
 
           {/* Images */}
           <div>

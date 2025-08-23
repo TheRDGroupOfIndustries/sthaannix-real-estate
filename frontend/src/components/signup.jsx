@@ -95,6 +95,7 @@ const Signup = () => {
     phone: "",
     email: "",
     password: "",
+    role: "user"
   });
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);

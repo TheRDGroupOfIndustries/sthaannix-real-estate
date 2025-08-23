@@ -44,9 +44,10 @@ export const register = async (req: Request, res: Response) => {
       otp: generatedOTP,
       name,
       phone,
-      role: role.toLowerCase(),
-      password, // plain password for now (will hash after OTP verified)
+      role: role ? role.toLowerCase() : "user",
+      password, 
     });
+console.log(role);
 
     await sendOTP(email, generatedOTP);
 
@@ -149,7 +150,7 @@ export const login = async (req: Request, res: Response) => {
       walletBalance: user.walletBalance,
       status: user.status,
     };
-
+ 
     res.json({ token, user: responseUser });
   } catch (error) {
     console.error("Login Error:", error);

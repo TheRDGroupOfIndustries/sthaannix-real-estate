@@ -323,3 +323,36 @@ export const deleteProperty = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Failed to delete property", error });
   }
 };
+
+export const myProperties = async (req: Request, res: Response) => {
+  try {
+    if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+
+    const { sort, status } = req.query as {
+      sort?: string;
+      status?: string;
+    };
+
+    const filter: Record<string, any> = { owner: req.user.id };
+
+    if (status) {
+      const allowedStatuses = ["pending", "approved", "rejected"];
+      if (allowedStatuses.includes(status)) {
+        filter.status = status;
+      } else {
+        return res.status(400).json({ message: `Invalid status: ${status}` });
+      }
+    }
+
+    const sortOptions: Record<string, any> = {};
+    if (sort === "newest") sortOptions.createdAt = -1;
+    if (sort === "cheapest") sortOptions.price = 1;
+
+    const properties = await Property.find(filter).sort(sortOptions).exec();
+
+    res.json(properties);
+  } catch (error) {
+    console.error("My Properties Error:", error);
+    res.status(500).json({ message: "Failed to fetch your properties", error });
+  }
+};

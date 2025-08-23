@@ -139,29 +139,22 @@ const PropertyDetails = () => {
   }, [id, property]);
 
   useEffect(() => {
+    if (!property || !property.owner) return; // ✅ guard
+
     const fetchPropertyOwner = async () => {
       try {
         const res = await http.get(`/user/get-by-id/${property.owner}`);
-        if (!res.data.user) {
-          console.log("No user found");
-          return;
-        }
+        if (!res.data.user) return;
 
-        const fetchedUser = res.data.user;
-        setUser(fetchedUser);
-        setWhatsappNum(fetchedUser.phone);
-
-        console.log(fetchedUser);
-        console.log(fetchedUser.phone);
+        setUser(res.data.user);
+        setWhatsappNum(res.data.user.phone);
       } catch (error) {
         console.log(error);
       }
     };
 
-    if (property?.owner) {
-      fetchPropertyOwner();
-    }
-  }, [property.owner]);
+    fetchPropertyOwner();
+  }, [property]);
 
   useEffect(() => {
     window.scrollTo(0, 0);

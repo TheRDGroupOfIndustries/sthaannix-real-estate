@@ -70,10 +70,14 @@ const PropertiesPage = () => {
     }
   };
 
+  // useEffect(() => {
+  //   if (!propertyState.properties || propertyState.properties.length === 0) {
+  //     fetchPropertiesHandler();
+  //   }
+  // }, []);
+
   useEffect(() => {
-    if (!propertyState.properties || propertyState.properties.length === 0) {
-      fetchPropertiesHandler();
-    }
+    fetchPropertiesHandler(); 
   }, []);
 
   // Save properties to localStorage on update
@@ -96,7 +100,7 @@ const PropertiesPage = () => {
         // const typeMatch =
         //   !filters.propertyType ||
         //   property.type?.toLowerCase() === filters.propertyType.toLowerCase();
-        
+
         const typeMatch =
           !filters.propertyType ||
           property.propertyType?.toLowerCase() ===

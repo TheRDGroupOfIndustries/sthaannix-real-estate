@@ -5,6 +5,7 @@ import {
   getPropertyById,
   updateProperty,
   deleteProperty,
+  myProperties,
 } from "../controllers/propertyController";
 
 import { authenticate } from "../middlewares/authenticate";
@@ -33,5 +34,6 @@ router.put(
   updateProperty
 );
 router.delete("/delete/:id", authenticate, checkUserApproval, deleteProperty);
+router.get("/my-properties", authenticate, checkUserApproval, myProperties);
 
 export default router;

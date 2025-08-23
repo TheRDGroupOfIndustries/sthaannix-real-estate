@@ -202,6 +202,74 @@ export const getProperties = async (req: Request, res: Response) => {
   }
 };
 
+export const updateProperty = async (req: Request, res: Response) => {
+  try {
+    if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid property ID" });
+    }
+
+    const property = await Property.findById(id);
+    if (!property) {
+      return res.status(404).json({ message: "Property not found" });
+    }
+
+    if (!isOwnerOrAdmin(req.user.id, property.owner, req.user.role)) {
+      return res
+        .status(403)
+        .json({ message: "You cannot update this property" });
+    }
+
+    const {
+      title,
+      description,
+      price,
+      size,
+      bhk,
+      bathroom,
+      location,
+      isPromoted,
+    } = req.body;
+
+    const uploadedImages: string[] = [];
+    if (req.files && Array.isArray(req.files)) {
+      for (const file of req.files as Express.Multer.File[]) {
+        const result = await uploadFile(file.buffer, "properties/images");
+        uploadedImages.push(result.secure_url);
+      }
+    }
+
+    if (title !== undefined) property.title = title;
+    if (description !== undefined) property.description = description;
+    if (price !== undefined) property.price = Number(price);
+    if (size !== undefined) property.size = Number(size);
+    if (bhk !== undefined) property.bhk = Number(bhk);
+    if (bathroom !== undefined) property.bathroom = Number(bathroom);
+
+    if (location !== undefined) {
+      property.location =
+        typeof location === "string" ? JSON.parse(location) : location;
+    }
+
+    if (isPromoted !== undefined) {
+      property.isPromoted =
+        isPromoted === "true" || isPromoted === true ? true : false;
+    }
+
+    if (uploadedImages.length > 0) {
+      property.images = uploadedImages;
+    }
+
+    await property.save();
+    res.json({ message: "Property updated successfully", property });
+  } catch (error) {
+    console.error("Update Property Error:", error);
+    res.status(500).json({ message: "Failed to update property", error });
+  }
+};
+
 export const getPropertyById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -220,8 +288,6 @@ export const getPropertyById = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Failed to fetch property", error });
   }
 };
-
-
 
 export const deleteProperty = async (req: Request, res: Response) => {
   try {

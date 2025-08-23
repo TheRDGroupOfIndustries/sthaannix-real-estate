@@ -3,20 +3,21 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Upload, ChevronDown, ClipboardCopy } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { submitPaymentProof } from "../api/paymentService";
 
-const WHATSAPP_LINK = "https://api.whatsapp.com/send?phone=9033197427";
+const WHATSAPP_LINK = "https://api.whatsapp.com/send?phone=997690669";
 
 const Payment = () => {
    const [formData, setFormData] = useState({
-    amount: 0,
+    amount: 1500,
     paymentMethod: "",
   });
   const location = useLocation();
   const navigate = useNavigate();
 
   // formData passed from Register page
-  // const { formData } = location.state || {};
-  // if (!formData) {
+  // const {userData} = location.state || {};
+  // if (!userData) {
   //   navigate("/register");
   //   return null;
   // }
@@ -64,6 +65,7 @@ const Payment = () => {
 
   const handlePaymentSubmit = async (e) => {
     e.preventDefault();
+    
     if (!paymentRef.trim()) {
       toast.error("Please enter Unique Transaction Reference");
       return;
@@ -74,12 +76,13 @@ const Payment = () => {
     }
 
     setLoading(true);
-
+    
     // Save payment record in localStorage (append)
-    const paymentRecords = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
-
-    const newPayment = {
+    // const paymentRecords = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
+     try {
+    const paymentData = {
       id: Date.now().toString(),
+      amount: 1500,
       user: formData,
       paymentRef: paymentRef.trim(),
       paymentMethod: selectedMethod,
@@ -88,15 +91,33 @@ const Payment = () => {
       status: "pending",
     };
 
-    paymentRecords.push(newPayment);
-    localStorage.setItem("paymentRecords", JSON.stringify(paymentRecords));
-
-    setTimeout(() => {
+    const response = await submitPaymentProof(paymentData);
+    if (response.success) {
+        toast.success("Payment submitted successfully! Your account will be activated after verification.");
+        navigate("/login");
+      } 
+      else {
+        toast.error(response.message || "Payment submission failed");
+      }
+    } 
+    catch (error) {
+      console.error("Payment submission error:", error);
+      toast.error(error.response?.data?.message || "Failed to submit payment. Please try again.");
+    }
+     finally {
       setLoading(false);
-      toast.success("Payment submitted! Please login.");
-      navigate("/login");
-    }, 1500);
+    }
   };
+
+  //   paymentRecords.push(newPayment);
+  //   localStorage.setItem("paymentRecords", JSON.stringify(paymentRecords));
+
+  //   setTimeout(() => {
+  //     setLoading(false);
+  //     toast.success("Payment submitted! Please login.");
+  //     navigate("/login");
+  //   }, 1500);
+  // };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
@@ -129,9 +150,20 @@ const Payment = () => {
         {selectedMethod === "Account" && (
           <div className="border border-gray-200 rounded-lg p-4 space-y-3">
             <h3 className="font-semibold text-gray-800">Account Details</h3>
-            <p><span className="font-medium">Bank:</span> {accountDetails.bankName}</p>
-            <p>
-              <span className="font-medium">Account Name:</span> {accountDetails.accountName}
+            <p className="flex items-center justify-between"><span><strong>Bank  :</strong> {accountDetails.bankName}</span> 
+            <ClipboardCopy
+                className="w-5 h-5 cursor-pointer text-blue-600"
+                onClick={() => copyToClipboard(accountDetails.bankName)}
+                title="Copy Account Number"
+              />
+              </p>
+            <p className="flex items-center justify-between">
+              <span><strong>Account Name:</strong> {accountDetails.accountName}</span> 
+              <ClipboardCopy
+                className="w-5 h-5 cursor-pointer text-blue-600"
+                onClick={() => copyToClipboard(accountDetails.accountName)}
+                title="Copy Account Number"
+              />
             </p>
             <p className="flex items-center justify-between">
               <span><strong>Account Number:</strong> {accountDetails.accountNumber}</span>

@@ -233,9 +233,10 @@ export const updateProperty = async (req: Request, res: Response) => {
       isPromoted,
       propertyType,
       transactionType,
+      existingImages, // <-- frontend will send this
     } = req.body;
 
-    // Handle uploaded images
+    // Handle new uploaded images
     const uploadedImages: string[] = [];
     if (req.files && Array.isArray(req.files)) {
       for (const file of req.files as Express.Multer.File[]) {
@@ -243,6 +244,17 @@ export const updateProperty = async (req: Request, res: Response) => {
         uploadedImages.push(result.secure_url);
       }
     }
+
+    // Merge existing + new images
+    let finalImages: string[] = [];
+    if (existingImages) {
+      if (Array.isArray(existingImages)) {
+        finalImages = existingImages;
+      } else {
+        finalImages = [existingImages]; // single string case
+      }
+    }
+    finalImages = [...finalImages, ...uploadedImages];
 
     // Update fields if provided
     if (title !== undefined) property.title = title;
@@ -264,8 +276,9 @@ export const updateProperty = async (req: Request, res: Response) => {
       property.isPromoted = isPromoted === "true" || isPromoted === true;
     }
 
-    if (uploadedImages.length > 0) {
-      property.images = uploadedImages;
+    // Update images (only if provided, else keep old ones)
+    if (finalImages.length > 0) {
+      property.images = finalImages;
     }
 
     await property.save();

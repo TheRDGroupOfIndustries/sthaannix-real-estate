@@ -167,6 +167,8 @@ const PropertyDetails = () => {
     }
   }, [property, localStorageKey]);
 
+ 
+
   // const parseAmenities = (amenities) => {
   //   if (!amenities || !Array.isArray(amenities)) return [];
 

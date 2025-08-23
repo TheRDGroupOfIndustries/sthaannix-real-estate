@@ -138,7 +138,7 @@
 //     <div className="min-h-screen pt-32 px-4 bg-gray-50">
 //       <div className="max-w-2xl mx-auto rounded-lg shadow-xl bg-white p-6">
 //         <h2 className="text-2xl font-bold text-gray-900 mb-6">Update Property</h2>
-        
+
 //         <form onSubmit={handleSubmit} className="space-y-6">
 //           {/* Basic Information */}
 //           <div className="space-y-4">
@@ -403,13 +403,12 @@
 
 // export default Update;
 
-
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
-import { Backendurl } from '../config/constants';
-import { X, Upload } from 'lucide-react';
-import http from '../api/http';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { Backendurl } from "../config/constants";
+import { X, Upload } from "lucide-react";
+import http from "../api/http";
 
 const PROPERTY_TYPES = ["house", "apartment", "commercial", "villa", "plot"];
 const TRANSACTION_TYPES = ["buy", "rent", "lease"];
@@ -424,23 +423,21 @@ const Update = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    title: '',
-    propertyType: '',
-    price: '',
-    description: '',
-    bhk: '',
-    bathroom: '',
-    size: '',
-    // phone: '',
-    transactionType: '',
-    // amenities: [],
+    title: "",
+    propertyType: "",
+    price: "",
+    description: "",
+    bhk: "",
+    bathroom: "",
+    size: "",
+    transactionType: "",
     images: [],
     location: {
-      address: '',
-      city: '',
-      state: '',
-      pincode: ''
-    }
+      address: "",
+      city: "",
+      state: "",
+      pincode: "",
+    },
   });
   const [previewUrls, setPreviewUrls] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -450,37 +447,37 @@ const Update = () => {
     const fetchProperty = async () => {
       try {
         const res = await http.get(`${Backendurl}/properties/get-by-id/${id}`);
-        console.log("res: ",res.data);
-        
         if (res.status === 200) {
           const property = res.data;
 
           setFormData({
-            title: property.title || '',
-            propertyType: property.propertyType || '',
-            price: property.price || '',
-            description: property.description || '',
-            bhk: property.bhk || '',
-            bathroom: property.bathroom || '',
-            size: property.size || '',
-            // phone: property.phone || '',
-            transactionType: property.transactionType || '',
-            // amenities: property.amenities || [],
-            images: property.images || [],
+            title: property.title || "",
+            propertyType: property.propertyType || "",
+            price: property.price || "",
+            description: property.description || "",
+            bhk: property.bhk || "",
+            bathroom: property.bathroom || "",
+            size: property.size || "",
+            transactionType: property.transactionType || "",
+            images: (property.images || []).map((url) => ({
+              type: "url",
+              value: url,
+            })),
             location: property.location || {
-              address: '',
-              city: '',
-              state: '',
-              pincode: ''
-            }
+              address: "",
+              city: "",
+              state: "",
+              pincode: "",
+            },
           });
+
           setPreviewUrls(property.images || []);
         } else {
           toast.error(res.data.message);
         }
       } catch (err) {
         console.error(err);
-        toast.error('Failed to fetch property');
+        toast.error("Failed to fetch property");
       }
     };
 
@@ -490,40 +487,45 @@ const Update = () => {
   // Input handlers
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleLocationChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       location: {
         ...prev.location,
-        [name]: value
-      }
+        [name]: value,
+      },
     }));
   };
 
-  // const handleAmenityToggle = (amenity) => {
-  //   setFormData(prev => ({
-  //     ...prev,
-  //     amenities: prev.amenities.includes(amenity)
-  //       ? prev.amenities.filter(a => a !== amenity)
-  //       : [...prev.amenities, amenity]
-  //   }));
-  // };
-
+  // Handle new image selection
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    setPreviewUrls(files.map(file => URL.createObjectURL(file)));
-    setFormData(prev => ({ ...prev, images: files }));
+
+    const newImageObjs = files.map((file) => ({
+      type: "file",
+      value: file,
+    }));
+
+    setPreviewUrls((prev) => [
+      ...prev,
+      ...files.map((file) => URL.createObjectURL(file)),
+    ]);
+    setFormData((prev) => ({
+      ...prev,
+      images: [...prev.images, ...newImageObjs],
+    }));
   };
 
+  // Remove image
   const removeImage = (index) => {
-    setPreviewUrls(prev => prev.filter((_, i) => i !== index));
-    setFormData(prev => ({
+    setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
+    setFormData((prev) => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index)
+      images: prev.images.filter((_, i) => i !== index),
     }));
   };
 
@@ -534,46 +536,43 @@ const Update = () => {
 
     try {
       const formdata = new FormData();
-      formdata.append('id', id);
-      formdata.append('title', formData.title);
-      formdata.append('propertyType', formData.propertyType);
-      formdata.append('price', formData.price);
-      formdata.append('description', formData.description);
-      formdata.append('bhk', formData.bhk);
-      formdata.append('bathroom', formData.bathroom);
-      formdata.append('size', formData.size);
-      formdata.append('transactionType', formData.transactionType);
-      // formdata.append('phone', formData.phone);
-      // formdata.append('amenities', JSON.stringify(formData.amenities));
-      formdata.append('location', JSON.stringify(formData.location));
+      formdata.append("id", id);
+      formdata.append("title", formData.title);
+      formdata.append("propertyType", formData.propertyType);
+      formdata.append("price", formData.price);
+      formdata.append("description", formData.description);
+      formdata.append("bhk", formData.bhk);
+      formdata.append("bathroom", formData.bathroom);
+      formdata.append("size", formData.size);
+      formdata.append("transactionType", formData.transactionType);
+      formdata.append("location", JSON.stringify(formData.location));
 
-      // formData.images.forEach((img, idx) => {
-      //   if (typeof img !== 'string') {
-      //     formdata.append(`image${idx + 1}`, img);
-      //   }
-      // });
+      // Append images properly
+      formData.images.forEach((imgObj) => {
+        if (imgObj.type === "file") {
+          formdata.append("images", imgObj.value); // File
+        } else if (imgObj.type === "url") {
+          formdata.append("existingImages", imgObj.value); // String URL
+        }
+      });
 
-       formData.images.forEach((imgObj) => {
-      if (imgObj.type === "file") {
-        formdata.append('images', imgObj.value); // appends as file
-      } else if (imgObj.type === "url") {
-        formdata.append('existingImages', imgObj.value); // appends as string URL for backend
-      }
-    });
-    console.log("formdata: ",formData);
-    
-      const res = await http.put(`${Backendurl}/properties/update/${id}`, formdata);
-      console.log("backend res: ",res);
-      
+      const res = await http.put(
+        `${Backendurl}/properties/update/${id}`,
+        formdata,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
       if (res.status === 200) {
-        toast.success('Property updated successfully!');
-        navigate('/list');
+        toast.success("Property updated successfully!");
+        navigate("/list");
       } else {
-        toast.error(res.data.message || 'Failed to update');
+        toast.error(res.data.message || "Failed to update");
       }
     } catch (err) {
       console.error(err);
-      toast.error('Something went wrong while updating');
+      toast.error("Something went wrong while updating");
     } finally {
       setLoading(false);
     }
@@ -582,12 +581,16 @@ const Update = () => {
   return (
     <div className="min-h-screen pt-32 px-4 bg-gray-50">
       <div className="max-w-2xl mx-auto rounded-lg shadow-xl bg-white p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Update Property</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          Update Property
+        </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Property Title</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Property Title
+            </label>
             <input
               type="text"
               name="title"
@@ -600,7 +603,9 @@ const Update = () => {
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Description</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Description
+            </label>
             <textarea
               name="description"
               value={formData.description}
@@ -614,7 +619,9 @@ const Update = () => {
           {/* Property Type & Transaction Type */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Property Type</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Property Type
+              </label>
               <select
                 name="propertyType"
                 value={formData.propertyType}
@@ -623,14 +630,18 @@ const Update = () => {
                 required
               >
                 <option value="">Select Type</option>
-                {PROPERTY_TYPES.map(type => (
-                  <option key={type} value={type}>{type}</option>
+                {PROPERTY_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Transaction Type</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Transaction Type
+              </label>
               <select
                 name="transactionType"
                 value={formData.transactionType}
@@ -639,8 +650,10 @@ const Update = () => {
                 required
               >
                 <option value="">Select Transaction</option>
-                {TRANSACTION_TYPES.map(type => (
-                  <option key={type} value={type}>{type}</option>
+                {TRANSACTION_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
                 ))}
               </select>
             </div>
@@ -648,7 +661,9 @@ const Update = () => {
 
           {/* Price */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Price</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Price
+            </label>
             <input
               type="number"
               name="price"
@@ -662,7 +677,9 @@ const Update = () => {
           {/* BHK, Bathrooms, Size */}
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">BHK</label>
+              <label className="block text-sm font-medium text-gray-700">
+                BHK
+              </label>
               <input
                 type="number"
                 name="bhk"
@@ -673,7 +690,9 @@ const Update = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Bathrooms</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Bathrooms
+              </label>
               <input
                 type="number"
                 name="bathroom"
@@ -684,7 +703,9 @@ const Update = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Size (sqft)</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Size (sqft)
+              </label>
               <input
                 type="number"
                 name="size"
@@ -697,7 +718,9 @@ const Update = () => {
 
           {/* Location */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Location</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Location
+            </label>
             <input
               type="text"
               name="address"
@@ -769,11 +792,19 @@ const Update = () => {
 
           {/* Images */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Property Images</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Property Images
+            </label>
             <div className="grid grid-cols-2 gap-4 mt-2">
               {previewUrls.map((url, index) => (
                 <div key={index} className="relative">
-                  <img src={url} alt="" className="h-40 w-full object-cover rounded-md" />
+                  <img
+                    src={
+                      typeof url === "string" ? url : URL.createObjectURL(url)
+                    }
+                    alt=""
+                    className="h-40 w-full object-cover rounded-md"
+                  />
                   <button
                     type="button"
                     onClick={() => removeImage(index)}
@@ -809,7 +840,7 @@ const Update = () => {
             disabled={loading}
             className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700"
           >
-            {loading ? 'Updating...' : 'Update Property'}
+            {loading ? "Updating..." : "Update Property"}
           </button>
         </form>
       </div>

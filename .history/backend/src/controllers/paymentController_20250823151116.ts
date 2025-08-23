@@ -302,41 +302,19 @@ export const rejectPayment = async (req: Request, res: Response) => {
   }
 };
 
-export const getMyPayments = async (req: Request, res: Response) => {
-  try {
-    if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+// export const getMyPayments = async (req: Request, res: Response) => {
+//   try {
+//     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
-    // Get normal payments
-    const payments = await Payment.find({ user: req.user.id }).sort({
-      createdAt: -1,
-    });
+//     const payments = await Payment.find({ user: req.user.id }).sort({
+//       createdAt: -1,
+//     });
+//     res.json(payments);
+//   } catch (error) {
+//     res.status(500).json({ message: "Failed to fetch payments", error });
+//   }
+// };
 
-    // Get wallet top-ups
-    const topUps = await TopUpRequest.find({ user: req.user.id }).sort({
-      createdAt: -1,
-    });
-
-    // Combine both with a tag to distinguish them
-    const allTransactions = [
-      ...payments.map((p) => ({
-        ...p.toObject(),
-        type: "payment", // tag it
-      })),
-      ...topUps.map((t) => ({
-        ...t.toObject(),
-        type: "wallet-topup", // tag it
-      })),
-    ].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
-
-    res.json({
-      success: true,
-      transactions: allTransactions,
-    });
-  } catch (error) {
-    console.error("getMyPayments error:", error);
-    res.status(500).json({ message: "Failed to fetch payments", error });
-  }
-};
 
 export const getAllPayments = async (req: Request, res: Response) => {
   try {

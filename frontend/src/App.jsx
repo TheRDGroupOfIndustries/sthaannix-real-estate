@@ -14,7 +14,7 @@ import Login from './components/login';
 import Signup from './components/signup';
 import ForgotPassword from './components/forgetpassword';
 import ResetPassword from './components/resetpassword';
-import SavedProperties from './components/SavedProperties';
+import SavedProperties from './components/PropertiesInquiry';
 import UserProfile from './components/UserProfile';
 import Footer from './components/footer';
 import NotFoundPage from './components/Notfound';
@@ -38,7 +38,7 @@ const App = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset" element={<ResetPassword />} />
          <Route path="/user-profile" element={<UserProfile />} />
-        <Route path="/saved-properties" element={<SavedProperties />} />
+        <Route path="/inquiry-properties" element={<SavedProperties />} />
         <Route path="/" element={<Home />} />
         <Route path="/properties" element={<Properties />} />
         <Route path="/properties/single/:id" element={<PropertyDetails />} />

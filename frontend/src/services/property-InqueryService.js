@@ -28,7 +28,18 @@ export const fetchPropertyDetail = async (id) => {
 // Submit inquiry
 export const submitInquiry = async (inquiryData) => {
   try {
-    const response = await axios.post(`${Backendurl}/leads/create`, inquiryData);
+    const token = localStorage.getItem("authToken"); 
+
+    const response = await axios.post(
+      `${Backendurl}/leads/create`,
+      inquiryData,
+      {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : '',
+          "Content-Type": "application/json",
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error submitting inquiry:", error);
@@ -36,8 +47,28 @@ export const submitInquiry = async (inquiryData) => {
   }
 };
 
+export const fetchInquiryys = async () => {
+  try {
+   
+    const token = localStorage.getItem("authToken");
+    
+    const response = await axios.get(`${Backendurl}/leads/my`, {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : '',
+         "Content-Type": "application/json",
+      },
+    });
+
+   return response.data;
+  } catch (error) {
+    console.error("Error fetching Inquiryys:", error);
+    throw error;
+  }
+};
+
 export default {
   fetchProperties,
   fetchPropertyDetail,
-  submitInquiry
+  submitInquiry,
+  fetchInquiryys
 };

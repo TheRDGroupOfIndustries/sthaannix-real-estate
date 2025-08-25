@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { User, Camera } from "lucide-react";
 import { fetchUserProfile, updateUserProfile } from "../services/userService";
-
-// const USER_PROFILE_KEY = "userProfile";
+import { toast } from 'react-hot-toast';
 
 const UserProfile = () => {
   const [formData, setFormData] = useState({
@@ -20,9 +19,7 @@ const UserProfile = () => {
     async function loadProfile() {
     try {
     const profile = await fetchUserProfile();   
-    //  if (storedProfile) {
-    //   try {
-        // const profile = JSON.parse(storedProfile);
+   
         setFormData({
           name: profile.name || "",
           email: profile.email || "",
@@ -30,7 +27,7 @@ const UserProfile = () => {
         });
         setProfileImage(profile.profileImage || "");
       } catch {
-         toast.error("Failed to load profile");
+         console.error("Failed to load profile");
       }
     }
      loadProfile();

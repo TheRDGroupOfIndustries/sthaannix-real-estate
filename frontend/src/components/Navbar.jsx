@@ -14,7 +14,7 @@ import {
   Bell,
   Settings,
   UserCircle,
-  Heart,
+  Calendar,
   Zap,
   Crown,
 } from "lucide-react";
@@ -142,14 +142,14 @@ const Navbar = () => {
       .join("")
       .toUpperCase();
   };
-    // Profile and Saved Property navigation
+    // Profile and inquiry Property navigation
   const handleProfileClick = () => {
     setIsDropdownOpen(false);
     navigate("/user-profile");
   };
 
-  const handleSavedPropertiesClick = () => {
-    navigate("/saved-properties");
+  const handleInquiryPropertiesClick = () => {
+    navigate("/inquiry-properties");
   };
 
   return (
@@ -295,12 +295,12 @@ const Navbar = () => {
                               <span>My Profile</span>
                             </motion.button>
                             <motion.button
-                              onClick={handleSavedPropertiesClick}
+                              onClick={handleInquiryPropertiesClick}
                               whileHover={{ x: 4, backgroundColor: "rgb(243 244 246)" }}
                               className="w-full px-6 py-3 text-left text-sm text-gray-700 hover:text-blue-600 flex items-center space-x-3 transition-colors"
                             >
-                              <Heart className="w-4 h-4" />
-                              <span>Saved Properties</span>
+                              <Calendar className="w-4 h-4" />
+                              <span> Properties Inquiry</span>
                             </motion.button>
                               {/* <motion.button
                                 whileHover={{ x: 4, backgroundColor: "rgb(243 244 246)" }}
@@ -646,16 +646,16 @@ const MobileNavLinks = ({
                 whileTap={{ scale: 0.95 }}
                 className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all"
               >
-                <Heart className="w-5 h-5 text-gray-600" />
-                <span className="text-sm font-medium text-gray-700">Saved</span>
+                <Calendar className="w-5 h-5 text-gray-600" />
+                <span className="text-sm font-medium text-gray-700">Inquiry</span>
               </motion.button>
-              <motion.button
+              {/* <motion.button
                 whileTap={{ scale: 0.95 }}
                 className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all"
               >
                 <Settings className="w-5 h-5 text-gray-600" />
                 <span className="text-sm font-medium text-gray-700">Settings</span>
-              </motion.button>
+              </motion.button> */}
             </div>
 
             {/* Logout Button */}

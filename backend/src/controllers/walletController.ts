@@ -4,6 +4,7 @@ import User from "../models/User";
 import TopUpRequest from "../models/TopUpRequest";
 import { uploadFile } from "../utils/uploadToCloudinary";
 
+
 export const getMyWallet = async (req: Request, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
@@ -42,7 +43,7 @@ export const createTopUpRequest = async (req: Request, res: Response) => {
       });
     }
 
-    const { amount, utrNo } = req.body as { amount: string; utrNo?: string };
+    const { amount, utrNumber } = req.body as { amount: string; utrNumber?: string };
     const numericAmount = Number(amount);
 
     if (!numericAmount || isNaN(numericAmount) || numericAmount <= 0) {
@@ -69,7 +70,7 @@ export const createTopUpRequest = async (req: Request, res: Response) => {
       amount: numericAmount,
       proofUrl: uploaded.secure_url,
       status: "pending",
-      utrNo: utrNo || undefined, //  Optional
+      utrNumber: utrNumber || undefined, //  Optional
     });
 
     res.status(201).json({
@@ -86,10 +87,10 @@ export const createTopUpRequest = async (req: Request, res: Response) => {
 
 export const listTopUpRequests = async (req: Request, res: Response) => {
   try {
-    const { status, utrNo } = req.query as { status?: string; utrNo?: string };
+    const { status, utrNumber } = req.query as { status?: string; utrNumber?: string };
     const query: any = {};
     if (status) query.status = status;
-    if (utrNo) query.utrNo = utrNo; //  Allow filtering by UTR number
+    if (utrNumber) query.utrNumber = utrNumber; //  Allow filtering by UTR number
 
     const requests = await TopUpRequest.find(query)
       .populate("user", "name email")
@@ -115,10 +116,10 @@ export const reviewTopUpRequest = async (req: Request, res: Response) => {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
     const { id } = req.params;
-    const { action, reason, utrNo } = req.body as {
+    const { action, reason, utrNumber } = req.body as {
       action: "approve" | "reject";
       reason?: string;
-      utrNo?: string;
+      utrNumber?: string;
     };
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -139,8 +140,8 @@ export const reviewTopUpRequest = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Request already processed" });
     }
 
-    if (utrNo) {
-      topUp.utrNo = utrNo; // Admin can update/add UTR No during review
+    if (utrNumber) {
+      topUp.utrNumber = utrNumber; // Admin can update/add UTR No during review
     }
 
     if (action === "approve") {

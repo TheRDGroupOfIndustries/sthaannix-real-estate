@@ -13,7 +13,8 @@ import {
   Settings,
   Bell,
   User,
-  ChevronDown
+  ChevronDown,
+  ChartCandlestick
 } from 'lucide-react';
 
 const Navbar = () => {
@@ -22,7 +23,10 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  
+   const storedUser = localStorage.getItem("user");
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  const role = user?.role;
+
   // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
@@ -52,12 +56,12 @@ const Navbar = () => {
     setIsMenuOpen(false);
   };
 
-  const navItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/list', label: 'Properties', icon: List },
-    { path: '/add', label: 'Add Property', icon: PlusSquare },
-    { path: '/appointments', label: 'Leads', icon: Calendar },
-  ];
+  // const navItems = [
+  //   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  //   { path: '/list', label: 'Properties', icon: List },
+  //   { path: '/add', label: 'Add Property', icon: PlusSquare },
+  //   { path: '/appointments', label: 'Leads', icon: Calendar },
+  // ];
 
   const containerVariants = {
     hidden: { opacity: 0, y: -10 },
@@ -75,6 +79,39 @@ const Navbar = () => {
     hidden: { opacity: 0, x: -10 },
     visible: { opacity: 1, x: 0 }
   };
+ 
+
+   const navConfig = {
+    admin: [
+      { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+      { path: '/list', label: 'Properties', icon: List },
+      { path: '/add', label: 'Add Property', icon: PlusSquare },
+      { path: '/appointments', label: 'Leads', icon: Calendar },
+      { path: '/revenue', label: 'Revenue', icon: ChartCandlestick },
+    ],
+    broker: [
+      { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+      { path: '/leads', label: 'My Leads', icon: Calendar },
+      { path: '/add', label: 'Add Property', icon: PlusSquare },
+       { path: '/appointments', label: 'Leads', icon: Calendar },
+    ],
+    builder: [
+    { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+      { path: '/leads', label: 'My Leads', icon: Calendar },
+      { path: '/add', label: 'Add Property', icon: PlusSquare },
+       { path: '/appointments', label: 'Leads', icon: Calendar },
+    ],
+    owner: [
+   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+      { path: '/leads', label: 'My Leads', icon: Calendar },
+      { path: '/add', label: 'Add Property', icon: PlusSquare },
+       { path: '/appointments', label: 'Leads', icon: Calendar },
+    ],
+  };
+
+  const navItems = navConfig[role] || [];
+
+  
 
   return (
     <motion.header 

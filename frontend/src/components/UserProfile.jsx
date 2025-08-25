@@ -21,8 +21,11 @@ const UserProfile = () => {
   // Load user profile from backend
   useEffect(() => {
     async function loadProfile() {
-      try {
-        const profile = await fetchUserProfile();
+    try {
+    const profile = await fetchUserProfile();   
+    //  if (storedProfile) {
+    //   try {
+        // const profile = JSON.parse(storedProfile);
         setFormData({
           name: profile.name || "",
           email: profile.email || "",

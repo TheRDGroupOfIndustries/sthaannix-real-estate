@@ -28,7 +28,7 @@ const AdminDashboard = () => {
   // Users state
   const [users, setUsers] = useState([]);
   const [usersLoading, setUsersLoading] = useState(true);
-  const [stats, setStats] = useState([]);
+
   // Payments state
   const [payments, setPayments] = useState([]);
   const [paymentsLoading, setPaymentsLoading] = useState(true);
@@ -39,29 +39,12 @@ const AdminDashboard = () => {
   const fetchUsersData = async () => {
     try {
       setUsersLoading(true);
+
       const response = await adminAPI.getUsersData();
       // console.log("fetchUsersData:", response.data.data);
-      if (response.data.success) {
-        setUsers(response.data.data);
-      } else {
-        toast.error(response.data.message || "Failed to load data");
-      }
-    } catch (error) {
-      console.error("Error fetching admin data:", error);
-      toast.error("Error loading data");
-    } finally {
-      setUsersLoading(false);
-    }
-  };
 
-  const fetchAdminStats = async () => {
-    try {
-      setUsersLoading(true);
-      const response = await adminAPI.getStats();
-      // console.log("fetchAdminStats",response);
-      
-      if (response.status == 200) {
-        setStats(response.data);
+      if (response.data.success) {
+        setUsers(response.data.users);
       } else {
         toast.error(response.data.message || "Failed to load data");
       }
@@ -78,10 +61,13 @@ const AdminDashboard = () => {
     try {
       setPaymentsLoading(true);
       const response = await paymentsAPI.getAll();
+
       console.log("loadPayments:", response.data.data);
 
-      if (response.status == 200) {
-        setPayments(response.data.data);
+
+      if (response.status === 200) {
+        // Always ensure it's an array
+        setPayments(response.data.data || []);
       } else {
         toast.error(response.data.message || "Failed to load data");
       }
@@ -96,7 +82,6 @@ const AdminDashboard = () => {
   useEffect(() => {
     if (activeTab === "users") {
       fetchUsersData();
-      fetchAdminStats();
     } else {
       loadPayments();
     }
@@ -147,9 +132,9 @@ const AdminDashboard = () => {
       const res = await paymentsAPI.approve(id);
 
       if (res.status === 200) {
-        // Instead of making another patch, reload payments
         const updatedRes = await paymentsAPI.getAll();
-        setPayments(updatedRes.data.data);
+
+        setPayments(updatedRes.data.data || []); // ✅ fixed
 
         toast.success("Payment approved successfully");
       } else {
@@ -160,14 +145,15 @@ const AdminDashboard = () => {
     }
   };
 
+  // Cancel payment
   const cancelPayment = async (id, reason) => {
     try {
-      // Call backend reject API with reason
       const res = await paymentsAPI.reject(id, reason);
 
       if (res.status === 200) {
         const updatedRes = await paymentsAPI.getAll();
-        setPayments(updatedRes.data.data);
+
+        setPayments(updatedRes.data.data || []); // ✅ fixed
 
         toast.success("Payment rejected");
       } else {
@@ -310,108 +296,11 @@ const AdminDashboard = () => {
         {/* Tab content */}
         {activeTab === "users" ? (
           <>
-            {/* Summary stats */}
-
-            <div className="mt-10 grid grid-cols-1 md:grid-cols-4 gap-6">
-              {/* Total Users */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
-              >
-                <div className="p-3 bg-blue-100 rounded-xl">
-                  <Users className="w-8 h-8 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Total Users
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {stats?.users?.total ?? 0}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Broker: {stats?.users?.byRole?.broker ?? 0} | Owner:{" "}
-                    {stats?.users?.byRole?.owner ?? 0} | Builder:{" "}
-                    {stats?.users?.byRole?.builder ?? 0}
-                  </p>
-                </div>
-              </motion.div>
-
-              {/* Total Properties */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
-              >
-                <div className="p-3 bg-green-100 rounded-xl">
-                  <Home className="w-8 h-8 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Total Properties
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {stats?.properties?.total ?? 0}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Pending: {stats?.properties?.byStatus?.pending ?? 0} |
-                    Approved: {stats?.properties?.byStatus?.approved ?? 0}
-                  </p>
-                </div>
-              </motion.div>
-
-              {/* Total Leads */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
-              >
-                <div className="p-3 bg-purple-100 rounded-xl">
-                  <ClipboardList className="w-8 h-8 text-purple-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Total Leads
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {stats?.leads?.total ?? 0}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Open: {stats?.leads?.open ?? 0} | Closed:{" "}
-                    {stats?.leads?.closed ?? 0}
-                  </p>
-                </div>
-              </motion.div>
-
-              {/* Wallet */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
-              >
-                <div className="p-3 bg-yellow-100 rounded-xl">
-                  <CreditCard className="w-8 h-8 text-yellow-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                ₹{stats?.adminRevenue?.finalRevenue}
-              </p>
-                </div>
-              </motion.div>
-            </div>
-
             {/* Users Overview Content */}
-            <div className="overflow-x-auto bg-white rounded-xl shadow border border-gray-200 my-10">
+            <div className="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      No
-                    </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       User Name
                     </th>
@@ -451,48 +340,121 @@ const AdminDashboard = () => {
                         transition={{ delay: idx * 0.05 }}
                         className="hover:bg-gray-50"
                       >
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {idx + 1}
+                        <td className="px-6 py-4 whitespace-nowrap flex items-center gap-2">
+                          <User className="w-5 h-5 text-gray-400" />{" "}
+                          {user.name || "-"}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-2">
-                            <User className="w-5 h-5 text-gray-400" />
-                            {user.name || "-"}
-                          </div>
-                        </td>
-
                         <td className="px-6 py-4 whitespace-nowrap">
                           {user.role || "-"}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-1">
-                            <Mail className="w-4 h-4 text-gray-400" />
-                            {user.email || "-"}
-                          </div>
+                        <td className="px-6 py-4 whitespace-nowrap flex items-center gap-1">
+                          <Mail className="w-4 h-4 text-gray-400" />
+                          {user.email || "-"}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-1">
-                            <Phone className="w-4 h-4 text-gray-400" />
-                            {user.phone || "-"}
-                          </div>
+                        <td className="px-6 py-4 whitespace-nowrap flex items-center gap-1">
+                          <Phone className="w-4 h-4 text-gray-400" />
+                          {user.phone || "-"}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-1">
-                            <Home className="w-4 h-4 text-gray-400" />
-                            {user?.totalProperties || 0}
-                          </div>
+                        <td className="px-6 py-4 whitespace-nowrap flex items-center gap-1">
+                          <Home className="w-4 h-4 text-gray-400" />
+                          {user.properties?.length || 0}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-1">
-                            <ClipboardList className="w-4 h-4 text-gray-400" />
-                            {user?.totalLeads || 0}
-                          </div>
+                        <td className="px-6 py-4 whitespace-nowrap flex items-center gap-1">
+                          <ClipboardList className="w-4 h-4 text-gray-400" />
+                          {user.leads?.length || 0}
                         </td>
                       </motion.tr>
                     ))
                   )}
                 </tbody>
               </table>
+            </div>
+
+            {/* Summary stats */}
+            <div className="mt-10 grid grid-cols-1 md:grid-cols-4 gap-6">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
+              >
+                <div className="p-3 bg-blue-100 rounded-xl">
+                  <Users className="w-8 h-8 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-600">
+                    Total Users
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {users.length}
+                  </p>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
+              >
+                <div className="p-3 bg-green-100 rounded-xl">
+                  <Home className="w-8 h-8 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-600">
+                    Total Properties
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {users.reduce(
+                      (acc, cur) => acc + (cur.properties?.length || 0),
+                      0
+                    )}
+                  </p>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
+              >
+                <div className="p-3 bg-purple-100 rounded-xl">
+                  <ClipboardList className="w-8 h-8 text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-600">
+                    Total Leads
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {users.reduce(
+                      (acc, cur) => acc + (cur.leads?.length || 0),
+                      0
+                    )}
+                  </p>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
+              >
+                <div className="p-3 bg-yellow-100 rounded-xl">
+                  <CalendarCheck className="w-8 h-8 text-yellow-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-600">
+                    Recent Activities
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {users.reduce(
+                      (acc, cur) => acc + (cur.activities?.length || 0),
+                      0
+                    )}
+                  </p>
+                </div>
+              </motion.div>
             </div>
           </>
         ) : (
@@ -582,42 +544,45 @@ const AdminDashboard = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex gap-2">
-                            {payment.proof?.map((imgUrl, i) => (
-                              <div
-                                key={i}
-                                className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
-                                title="View Image"
-                                onClick={() => window.open(imgUrl, '_blank')}
-                              >
-                                <img
-                                  src={imgUrl}
-                                  alt={`payment-proof-${i}`}
-                                  className="w-full h-full object-cover"
-                                />
-                                <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
-                                  <Image className="w-4 h-4" />
-                                </div>
-                              </div>
-                            ))}
-                            {/* {
-                              <div
-                                key={payment._id}
-                                className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
-                                title="View Image"
-                                onClick={() =>
-                                  window.open(payment.screenshot, "_blank")
-                                }
-                              >
-                                <img
-                                  src={payment.screenshot}
-                                  alt={`payment-proof`}
-                                  className="w-full h-full object-cover"
-                                />
-                                <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
-                                  <Image className="w-4 h-4" />
-                                </div>
-                              </div>
-                            } */}
+                            {payment.type === "Wallet" &&
+                            payment.proof?.length > 0
+                              ? payment.proof.map((imgUrl, idx) => (
+                                  <div
+                                    key={idx}
+                                    className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
+                                    title="View Image"
+                                    onClick={() =>
+                                      window.open(imgUrl, "_blank")
+                                    }
+                                  >
+                                    <img
+                                      src={imgUrl}
+                                      alt={`payment-proof-${idx}`}
+                                      className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
+                                      <Image className="w-4 h-4" />
+                                    </div>
+                                  </div>
+                                ))
+                              : payment.screenshot && (
+                                  <div
+                                    className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
+                                    title="View Image"
+                                    onClick={() =>
+                                      window.open(payment.screenshot, "_blank")
+                                    }
+                                  >
+                                    <img
+                                      src={payment.screenshot}
+                                      alt="payment-proof"
+                                      className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
+                                      <Image className="w-4 h-4" />
+                                    </div>
+                                  </div>
+                                )}
                           </div>
                         </td>
 
@@ -656,131 +621,90 @@ const AdminDashboard = () => {
             )}
 
             {/* Approved payments section */}
-
             {/* <section className="mt-16">
-              <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <CheckCircle className="w-6 h-6 text-green-600" />
-                Approved Payments
-              </h2>
-              {payments.filter((p) => p.status === "approved").length === 0 ? (
-                <p className="text-gray-500 bg-white rounded-xl p-4 shadow border border-gray-200">
-                  No approved payments yet.
-                </p>
-              ) : (
-                <div className="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          No
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Name
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Role
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Email
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Purpose
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Payment Method
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Amount
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          UTR Number
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Created At
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Reviewed At
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Screenshot
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {payments
-                        .filter((p) => p.status === "approved")
-                        .map((payment, idx) => (
-                          <motion.tr
-                            key={payment._id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: idx * 0.05 }}
-                            className="hover:bg-gray-50"
-                          >
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              {idx + 1}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              {payment.user?.name}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              {payment.user?.role}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              {payment.user?.email}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              {payment.purpose}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              {payment?.paymentMethod}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap font-mono">
-                              ₹{payment.amount}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">
-                              {payment.utrNumber}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              {new Date(payment.createdAt).toLocaleString()}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              {payment.reviewedAt
-                                ? new Date(payment.reviewedAt).toLocaleString()
-                                : "-"}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              {payment.screenshot ? (
-                                <div
-                                  className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
-                                  title="View Screenshot"
-                                  onClick={() =>
-                                    window.open(payment.screenshot, "_blank")
-                                  }
-                                >
-                                  <img
-                                    src={payment.screenshot}
-                                    alt="payment-proof"
-                                    className="w-full h-full object-cover"
-                                  />
-                                  <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
-                                    <Image className="w-4 h-4" />
-                                  </div>
-                                </div>
-                              ) : (
-                                "-"
-                              )}
-                            </td>
-                          </motion.tr>
-                        ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </section> */}
+  <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+    <CheckCircle className="w-6 h-6 text-green-600" />
+    Approved Payments
+  </h2>
+  {payments.filter(p => p.status === "approved").length === 0 ? (
+    
+    <p className="text-gray-500 bg-white rounded-xl p-4 shadow border border-gray-200">
+      No approved payments yet.
+    </p>
+  ) : (
+    <div className="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
+     
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead className="bg-gray-50">
+          <tr>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purpose</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">UTR Number</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reviewed At</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Screenshot</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-100">
+          {payments
+            .filter(p => p.status === "approved")
+            .map((payment, idx) => (
+              <motion.tr
+                key={payment._id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.05 }}
+                className="hover:bg-gray-50"
+              >
+                <td className="px-6 py-4 whitespace-nowrap">{idx + 1}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{payment.user?.name}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{payment.user?.role}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{payment.user?.email}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{payment.purpose}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{payment?.paymentMethod}</td>
+                <td className="px-6 py-4 whitespace-nowrap font-mono">₹{payment.amount}</td>
+                <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">{payment.utrNumber}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {new Date(payment.createdAt).toLocaleString()}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {payment.reviewedAt ? new Date(payment.reviewedAt).toLocaleString() : "-"}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {payment.screenshot ? (
+                    <div
+                      className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
+                      title="View Screenshot"
+                      onClick={() => window.open(payment.screenshot, "_blank")}
+                    >
+                      <img
+                        src={payment.screenshot}
+                        alt="payment-proof"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
+                        <Image className="w-4 h-4" />
+                      </div>
+                    </div>
+                  ) : (
+                    "-"
+                  )}
+                </td>
+              </motion.tr>
+            ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+</section> */}
 
             {/* Canceled payments section */}
-            <section className="mt-16 mb-10">
+            <section className="mt-16">
               <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
                 <FileText className="w-6 h-6 text-gray-600" />
                 Canceled Payments

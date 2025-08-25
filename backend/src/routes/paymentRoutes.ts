@@ -18,7 +18,7 @@ router.post(
   "/submit-proof",
   authenticate,
   (req, res, next) => {
-    upload.array("screenshot", 5)(req, res, (err) => { // 👈 allow up to 5 files
+    upload.array("proof", 5)(req, res, (err) => { // 👈 allow up to 5 files
       if (err instanceof multer.MulterError) {
         return res.status(400).json({ message: err.message });
       } else if (err) {
@@ -42,3 +42,4 @@ router.patch("/admin/approve/:id", authenticate, adminOnly, approvePayment);
 router.patch("/admin/reject/:id", authenticate, adminOnly, rejectPayment);
 
 export default router;
+ 

@@ -1,15 +1,15 @@
-import { UserRole } from "../models/User"; // adjust the path
+import { UserRole } from "../models/User";
 
 declare global {
   namespace Express {
-    interface UserPayload {
-      id: string;
-      role: UserRole;
-      isVerified?: boolean;
-    }
-
     interface Request {
-      user?: UserPayload;
+      user?: {
+        id: string;
+        role: UserRole;
+        isVerified?: boolean;
+        name?: string;
+        status?: string;
+      };
     }
   }
 }

@@ -3,12 +3,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Upload, ChevronDown, ClipboardCopy } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { paymentsAPI } from '../api/api';
+import { paymentsAPI } from "../api/api";
 
 const WHATSAPP_LINK = "https://api.whatsapp.com/send?phone=997690669";
 
 const Payment = () => {
-   const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({
     amount: 1500,
     paymentMethod: "",
   });
@@ -47,15 +47,15 @@ const Payment = () => {
       toast.error("Maximum 4 images allowed");
       return;
     }
-    setImages(prev => [...prev, ...files]);
+    setImages((prev) => [...prev, ...files]);
   };
 
   const removeImage = (index) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
+    setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const toggleUpiDetails = () => {
-    setShowUpiDetails(prev => !prev);
+    setShowUpiDetails((prev) => !prev);
   };
 
   const handleMethodChange = (method) => {
@@ -63,67 +63,67 @@ const Payment = () => {
     setShowUpiDetails(false);
   };
 
-const handlePaymentSubmit = async (e) => {
-  e.preventDefault();
+  const handlePaymentSubmit = async (e) => {
+    e.preventDefault();
 
-  const token = localStorage.getItem("token");
-  if (!token) {
-    toast.error("Please login first");
-    navigate("/login");
-    return;
-  }
-
-  const utrNumber = paymentRef?.trim();
-  if (!utrNumber) {
-    toast.error("Please enter Unique Transaction Reference");
-    return;
-  }
-
-  if (!images || images.length === 0) {
-    toast.error("Please upload payment proof images");
-    return;
-  }
-
-  setLoading(true);
-
-  try {
-    const formDataToSend = new FormData();
-    formDataToSend.append("amount", formData?.amount || "0");
-    formDataToSend.append("purpose", "registration"); // or "role-upgrade"
-    formDataToSend.append("utrNumber", utrNumber);
-
-    // ✅ add paymentMethod mapping
-    let methodValue = "upi";
-    if (selectedMethod === "Account") methodValue = "account";
-    if (selectedMethod === "Whatsapp Deposit") methodValue = "whatsapp";
-
-    formDataToSend.append("paymentMethod", methodValue);
-
-    // append multiple images
-    images.forEach((file) => {
-      formDataToSend.append("screenshot", file); // backend will get it
-    });
-
-    const response = await paymentsAPI.submitProof(formDataToSend, token);
-
-    if (response?.status === 201 || response?.data?.payment) {
-      toast.success(
-        "Payment submitted successfully! Your account will be activated after verification."
-      );
-      navigate("/register");
-    } else {
-      toast.error(response?.data?.message || "Payment submission failed");
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Please login first");
+      navigate("/login");
+      return;
     }
-  } catch (error) {
-    console.error("Payment submission error:", error);
-    toast.error(
-      error?.response?.data?.message ||
-        "Failed to submit payment. Please try again."
-    );
-  } finally {
-    setLoading(false);
-  }
-};
+
+    const utrNumber = paymentRef?.trim();
+    if (!utrNumber) {
+      toast.error("Please enter Unique Transaction Reference");
+      return;
+    }
+
+    if (!images || images.length === 0) {
+      toast.error("Please upload payment proof images");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append("amount", formData?.amount || "0");
+      formDataToSend.append("purpose", "registration"); // or "role-upgrade"
+      formDataToSend.append("utrNumber", utrNumber);
+
+      // ✅ add paymentMethod mapping
+      let methodValue = "upi";
+      if (selectedMethod === "Account") methodValue = "account";
+      if (selectedMethod === "Whatsapp Deposit") methodValue = "whatsapp";
+
+      formDataToSend.append("paymentMethod", methodValue);
+
+      // append multiple images
+      images.forEach((file) => {
+        formDataToSend.append("screenshot", file); // backend will get it
+      });
+
+      const response = await paymentsAPI.submitProof(formDataToSend, token);
+
+      if (response?.status === 201 || response?.data?.payment) {
+        toast.success(
+          "Payment submitted successfully! Your account will be activated after verification."
+        );
+        navigate("/register");
+      } else {
+        toast.error(response?.data?.message || "Payment submission failed");
+      }
+    } catch (error) {
+      console.error("Payment submission error:", error);
+      toast.error(
+        error?.response?.data?.message ||
+          "Failed to submit payment. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
@@ -137,7 +137,7 @@ const handlePaymentSubmit = async (e) => {
         </p>
 
         <div className="flex justify-center gap-4 mb-4">
-          {["UPI", "Account", "Whatsapp Deposit"].map(method => (
+          {["UPI", "Account", "Whatsapp Deposit"].map((method) => (
             <button
               key={method}
               type="button"
@@ -156,15 +156,20 @@ const handlePaymentSubmit = async (e) => {
         {selectedMethod === "Account" && (
           <div className="border border-gray-200 rounded-lg p-4 space-y-3">
             <h3 className="font-semibold text-gray-800">Account Details</h3>
-            <p className="flex items-center justify-between"><span><strong>Bank  :</strong> {accountDetails.bankName}</span> 
-            <ClipboardCopy
+            <p className="flex items-center justify-between">
+              <span>
+                <strong>Bank :</strong> {accountDetails.bankName}
+              </span>
+              <ClipboardCopy
                 className="w-5 h-5 cursor-pointer text-blue-600"
                 onClick={() => copyToClipboard(accountDetails.bankName)}
                 title="Copy Account Number"
               />
-              </p>
+            </p>
             <p className="flex items-center justify-between">
-              <span><strong>Account Name:</strong> {accountDetails.accountName}</span> 
+              <span>
+                <strong>Account Name:</strong> {accountDetails.accountName}
+              </span>
               <ClipboardCopy
                 className="w-5 h-5 cursor-pointer text-blue-600"
                 onClick={() => copyToClipboard(accountDetails.accountName)}
@@ -172,7 +177,9 @@ const handlePaymentSubmit = async (e) => {
               />
             </p>
             <p className="flex items-center justify-between">
-              <span><strong>Account Number:</strong> {accountDetails.accountNumber}</span>
+              <span>
+                <strong>Account Number:</strong> {accountDetails.accountNumber}
+              </span>
               <ClipboardCopy
                 className="w-5 h-5 cursor-pointer text-blue-600"
                 onClick={() => copyToClipboard(accountDetails.accountNumber)}
@@ -180,7 +187,9 @@ const handlePaymentSubmit = async (e) => {
               />
             </p>
             <p className="flex items-center justify-between">
-              <span><strong>IFSC:</strong> {accountDetails.ifsc}</span>
+              <span>
+                <strong>IFSC:</strong> {accountDetails.ifsc}
+              </span>
               <ClipboardCopy
                 className="w-5 h-5 cursor-pointer text-blue-600"
                 onClick={() => copyToClipboard(accountDetails.ifsc)}
@@ -206,7 +215,9 @@ const handlePaymentSubmit = async (e) => {
             {showUpiDetails && (
               <div className="mt-4 text-gray-700 space-y-1">
                 <p className="flex items-center justify-between">
-                  <span><strong>UPI ID:</strong> {accountDetails.upiId}</span>
+                  <span>
+                    <strong>UPI ID:</strong> {accountDetails.upiId}
+                  </span>
                   <ClipboardCopy
                     className="w-5 h-5 cursor-pointer text-blue-600"
                     onClick={() => copyToClipboard(accountDetails.upiId)}
@@ -221,9 +232,7 @@ const handlePaymentSubmit = async (e) => {
 
         {selectedMethod === "Whatsapp Deposit" && (
           <div className="border border-gray-200 rounded-lg p-4 text-center text-gray-700">
-            <p>
-              Please deposit the payment by contacting us on WhatsApp.
-            </p>
+            <p>Please deposit the payment by contacting us on WhatsApp.</p>
             <a
               href={WHATSAPP_LINK}
               target="_blank"
@@ -236,7 +245,10 @@ const handlePaymentSubmit = async (e) => {
         )}
 
         <div>
-          <label htmlFor="paymentRef" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="paymentRef"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Unique Transaction Reference *
           </label>
           <input
@@ -256,7 +268,10 @@ const handlePaymentSubmit = async (e) => {
           </label>
           <div className="flex flex-wrap gap-3 mb-3">
             {images.map((file, idx) => (
-              <div key={idx} className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-300">
+              <div
+                key={idx}
+                className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-300"
+              >
                 <img
                   src={URL.createObjectURL(file)}
                   alt={`upload-${idx + 1}`}

@@ -45,11 +45,11 @@ export const register = async (req: Request, res: Response) => {
       name,
       phone,
       role: role ? role.toLowerCase() : "user",
-      password, 
+      password,
     });
-console.log(role);
+    console.log(role);
 
-    await sendOTP(email, generatedOTP);
+    await sendOTP(email, generatedOTP, "registration");
 
     res.status(200).json({
       message: "OTP sent to email. Please verify to complete registration.",
@@ -77,8 +77,10 @@ export const verifyOtp = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Invalid or expired OTP" });
     }
 
-    const { name, phone, role, password } = validOtp; // take stored values
-
+    const { name, phone, role, password } = validOtp;
+    if (!password) {
+      throw new Error("Password is required.");
+    }
     const hashedPass = await bcrypt.hash(password.toString(), 10);
 
     let status: "pending" | "approved" | "rejected" = "approved";
@@ -150,7 +152,7 @@ export const login = async (req: Request, res: Response) => {
       walletBalance: user.walletBalance,
       status: user.status,
     };
- 
+
     res.json({ token, user: responseUser });
   } catch (error) {
     console.error("Login Error:", error);
@@ -173,7 +175,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE USER 
+// DELETE USER
 export const deleteUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -223,7 +225,9 @@ export const requestRoleUpgrade = async (req: Request, res: Response) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     if (user.role !== "user") {
-      return res.status(400).json({ message: "Only normal users can request upgrade" });
+      return res
+        .status(400)
+        .json({ message: "Only normal users can request upgrade" });
     }
 
     let screenshot = "";
@@ -246,16 +250,16 @@ export const requestRoleUpgrade = async (req: Request, res: Response) => {
       meta: { requestedRole: newRole.toLowerCase() },
     });
 
-    res.status(201).json({ 
-      message: "Role upgrade payment proof submitted. Waiting for admin approval.", 
-      payment 
+    res.status(201).json({
+      message:
+        "Role upgrade payment proof submitted. Waiting for admin approval.",
+      payment,
     });
   } catch (error) {
     console.error("RoleUpgrade Error:", error);
     res.status(500).json({ message: "Server error", error });
   }
 };
-
 
 //UPDATE NAME,EMAIL,PASS
 export const updateUserProfile = async (req: Request, res: Response) => {
@@ -310,7 +314,6 @@ export const updateUserProfile = async (req: Request, res: Response) => {
   }
 };
 
-
 export const getUserById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -335,39 +338,102 @@ export const getUserById = async (req: Request, res: Response) => {
   }
 };
 
+// ---pass reset  ---
+export const sendPasswordResetOTP = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
 
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: "No account found with this email" });
+    }
 
+    const generatedOTP = generateOTP().toString();
+    console.log("PASS RESET OTP : ", generatedOTP);
 
+    await Otp.create({
+      email,
+      otp: generatedOTP,
+      purpose: "password-reset",
+    });
 
+    await sendOTP(email, generatedOTP, "passwordReset");
 
-// export const login = async (req: Request, res: Response) => {
-//   try {
-//     const { email, password } = req.body;
+    res
+      .status(200)
+      .json({ message: "Password reset OTP sent to email", success: true });
+  } catch (error) {
+    console.error("SendPasswordResetOTP Error:", error);
+    res.status(500).json({ message: "Server error", success: false });
+  }
+};
 
-//     const user = await User.findOne({ email });
-//     if (!user) return res.status(400).json({ message: "Invalid credentials" });
+// VERIFY PASSWORD RESET OTP
+export const verifyPasswordResetOTP = async (req: Request, res: Response) => {
+  try {
+    const { email, otp } = req.body;
 
-//     if (!user.isVerified) {
-//       return res
-//         .status(403)
-//         .json({ message: "Please verify your account first" });
-//     }
+    if (!otp) {
+      return res.status(400).json({ message: "OTP is required" });
+    }
 
-//     const isMatch = await bcrypt.compare(password.toString(), user.password);
-//     if (!isMatch)
-//       return res.status(400).json({ message: "Invalid credentials" });
+    const validOtp = await Otp.findOne({
+      email,
+      otp: otp.toString(),
+      purpose: "password-reset",
+    });
+    if (!validOtp) {
+      return res.status(400).json({ message: "Invalid or expired OTP" });
+    }
 
-//     const payload = {
-//       id: user._id.toString(),
-//       role: user.role,
-//       email: user.email,
-//     };
+    await Otp.deleteMany({ email, purpose: "password-reset" });
 
-//     const token = generateToken(payload);
+    res
+      .status(200)
+      .json({ message: "OTP verified successfully", status: true });
+  } catch (error) {
+    console.error("VerifyPasswordResetOTP Error:", error);
+    res.status(500).json({ message: "Server error", status: false });
+  }
+};
 
-//     res.json({ token, role: user.role });
-//   } catch (error) {
-//     console.error("Login Error:", error);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const { email, newPassword } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    if (!newPassword) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Empty password" });
+    }
+
+    if (newPassword.length < 8) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "Password must be at least 8 characters long",
+        });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Password reset successfully!",
+    });
+  } catch (error) {
+    console.error("ResetPassword Error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};

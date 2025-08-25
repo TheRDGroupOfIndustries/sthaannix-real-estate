@@ -10,7 +10,6 @@
 //   },
 // });
 
-
 // export const sendOTP = async (to: string, otp: string) => {
 //   try {
 //     const mailoptions = {
@@ -28,7 +27,6 @@
 //     throw new Error("Failed to send OTP");
 //   }
 // };
-
 
 import nodemailer from "nodemailer";
 
@@ -65,12 +63,34 @@ export const sendEmail = async (options: EmailOptions) => {
   }
 };
 
-export const sendOTP = async (to: string, otp: string) => {
-  return sendEmail({
-    to,
-    subject: "Your OTP Code",
-    text: `Your OTP is ${otp}`,
-    html: `
+export const sendOTP = async (to: string, otp: string, purpose: string) => {
+  if (purpose === "passwordReset") {
+    return sendEmail({
+      to,
+      subject: "Password Reset OTP",
+      text: `Your password reset OTP is ${otp}. It will expire in 10 minutes.`,
+      html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #2d3748;">Password Reset Request</h2>
+        <p>We received a request to reset your password. Your OTP code is:</p>
+        <div style="background: #f7fafc; padding: 16px; border-radius: 4px; 
+                    font-size: 24px; font-weight: bold; color: #2d3748; 
+                    text-align: center; margin: 16px 0;">
+          ${otp}
+        </div>
+        <p>This code will expire in 10 minutes.</p>
+        <p style="color: #718096; font-size: 12px;">
+          If you didn't request a password reset, you can safely ignore this email.
+        </p>
+      </div>
+    `,
+    });
+  } else {
+    return sendEmail({
+      to,
+      subject: "Your OTP Code",
+      text: `Your OTP is ${otp}`,
+      html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #2d3748;">Sthaanix Account Verification</h2>
         <p>Your OTP code is:</p>
@@ -85,7 +105,8 @@ export const sendOTP = async (to: string, otp: string) => {
         </p>
       </div>
     `,
-  });
+    });
+  }
 };
 
 export const sendLeadNotification = async (
@@ -112,7 +133,7 @@ export const sendLeadNotification = async (
           <p><strong>Price:</strong> ₹${leadData.price.toLocaleString()}</p>
           <p><strong>Name:</strong> ${leadData.buyerName}</p>
           <p><strong>From:</strong> ${leadData.buyerEmail}</p>
-          ${leadData.message ? `<p><strong>Message:</strong> ${leadData.message}</p>` : ''}
+          ${leadData.message ? `<p><strong>Message:</strong> ${leadData.message}</p>` : ""}
         </div>
                 
         <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0;">
@@ -147,7 +168,7 @@ export const sendLeadStatusUpdate = async (
         <div style="background: #f7fafc; padding: 16px; border-radius: 4px; margin: 16px 0;">
           <h3 style="margin-top: 0;">${updateData.propertyTitle}</h3>
           <p><strong>New Status:</strong> ${updateData.status}</p>
-          ${updateData.responseMessage ? `<p><strong>Owner's Response:</strong> ${updateData.responseMessage}</p>` : ''}
+          ${updateData.responseMessage ? `<p><strong>Owner's Response:</strong> ${updateData.responseMessage}</p>` : ""}
         </div>
         
         <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0;">

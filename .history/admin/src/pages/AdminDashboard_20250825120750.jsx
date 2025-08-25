@@ -423,8 +423,8 @@ const cancelPayment = async (id, reason) => {
                       >
                         <td className="px-6 py-4 whitespace-nowrap">{idx + 1}</td>
                         <td className="px-6 py-4 whitespace-nowrap">{payment.user?.name}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">{payment.user?.role}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">{payment.user?.email}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">{payment.user.role}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">{payment.user.email}</td>
                         <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">
                           {payment.utrNumber}
                         </td>
@@ -635,9 +635,9 @@ const cancelPayment = async (id, reason) => {
                           className="hover:bg-gray-50"
                         >
                           <td className="px-6 py-4 whitespace-nowrap">{idx + 1}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{payment.user?.name}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{payment.user?.role}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{payment.user?.email}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">{payment.user.name}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">{payment.user.role}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">{payment.user.email}</td>
                           <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">
                             {payment.utrNumber}
                           </td>

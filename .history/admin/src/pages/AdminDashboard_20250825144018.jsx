@@ -453,7 +453,7 @@ const cancelPayment = async (id, reason) => {
                           {payment.utrNumber}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">
-                          {payment.type}
+                          {payment.purpo}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           {new Date(payment.createdAt).toLocaleString()}

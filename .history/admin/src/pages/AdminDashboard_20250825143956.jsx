@@ -415,7 +415,7 @@ const cancelPayment = async (id, reason) => {
                         Transaction Ref
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Purpose
+                        P
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Date & Time
@@ -451,9 +451,6 @@ const cancelPayment = async (id, reason) => {
 
                         <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">
                           {payment.utrNumber}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">
-                          {payment.type}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           {new Date(payment.createdAt).toLocaleString()}

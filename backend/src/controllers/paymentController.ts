@@ -194,26 +194,6 @@ export const uploadPaymentProof = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllPayments = async (req: Request, res: Response) => {
-  try {
-    if (!req.user || req.user.role !== "admin") {
-      return res.status(403).json({ message: "Admin access required" });
-    }
-
-    const { status } = req.query;
-    const filter: any = {};
-    if (status) filter.status = status;
-
-    const payments = await Payment.find(filter)
-      .populate("user", "name email role")
-      .sort({ createdAt: -1 });
-
-    res.json(payments);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch payments", error });
-  }
-};
-
 export const approvePayment = async (req: Request, res: Response) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -304,6 +284,97 @@ export const approvePayment = async (req: Request, res: Response) => {
   res.status(500).json({ message: "Approval failed", error: error });
   } finally {
     session.endSession();
+  }
+};
+
+
+// export const getAllPayments = async (req: Request, res: Response) => {
+//   try {
+//     if (!req.user || req.user.role !== "admin") {
+//       return res.status(403).json({ message: "Admin access required" });
+//     }
+
+//     const { status } = req.query;
+//     const filter: any = {};
+//     if (status) filter.status = status;
+
+//     const payments = await Payment.find(filter)
+//       .populate("user", "name email role")
+//       .sort({ createdAt: -1 });
+
+//     res.json(payments);
+//   } catch (error) {
+//     res.status(500).json({ message: "Failed to fetch payments", error });
+//   }
+// };
+
+export const getAllPayments = async (req: Request, res: Response) => {
+  try {
+    if (!req.user || req.user.role !== "admin") {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    const { status } = req.query;
+    const filter: any = {};
+    if (status) filter.status = status;
+
+    //  Normal Payments (registration, promotion, role upgrade)
+    const payments = await Payment.find(filter)
+      .populate("user", "name email role")
+      .sort({ createdAt: -1 });
+
+    //  Wallet Top-up Payments
+    const topUps = await TopUpRequest.find(filter)
+      .populate("user", "name email role")
+      .sort({ createdAt: -1 });
+
+    //  Normalize both collections into a single array
+    const combined = [
+      ...payments.map((p) => ({
+        _id: p._id,
+        type: "Registration",
+        user: p.user,
+        amount: p.amount,
+        purpose: p.purpose,
+        status: p.status,
+        paymentMethod: p.paymentMethod,
+        utrNumber: p.utrNumber,
+        screenshot: p.screenshot,
+        reviewedAt: p.reviewedAt,
+        approvedBy: p.approvedBy,
+        createdAt: p.createdAt,
+      })),
+      ...topUps.map((t) => ({
+        _id: t._id,
+        type: "Wallet",
+        user: t.user,
+        utrNumber: t.utrNumber,
+        amount: t.amount,
+        status: t.status,
+        proofUrl: t.proofUrl,
+        reviewedAt: t.reviewedAt,
+        reviewedBy: t.reviewedBy,
+        createdAt: t.createdAt,
+      })),
+    ];
+
+    // 🔹 Sort merged results by newest first
+    combined.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    res.json({
+      success: true,
+      message: "Payments & Wallet Top-ups fetched successfully",
+      data: combined,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch payments",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 

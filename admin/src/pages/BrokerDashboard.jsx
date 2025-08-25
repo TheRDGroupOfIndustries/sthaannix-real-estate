@@ -54,35 +54,6 @@ const BrokerDashboard = () => {
   }
 };
 
-//   // Load payments for the broker
-//   const loadPayments = async (email) => {
-//   setLoading(true);
-//   try {
-//     const data = await paymentsAPI.myPayments();
-//     if (data.success) {
-//       setPayments(data.payments);
-//     } else {
-//       toast.error('Failed to load payments');
-//       // Fallback to localStorage
-//       const allPayments = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
-//       const userPayments = allPayments.filter(
-//         (p) => p.status === "approved" && p.user.email === email
-//       );
-//       setPayments(userPayments);
-//     }
-//   } catch (error) {
-//     toast.error('Failed to load payments from server');
-//     // Fallback to localStorage
-//     const allPayments = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
-//     const userPayments = allPayments.filter(
-//       (p) => p.status === "approved" && p.user.email === email
-//     );
-//     setPayments(userPayments);
-//   } finally {
-//     setLoading(false);
-//   }
-// };
- 
 const loadPayments = async (email) => {
   setLoading(true);
   try {
@@ -135,18 +106,29 @@ const loadPayments = async (email) => {
 
   return (
     <div className="min-h-screen pt-16 px-6 bg-gray-50 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
+       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Broker Dashboard</h1>
-        {activeTab === "properties" && (
-          <button
-            onClick={() => navigate("/add")}
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-          >
-            <Plus size={20} />
-            Add Property
-          </button>
-        )}
-      </div>
+    <div className="flex space-x-5"> {/* ✅ 20px gap between buttons */}
+      {activeTab === "properties" && (
+        <button
+          onClick={() => navigate("/add")}
+          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+        >
+          <Plus size={20} />
+          Add Property
+        </button>
+      )}
+      {activeTab === "properties" && (
+        <button
+          onClick={() => navigate("/wallet")}
+          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+        >
+          <Plus size={20} />
+          Recharge
+        </button>
+      )}
+    </div>
+    </div>
 
       {/* Tab Navigation */}
       <div className="flex border border-gray-300 rounded-lg overflow-hidden mb-8">

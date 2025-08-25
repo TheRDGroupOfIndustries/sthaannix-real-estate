@@ -2,7 +2,10 @@ import { Request, Response } from "express";
 import mongoose from "mongoose";
 import Property from "../models/Property";
 import Lead from "../models/Lead";
-import { sendLeadNotification, sendLeadStatusUpdate } from "../utils/emailService";
+import {
+  sendLeadNotification,
+  sendLeadStatusUpdate,
+} from "../utils/emailService";
 import User from "../models/User";
 
 const buyerOnly = (role?: string) => role === "buyer";
@@ -91,6 +94,7 @@ export const getMyLeadsAsBuyer = async (req: Request, res: Response) => {
 
     const leads = await Lead.find({ buyer: req.user.id })
       .populate("property", "title price location.city")
+      .populate("buyer", "name email phone") 
       .sort({ createdAt: -1 });
 
     res.json(leads);
@@ -105,7 +109,7 @@ export const getLeadsForMyProperties = async (req: Request, res: Response) => {
     if (!sellerRoles.includes(req.user.role) && req.user.role !== "admin") {
       return res.status(403).json({ message: "Not allowed" });
     }
-  
+
     const query = req.user.role === "admin" ? {} : { owner: req.user.id };
 
     const leads = await Lead.find(query)
@@ -139,7 +143,7 @@ export const updateLeadStatus = async (req: Request, res: Response) => {
       id,
       { status },
       { new: true }
-    ).populate("property buyer"); 
+    ).populate("property buyer");
 
     if (!updatedLead) {
       return res.status(404).json({ message: "Lead not found" });

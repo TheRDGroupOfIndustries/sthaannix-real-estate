@@ -194,26 +194,6 @@ export const uploadPaymentProof = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllPayments = async (req: Request, res: Response) => {
-  try {
-    if (!req.user || req.user.role !== "admin") {
-      return res.status(403).json({ message: "Admin access required" });
-    }
-
-    const { status } = req.query;
-    const filter: any = {};
-    if (status) filter.status = status;
-
-    const payments = await Payment.find(filter)
-      .populate("user", "name email role")
-      .sort({ createdAt: -1 });
-
-    res.json(payments);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch payments", error });
-  }
-};
-
 export const approvePayment = async (req: Request, res: Response) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -304,6 +284,26 @@ export const approvePayment = async (req: Request, res: Response) => {
   res.status(500).json({ message: "Approval failed", error: error });
   } finally {
     session.endSession();
+  }
+};
+
+export const getAllPayments = async (req: Request, res: Response) => {
+  try {
+    if (!req.user || req.user.role !== "admin") {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    const { status } = req.query;
+    const filter: any = {};
+    if (status) filter.status = status;
+
+    const payments = await Payment.find(filter)
+      .populate("user", "name email role")
+      .sort({ createdAt: -1 });
+
+    res.json(payments);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch payments", error });
   }
 };
 

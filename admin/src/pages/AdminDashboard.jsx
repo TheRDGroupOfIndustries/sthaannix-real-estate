@@ -107,14 +107,32 @@ const AdminDashboard = () => {
   //   toast.success("Payment approved");
   // };
 
-const approvePayment = async (id) => {
+// const approvePayment = async (id) => {
+//   try {
+//     const res = await paymentsAPI.approve(id);
+
+//     if (res.status === 200) {
+    
+//       const updatedRes = await http.patch(`/payment/admin/approve/${id}`)
+//       setPayments(updatedRes.data);
+//       toast.success("Payment approved successfully");
+//     } else {
+//       toast.error("Failed to approve payment");
+//     }
+//   } catch (error) {
+//     toast.error(error.response?.data?.message || "Error approving payment");
+//   }
+// };
+
+  const approvePayment = async (id) => {
   try {
     const res = await paymentsAPI.approve(id);
 
     if (res.status === 200) {
-    
-      const updatedRes = await http.patch(`/payment/admin/approve/${id}`)
+      // Instead of making another patch, reload payments
+      const updatedRes = await paymentsAPI.getAll();
       setPayments(updatedRes.data);
+
       toast.success("Payment approved successfully");
     } else {
       toast.error("Failed to approve payment");
@@ -123,8 +141,6 @@ const approvePayment = async (id) => {
     toast.error(error.response?.data?.message || "Error approving payment");
   }
 };
-
-
 
 const cancelPayment = async (id, reason) => {
   try {
@@ -425,9 +441,11 @@ const cancelPayment = async (id, reason) => {
                         className="hover:bg-gray-50"
                       >
                         <td className="px-6 py-4 whitespace-nowrap">{idx + 1}</td>
+
                         <td className="px-6 py-4 whitespace-nowrap">{payment?.user?.name}</td>
                         <td className="px-6 py-4 whitespace-nowrap">{payment?.user?.role}</td>
                         <td className="px-6 py-4 whitespace-nowrap">{payment?.user?.email}</td>
+
                         <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">
                           {payment.utrNumber}
                         </td>
@@ -639,9 +657,11 @@ const cancelPayment = async (id, reason) => {
                           className="hover:bg-gray-50"
                         >
                           <td className="px-6 py-4 whitespace-nowrap">{idx + 1}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{payment?.user?.name}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{payment?.user?.role}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{payment?.user?.email}</td>
+
+                          <td className="px-6 py-4 whitespace-nowrap">{payment.user?.name}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">{payment.user?.role}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">{payment.user?.email}</td>
+
                           <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">
                             {payment.utrNumber}
                           </td>

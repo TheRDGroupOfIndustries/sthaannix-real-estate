@@ -40,7 +40,7 @@ const PaymentSchema = new Schema<IPayment>(
     paymentMethod: {
       type: String,
       enum: ["upi", "account", "whatsapp"],
-      required: true,
+      required: false,
     },
 
     meta: {

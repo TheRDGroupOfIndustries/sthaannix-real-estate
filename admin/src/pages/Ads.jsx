@@ -57,7 +57,7 @@ const Ads = ({ user }) => {
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6 border rounded shadow">
+    <div className="max-w-lg mx-auto p-6 m-5 border rounded shadow">
       <h2 className="text-2xl font-semibold mb-4">Submit Advertisement</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">

@@ -14,10 +14,10 @@ import {
   Send,
   Phone,
   Mail,
-  MessageCircle
+  MessageCircle,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { fetchInquiryys,  } from "../services/property-InqueryService";
+import { fetchInquiryys } from "../services/property-InqueryService";
 
 export default function PropertiesInquiry() {
   const [inquiries, setInquiries] = useState([]);
@@ -31,18 +31,18 @@ export default function PropertiesInquiry() {
       setLoading(true);
       const response = await fetchInquiryys();
 
-      if (response.status === 200 || response.success) {
-        // Filter out invalid inquiries and ensure proper data structure
+      if (response) {
         const validInquiries = response.data || response.inquiries || [];
-        setInquiries(validInquiries.filter(inquiry => 
-          inquiry.buyer?._id && inquiry.property?._id
-        ));
+        setInquiries(validInquiries);
+        console.log("Fetched inquiries:", response);
       } else {
         toast.error(response.message || "Failed to fetch inquiries");
       }
     } catch (error) {
       console.error("Error fetching inquiries:", error);
-      toast.error("Failed to fetch inquiries. Please check your authorization.");
+      toast.error(
+        "Failed to fetch inquiries. Please check your authorization."
+      );
     } finally {
       setLoading(false);
     }
@@ -52,12 +52,20 @@ export default function PropertiesInquiry() {
     fetchInquiryData();
   }, []);
 
-  const handleStatusChange = async (inquiryId, newStatus, responseMessage = "") => {
+  const handleStatusChange = async (
+    inquiryId,
+    newStatus,
+    responseMessage = ""
+  ) => {
     try {
       setLoadingAction({ id: inquiryId, status: newStatus });
-      
-      const response = await updateInquiryStatus(inquiryId, newStatus, responseMessage);
-      
+
+      const response = await updateInquiryStatus(
+        inquiryId,
+        newStatus,
+        responseMessage
+      );
+
       if (response.status === 200 || response.success) {
         toast.success(`Inquiry ${newStatus} successfully`);
         fetchInquiryData(); // Refresh the list
@@ -76,11 +84,11 @@ export default function PropertiesInquiry() {
     const search = searchTerm.toLowerCase();
 
     const matchesSearch =
-      searchTerm === "" ||
-      (inquiry.property?.title?.toLowerCase().includes(search)) ||
-      (inquiry.buyer?.name?.toLowerCase().includes(search)) ||
-      (inquiry.buyer?.email?.toLowerCase().includes(search)) ||
-      (inquiry.message?.toLowerCase().includes(search));
+    searchTerm === "" ||
+    (inquiry.property?.title && inquiry.property.title.toLowerCase().includes(search)) ||
+    (inquiry.buyer?.name && inquiry.buyer.name.toLowerCase().includes(search)) ||
+    (inquiry.buyer?.email && inquiry.buyer.email.toLowerCase().includes(search)) ||
+    (inquiry.message && inquiry.message.toLowerCase().includes(search));
 
     const matchesFilter = filter === "all" || inquiry.status === filter;
 
@@ -117,7 +125,9 @@ export default function PropertiesInquiry() {
             <h1 className="text-3xl font-bold text-gray-900 mb-1">
               My Properties Inquiries
             </h1>
-            <p className="text-gray-600">Manage all property inquiries from potential buyers</p>
+            <p className="text-gray-600">
+              Manage all property inquiries from potential buyers
+            </p>
           </div>
 
           <div className="flex items-center gap-4">
@@ -219,11 +229,15 @@ export default function PropertiesInquiry() {
                       <div className="space-y-1">
                         <div className="flex items-center text-sm">
                           <Mail className="w-4 h-4 text-gray-400 mr-2" />
-                          <span className="text-gray-600">{inquiry.buyer?.email || inquiry.email}</span>
+                          <span className="text-gray-600">
+                            {inquiry.buyer?.email || inquiry.email}
+                          </span>
                         </div>
                         <div className="flex items-center text-sm">
                           <Phone className="w-4 h-4 text-gray-400 mr-2" />
-                          <span className="text-gray-600">{inquiry.buyer?.phone || inquiry.phone}</span>
+                          <span className="text-gray-600">
+                            {inquiry.buyer?.phone || inquiry.phone}
+                          </span>
                         </div>
                       </div>
                     </td>
@@ -238,11 +252,14 @@ export default function PropertiesInquiry() {
                           </p>
                           <div className="flex items-center text-sm text-gray-500">
                             <Clock className="w-4 h-4 mr-1" />
-                            {new Date(inquiry.createdAt).toLocaleTimeString('en-US', {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                              hour12: true
-                            })}
+                            {new Date(inquiry.createdAt).toLocaleTimeString(
+                              "en-US",
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: true,
+                              }
+                            )}
                           </div>
                         </div>
                       </div>
@@ -265,7 +282,8 @@ export default function PropertiesInquiry() {
                           inquiry.status
                         )}`}
                       >
-                        {inquiry.status?.charAt(0).toUpperCase() + inquiry.status?.slice(1) || "Pending"}
+                        {inquiry.status?.charAt(0).toUpperCase() +
+                          inquiry.status?.slice(1) || "Pending"}
                       </span>
                     </td>
 
@@ -273,24 +291,44 @@ export default function PropertiesInquiry() {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => handleStatusChange(inquiry._id, "open", "Inquiry opened")}
-                          disabled={loadingAction?.id === inquiry._id && loadingAction?.status === "open"}
+                          onClick={() =>
+                            handleStatusChange(
+                              inquiry._id,
+                              "open",
+                              "Inquiry opened"
+                            )
+                          }
+                          disabled={
+                            loadingAction?.id === inquiry._id &&
+                            loadingAction?.status === "open"
+                          }
                           className="p-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
                           title="Mark as Open"
                         >
-                          {loadingAction?.id === inquiry._id && loadingAction?.status === "open" ? (
+                          {loadingAction?.id === inquiry._id &&
+                          loadingAction?.status === "open" ? (
                             <Loader className="animate-spin w-4 h-4" />
                           ) : (
                             <Check className="w-4 h-4" />
                           )}
                         </button>
                         <button
-                          onClick={() => handleStatusChange(inquiry._id, "closed", "Inquiry closed")}
-                          disabled={loadingAction?.id === inquiry._id && loadingAction?.status === "closed"}
+                          onClick={() =>
+                            handleStatusChange(
+                              inquiry._id,
+                              "closed",
+                              "Inquiry closed"
+                            )
+                          }
+                          disabled={
+                            loadingAction?.id === inquiry._id &&
+                            loadingAction?.status === "closed"
+                          }
                           className="p-2 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50"
                           title="Mark as Closed"
                         >
-                          {loadingAction?.id === inquiry._id && loadingAction?.status === "closed" ? (
+                          {loadingAction?.id === inquiry._id &&
+                          loadingAction?.status === "closed" ? (
                             <Loader className="animate-spin w-4 h-4" />
                           ) : (
                             <X className="w-4 h-4" />

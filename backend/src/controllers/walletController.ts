@@ -4,6 +4,7 @@ import User from "../models/User";
 import TopUpRequest from "../models/TopUpRequest";
 import { uploadFile } from "../utils/uploadToCloudinary";
 
+
 export const getMyWallet = async (req: Request, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
@@ -31,6 +32,7 @@ export const createTopUpRequest = async (req: Request, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
+    // Prevent multiple pending requests
     const existingPending = await TopUpRequest.findOne({
       user: req.user.id,
       status: "pending",
@@ -42,41 +44,58 @@ export const createTopUpRequest = async (req: Request, res: Response) => {
       });
     }
 
-    const { amount, utrNo } = req.body as { amount: string; utrNo?: string };
-    const numericAmount = Number(amount);
+    const { amount, utrNumber, proof, paymentMethod } = req.body as {
+      amount: string;
+      utrNumber?: string;
+      proof?: string;
+      paymentMethod?: "upi" | "account" | "whatsapp";
+    };
 
+    const numericAmount = Number(amount);
     if (!numericAmount || isNaN(numericAmount) || numericAmount <= 0) {
       return res.status(400).json({ message: "Valid amount is required" });
     }
 
     if (numericAmount < 100) {
-      return res.status(400).json({ message: "Minimum top-up amount is ₹100" });
-    }
-
-    if (!req.file) {
       return res
         .status(400)
-        .json({ message: "Proof image is required (field name: proof)" });
+        .json({ message: "Minimum top-up amount is ₹100" });
     }
 
-    const uploaded = await uploadFile(req.file.buffer, "payments/proofs");
-    if (!uploaded?.secure_url) {
-      return res.status(500).json({ message: "Failed to upload proof image" });
+    // --- Handle Proofs (Screenshots) ---
+    let proofs: string[] = [];
+
+    if (req.files && Array.isArray(req.files)) {
+    for (const file of req.files) {
+      const uploaded = await uploadFile(file.buffer, "payments/proofs");
+      proofs.push(uploaded.secure_url);
+    }
+  } else if (proof) {
+      proofs.push(proof); // fallback if client sends a URL
+    } else {
+      return res
+        .status(400)
+        .json({ message: "Proof image required (file or URL)" });
     }
 
-    const topUp = await TopUpRequest.create({
-      user: req.user.id,
-      amount: numericAmount,
-      proofUrl: uploaded.secure_url,
-      status: "pending",
-      utrNo: utrNo || undefined, //  Optional
-    });
+    // --- Save in DB ---
+ 
+  const topUp = await TopUpRequest.create({
+  user: req.user.id,
+  amount: numericAmount,
+  proof: proofs,   // since proofs is an array
+  status: "pending",
+  utrNumber: utrNumber || undefined,
+  paymentMethod: paymentMethod || "upi",
+});
+
 
     res.status(201).json({
       message: "Top-up request submitted successfully",
       data: topUp,
     });
   } catch (err) {
+    console.error("TopUp error:", err);
     res.status(500).json({
       message: "Failed to submit top-up request",
       error: err instanceof Error ? err.message : err,
@@ -84,12 +103,13 @@ export const createTopUpRequest = async (req: Request, res: Response) => {
   }
 };
 
+
 export const listTopUpRequests = async (req: Request, res: Response) => {
   try {
-    const { status, utrNo } = req.query as { status?: string; utrNo?: string };
+    const { status, utrNumber } = req.query as { status?: string; utrNumber?: string };
     const query: any = {};
     if (status) query.status = status;
-    if (utrNo) query.utrNo = utrNo; //  Allow filtering by UTR number
+    if (utrNumber) query.utrNumber = utrNumber; //  Allow filtering by UTR number
 
     const requests = await TopUpRequest.find(query)
       .populate("user", "name email")
@@ -115,10 +135,11 @@ export const reviewTopUpRequest = async (req: Request, res: Response) => {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
     const { id } = req.params;
-    const { action, reason, utrNo } = req.body as {
+    const { action, reason, utrNumber, paymentMethod } = req.body as {
       action: "approve" | "reject";
       reason?: string;
-      utrNo?: string;
+      utrNumber?: string;
+      paymentMethod?: "upi" | "account" | "whatsapp";
     };
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -139,8 +160,12 @@ export const reviewTopUpRequest = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Request already processed" });
     }
 
-    if (utrNo) {
-      topUp.utrNo = utrNo; // Admin can update/add UTR No during review
+    if (utrNumber) {
+      topUp.utrNumber = utrNumber; // Admin can update/add UTR No during review
+    }
+
+    if (paymentMethod) {
+      topUp.paymentMethod = paymentMethod; // ✅ now safe
     }
 
     if (action === "approve") {
@@ -169,6 +194,7 @@ export const reviewTopUpRequest = async (req: Request, res: Response) => {
       .json({ message: "Server error", error: (error as Error).message });
   }
 };
+
 
 
 

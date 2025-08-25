@@ -1,13 +1,13 @@
 import axios from "axios";
 import { Backendurl } from "../App";
 
-// Fetch all properties 
+// Fetch all properties
 export const fetchProperties = async (filters = {}) => {
   try {
-    const response = await axios.get(`${Backendurl}/properties/get`,{
-      params: filters
+    const response = await axios.get(`${Backendurl}/properties/get`, {
+      params: filters,
     });
-    return response.data; 
+    return response.data;
   } catch (error) {
     console.error("Error fetching properties:", error);
     throw error;
@@ -17,8 +17,10 @@ export const fetchProperties = async (filters = {}) => {
 // Fetch single property by ID
 export const fetchPropertyDetail = async (id) => {
   try {
-    const response = await axios.get(`${Backendurl}/properties/get-by-id/${id}`);
-    return response.data; 
+    const response = await axios.get(
+      `${Backendurl}/properties/get-by-id/${id}`
+    );
+    return response.data;
   } catch (error) {
     console.error(`Error fetching property ${id}:`, error);
     throw error;
@@ -28,14 +30,14 @@ export const fetchPropertyDetail = async (id) => {
 // Submit inquiry
 export const submitInquiry = async (inquiryData) => {
   try {
-    const token = localStorage.getItem("authToken"); 
+    const token = localStorage.getItem("authToken");
 
     const response = await axios.post(
       `${Backendurl}/leads/create`,
       inquiryData,
       {
         headers: {
-          Authorization: token ? `Bearer ${token}` : '',
+          Authorization: token ? `Bearer ${token}` : "",
           "Content-Type": "application/json",
         },
       }
@@ -49,17 +51,16 @@ export const submitInquiry = async (inquiryData) => {
 
 export const fetchInquiryys = async () => {
   try {
-   
-    const token = localStorage.getItem("authToken");
-    
+    const token = localStorage.getItem("token");
+
     const response = await axios.get(`${Backendurl}/leads/my`, {
       headers: {
-        Authorization: token ? `Bearer ${token}` : '',
-         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
     });
 
-   return response.data;
+    return response.data;
   } catch (error) {
     console.error("Error fetching Inquiryys:", error);
     throw error;
@@ -70,5 +71,5 @@ export default {
   fetchProperties,
   fetchPropertyDetail,
   submitInquiry,
-  fetchInquiryys
+  fetchInquiryys,
 };

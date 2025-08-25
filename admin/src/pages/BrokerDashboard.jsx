@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Plus, Edit3, Trash2 } from "lucide-react";
+import { Plus, Edit3, Trash2,TvMinimalPlay } from "lucide-react";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 import api from "../api/api";
@@ -108,7 +108,7 @@ const loadPayments = async (email) => {
     <div className="min-h-screen pt-16 px-6 bg-gray-50 max-w-7xl mx-auto">
        <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Broker Dashboard</h1>
-    <div className="flex space-x-5"> {/* ✅ 20px gap between buttons */}
+    <div className="flex space-x-5"> 
       {activeTab === "properties" && (
         <button
           onClick={() => navigate("/add")}
@@ -124,7 +124,7 @@ const loadPayments = async (email) => {
           className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
         >
           <Plus size={20} />
-          Recharge
+          Wallet
         </button>
       )}
     </div>
@@ -184,7 +184,7 @@ const loadPayments = async (email) => {
               </p>
               <div className="flex justify-between text-sm text-gray-500 mb-3">
                 <span>{property.bhk} BHK</span>
-                <span>{property.bathroom} Baths</span>
+                {/* <span>{property.bathroom} Baths</span> */}
                 <span>{property.size} Sq Ft</span>
               </div>
 
@@ -212,8 +212,9 @@ const loadPayments = async (email) => {
                     className="p-2 bg-yellow-400 rounded hover:bg-yellow-500"
                     aria-label="Edit property"
                   >
-                    <Edit3 size={18} />
+                  <Edit3 size={18} />
                   </button>
+
                   <button
                     onClick={() => handleDeleteProperty(property._id)}
                     className="p-2 bg-red-500 rounded hover:bg-red-600"
@@ -221,6 +222,15 @@ const loadPayments = async (email) => {
                   >
                     <Trash2 size={18} />
                   </button>
+
+                  <button
+                    onClick={() => navigate(`/ads/${property._id}`)}
+                    className="p-2 bg-yellow-400 rounded hover:bg-yellow-500"
+                    aria-label="Edit property"
+                  >
+                  <TvMinimalPlay size={18} />
+                  </button>
+
                 </div>
               </div>
             ))}

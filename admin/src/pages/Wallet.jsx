@@ -96,7 +96,7 @@ const handlePaymentSubmit = async (e) => {
 
     // append multiple images
     images.forEach((file) => {
-      formDataToSend.append("screenshot", file);
+       formDataToSend.append("proof", file);
     });
 
     // correct API call
@@ -111,7 +111,7 @@ const handlePaymentSubmit = async (e) => {
       toast.success(
         "Payment submitted successfully! Your account will be activated after verification."
       );
-      navigate("/");
+      navigate("/dashboard");
     } else {
       toast.error(response?.data?.message || "Payment submission failed");
     }

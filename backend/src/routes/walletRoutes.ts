@@ -13,7 +13,13 @@ const router = Router();
 
 // user
 router.get("/me", authenticate, getMyWallet);
-router.post("/topup", authenticate, upload.single("screenshot"), createTopUpRequest);
+
+router.post(
+  "/topup",
+  authenticate,
+  upload.array("proof", 4), 
+  createTopUpRequest
+);
 
 // admin
 router.get("/topups", authenticate, adminOnly, listTopUpRequests);

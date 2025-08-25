@@ -5,12 +5,15 @@ export type TopUpStatus = "pending" | "approved" | "rejected";
 export interface ITopUpRequest extends Document {
   user: mongoose.Types.ObjectId;
   amount: number;
-  proofUrl: string;
+  proof: string[];
   status: TopUpStatus;
   reviewedBy?: mongoose.Types.ObjectId;
   reviewedAt?: Date;
   reason?: string;
-  utrNo?: string; // Optional UTR number
+  utrNumber?: string; // Optional UTR number
+  paymentMethod: "upi" | "account" | "whatsapp"; 
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const TopUpRequestSchema = new Schema<ITopUpRequest>(
@@ -22,7 +25,7 @@ const TopUpRequestSchema = new Schema<ITopUpRequest>(
       index: true,
     },
     amount: { type: Number, required: true },
-    proofUrl: { type: String, required: true },
+   proof: { type: [String], required: true },
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],
@@ -32,7 +35,13 @@ const TopUpRequestSchema = new Schema<ITopUpRequest>(
     reviewedBy: { type: Schema.Types.ObjectId, ref: "User" },
     reviewedAt: { type: Date },
     reason: { type: String },
-    utrNo: { type: String ,unique: true, sparse: true}, // Optional field
+    utrNumber: { type: String ,unique: true, sparse: true}, // Optional field
+       //  New field for payment method
+    paymentMethod: {
+      type: String,
+      enum: ["upi", "account", "whatsapp"],
+      required: false,
+    },
   },
   { timestamps: true }
 );

@@ -82,6 +82,7 @@ const AdminDashboard = () => {
 
       if (response.status == 200) {
         setPayments(response.data);
+
       } else {
         toast.error(response.data.message || "Failed to load data");
       }
@@ -562,6 +563,9 @@ const AdminDashboard = () => {
                         Transaction Ref
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Purpose
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Date & Time
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -603,6 +607,9 @@ const AdminDashboard = () => {
 
                         <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">
                           {payment.utrNumber}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">
+                          {payment.type}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           {new Date(payment.createdAt).toLocaleString()}
@@ -653,6 +660,7 @@ const AdminDashboard = () => {
                             }
                           </div>
                         </td>
+
                         <td className="px-6 py-4 whitespace-nowrap text-center space-x-2">
                           <button
                             onClick={() => {

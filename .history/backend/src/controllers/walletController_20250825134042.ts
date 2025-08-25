@@ -43,12 +43,7 @@ export const createTopUpRequest = async (req: Request, res: Response) => {
       });
     }
 
-    const { amount, utrNumber, paymentMethod } = req.body as { 
-      amount: string; 
-      utrNumber?: string;
-      paymentMethod?: "upi" | "account" | "whatsapp"; 
-    };
-
+    const { amount, utrNumber } = req.body as { amount: string; utrNumber?: string };
     const numericAmount = Number(amount);
 
     if (!numericAmount || isNaN(numericAmount) || numericAmount <= 0) {
@@ -75,8 +70,7 @@ export const createTopUpRequest = async (req: Request, res: Response) => {
       amount: numericAmount,
       proofUrl: uploaded.secure_url,
       status: "pending",
-      utrNumber: utrNumber || undefined, 
-      paymentMethod: paymentMethod || "upi", // ✅ set payment method
+      utrNumber: utrNumber || undefined, //  Optional
     });
 
     res.status(201).json({
@@ -90,7 +84,6 @@ export const createTopUpRequest = async (req: Request, res: Response) => {
     });
   }
 };
-
 
 export const listTopUpRequests = async (req: Request, res: Response) => {
   try {
@@ -123,11 +116,10 @@ export const reviewTopUpRequest = async (req: Request, res: Response) => {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
     const { id } = req.params;
-    const { action, reason, utrNumber, paymentMethod } = req.body as {
+    const { action, reason, utrNumber } = req.body as {
       action: "approve" | "reject";
       reason?: string;
       utrNumber?: string;
-      paymentMethod?: "upi" | "account" | "whatsapp";
     };
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -150,10 +142,6 @@ export const reviewTopUpRequest = async (req: Request, res: Response) => {
 
     if (utrNumber) {
       topUp.utrNumber = utrNumber; // Admin can update/add UTR No during review
-    }
-
-    if (paymentMethod) {
-      topUp.paymentMethod = paymentMethod; // ✅ now safe
     }
 
     if (action === "approve") {
@@ -182,7 +170,6 @@ export const reviewTopUpRequest = async (req: Request, res: Response) => {
       .json({ message: "Server error", error: (error as Error).message });
   }
 };
-
 
 
 

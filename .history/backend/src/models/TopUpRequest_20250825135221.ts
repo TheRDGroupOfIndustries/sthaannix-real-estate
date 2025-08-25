@@ -36,12 +36,6 @@ const TopUpRequestSchema = new Schema<ITopUpRequest>(
     reviewedAt: { type: Date },
     reason: { type: String },
     utrNumber: { type: String ,unique: true, sparse: true}, // Optional field
-       //  New field for payment method
-    paymentMethod: {
-      type: String,
-      enum: ["upi", "account", "whatsapp"],
-      required: false,
-    },
   },
   { timestamps: true }
 );

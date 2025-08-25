@@ -123,11 +123,10 @@ export const reviewTopUpRequest = async (req: Request, res: Response) => {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
     const { id } = req.params;
-    const { action, reason, utrNumber, paymentMethod } = req.body as {
+    const { action, reason, utrNumber } = req.body as {
       action: "approve" | "reject";
       reason?: string;
       utrNumber?: string;
-      paymentMethod?: "upi" | "account" | "whatsapp";
     };
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -150,10 +149,6 @@ export const reviewTopUpRequest = async (req: Request, res: Response) => {
 
     if (utrNumber) {
       topUp.utrNumber = utrNumber; // Admin can update/add UTR No during review
-    }
-
-    if (paymentMethod) {
-      topUp.paymentMethod = paymentMethod; // ✅ now safe
     }
 
     if (action === "approve") {
@@ -182,7 +177,6 @@ export const reviewTopUpRequest = async (req: Request, res: Response) => {
       .json({ message: "Server error", error: (error as Error).message });
   }
 };
-
 
 
 

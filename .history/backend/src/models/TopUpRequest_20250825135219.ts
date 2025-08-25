@@ -11,7 +11,7 @@ export interface ITopUpRequest extends Document {
   reviewedAt?: Date;
   reason?: string;
   utrNumber?: string; // Optional UTR number
-  paymentMethod: "upi" | "account" | "whatsapp"; 
+   paymentMethod: "upi" | "account" | "whatsapp"; 
   createdAt: Date;
   updatedAt: Date;
 }
@@ -36,12 +36,6 @@ const TopUpRequestSchema = new Schema<ITopUpRequest>(
     reviewedAt: { type: Date },
     reason: { type: String },
     utrNumber: { type: String ,unique: true, sparse: true}, // Optional field
-       //  New field for payment method
-    paymentMethod: {
-      type: String,
-      enum: ["upi", "account", "whatsapp"],
-      required: false,
-    },
   },
   { timestamps: true }
 );

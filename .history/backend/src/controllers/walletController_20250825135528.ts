@@ -130,6 +130,11 @@ export const reviewTopUpRequest = async (req: Request, res: Response) => {
       paymentMethod?: "upi" | "account" | "whatsapp";
     };
 
+    if (paymentMethod) {
+      topUp.paymentMethod = paymentMethod;
+    }
+
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid TopUp ID" });
     }
@@ -150,10 +155,6 @@ export const reviewTopUpRequest = async (req: Request, res: Response) => {
 
     if (utrNumber) {
       topUp.utrNumber = utrNumber; // Admin can update/add UTR No during review
-    }
-
-    if (paymentMethod) {
-      topUp.paymentMethod = paymentMethod; // ✅ now safe
     }
 
     if (action === "approve") {
@@ -182,7 +183,6 @@ export const reviewTopUpRequest = async (req: Request, res: Response) => {
       .json({ message: "Server error", error: (error as Error).message });
   }
 };
-
 
 
 

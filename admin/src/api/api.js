@@ -100,6 +100,7 @@ export const adminAPI = {
   approveProperty: (id) => api.patch(`/admin/approve-property/${id}`),
   // rejectProperty: (id) => api.patch(`/admin/reject-property/${id}`),
   deleteProperty: (id) => api.delete(`/admin/property/${id}`),
+  getUsersData:()=>api.get("/admin"),
   getStats: () => api.get("/admin/stats"),
   getTopups: () => api.get("/admin/topups"),
   reviewTopup: (id, action) => api.patch(`/admin/topups/${id}`, { action }),

@@ -236,6 +236,7 @@ import Add from "./pages/Add";
 import Update from "./pages/Update";
 import Appointments from "./pages/Appointments";
 import Wallet from "./pages/Wallet";
+import Revenue from "./Revenue";
 
 export const Backendurl = import.meta.env.VITE_API_BASE_URL;
 
@@ -410,7 +411,7 @@ const App = () => {
                 path="/revenue"
                 element={
                   <PrivateRoute allowedRoles={["admin"]}>
-                    <Appointments />
+                    <Revenue />
                   </PrivateRoute>
                 }
               />

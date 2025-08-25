@@ -15,7 +15,8 @@ export const generateToken = (payload: UserPayload): string => {
   }
 
   const options: SignOptions = {
-    expiresIn: "1h",
+    expiresIn: (process.env.JWT_EXPIRES_IN || "2h") as SignOptions["expiresIn"],
+
   };
 
   return jwt.sign(payload, secret, options); 

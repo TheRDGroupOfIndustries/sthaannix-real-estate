@@ -150,14 +150,25 @@ const Appointments = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header and Search Section - Keep existing code */}
         <div className="flex justify-between items-center mb-8">
-          <div>
+          {/* <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-1">
+              <Calendar/>
               Leads
             </h1>
             <p className="text-gray-600">
               Manage and track property viewing Leads
             </p>
-          </div>
+          </div> */}
+<div>
+  <h1 className="text-3xl font-bold text-gray-900 mb-1 flex items-center gap-2">
+    <Calendar className="w-8 h-8 text-blue-500" />
+    Leads
+  </h1>
+  <p className="text-gray-600">
+    Manage and track property viewing Leads
+  </p>
+</div>
+
 
           <div className="flex items-center gap-4">
             <div className="relative">

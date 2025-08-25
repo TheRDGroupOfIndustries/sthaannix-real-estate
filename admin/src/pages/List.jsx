@@ -862,7 +862,7 @@ const PropertyListings = () => {
         </motion.div>
 
         {/* Stats Cards */}
-        <motion.div 
+        {/* <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
@@ -870,6 +870,7 @@ const PropertyListings = () => {
           className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8"
         >
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Properties</p>
@@ -879,6 +880,7 @@ const PropertyListings = () => {
                 <Home className="w-6 h-6 text-blue-600" />
               </div>
             </div>
+            
           </div>
           
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
@@ -922,7 +924,76 @@ const PropertyListings = () => {
               </div>
             </div>
           </div>
-        </motion.div>
+        </motion.div> */}
+
+
+<motion.div 
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  exit={{ opacity: 0, y: 20 }}
+  variants={itemVariants}
+  className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8"
+>
+  {/* Total Properties */}
+  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <div className="flex items-center gap-4">
+      <div className="p-3 bg-blue-50 rounded-xl">
+        <Home className="w-6 h-6 text-blue-600" />
+      </div>
+      <div>
+        <p className="text-sm font-medium text-gray-600">Total Properties</p>
+        <p className="text-2xl font-bold text-gray-900">{properties.length}</p>
+      </div>
+    </div>
+  </div>
+
+  {/* For Rent */}
+  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <div className="flex items-center gap-4">
+      <div className="p-3 bg-green-50 rounded-xl">
+        <Calendar className="w-6 h-6 text-green-600" />
+      </div>
+      <div>
+        <p className="text-sm font-medium text-gray-600">For Rent</p>
+        <p className="text-2xl font-bold text-gray-900">
+          {properties.filter(p => p.availability === 'rent').length}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  {/* For Sale */}
+  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <div className="flex items-center gap-4">
+      <div className="p-3 bg-purple-50 rounded-xl">
+        <TrendingUp className="w-6 h-6 text-purple-600" />
+      </div>
+      <div>
+        <p className="text-sm font-medium text-gray-600">For Buy</p>
+        <p className="text-2xl font-bold text-gray-900">
+          {properties.filter(p => p.availability === 'buy').length}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  {/* Avg. Price */}
+  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <div className="flex items-center gap-4">
+      <div className="p-3 bg-orange-50 rounded-xl">
+        <Star className="w-6 h-6 text-orange-600" />
+      </div>
+      <div>
+        <p className="text-sm font-medium text-gray-600">Avg. Price</p>
+        <p className="text-2xl font-bold text-gray-900">
+          ₹{properties.length > 0 ? Math.round(properties.reduce((sum, p) => sum + p.price, 0) / properties.length / 100000) : 0}L
+        </p>
+      </div>
+    </div>
+  </div>
+</motion.div>
+
+
 
         {/* Search and Filters */}
         <motion.div 
@@ -963,11 +1034,18 @@ const PropertyListings = () => {
                   onChange={(e) => setFilterType(e.target.value)}
                   className="px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                 >
-                  <option value="all">All Types</option>
+                  {/* <option value="all">All Types</option>
                   <option value="house">Houses</option>
                   <option value="apartment">Apartments</option>
                   <option value="villa">Villas</option>
-                  <option value="office">Offices</option>
+                  <option value="office">Offices</option> */}
+                  <option value="all">All Types</option>
+<option value="plot">Plots</option>
+<option value="apartment">Apartments</option>
+<option value="commercial">Commercial</option>
+<option value="villa">Villas</option>
+<option value="house">Houses</option>
+
                 </select>
 
                 <select

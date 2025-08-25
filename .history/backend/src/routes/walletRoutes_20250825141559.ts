@@ -13,7 +13,6 @@ const router = Router();
 
 // user
 router.get("/me", authenticate, getMyWallet);
-
 router.post(
   "/topup",
   authenticate,

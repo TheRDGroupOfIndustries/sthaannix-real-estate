@@ -5,7 +5,7 @@ export type TopUpStatus = "pending" | "approved" | "rejected";
 export interface ITopUpRequest extends Document {
   user: mongoose.Types.ObjectId;
   amount: number;
-  proof: string[];
+  proof: string;
   status: TopUpStatus;
   reviewedBy?: mongoose.Types.ObjectId;
   reviewedAt?: Date;

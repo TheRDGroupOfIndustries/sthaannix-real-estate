@@ -32,7 +32,6 @@ export const createTopUpRequest = async (req: Request, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
-    // Prevent multiple pending requests
     const existingPending = await TopUpRequest.findOne({
       user: req.user.id,
       status: "pending",
@@ -44,58 +43,50 @@ export const createTopUpRequest = async (req: Request, res: Response) => {
       });
     }
 
-    const { amount, utrNumber, proof, paymentMethod } = req.body as {
-      amount: string;
+    const { amount, utrNumber,proof, paymentMethod } = req.body as { 
+      amount: string; 
       utrNumber?: string;
-      proof?: string;
-      paymentMethod?: "upi" | "account" | "whatsapp";
+      paymentMethod?: "upi" | "account" | "whatsapp"; 
     };
 
     const numericAmount = Number(amount);
+
     if (!numericAmount || isNaN(numericAmount) || numericAmount <= 0) {
       return res.status(400).json({ message: "Valid amount is required" });
     }
 
     if (numericAmount < 100) {
-      return res
-        .status(400)
-        .json({ message: "Minimum top-up amount is ₹100" });
+      return res.status(400).json({ message: "Minimum top-up amount is ₹100" });
     }
 
-    // --- Handle Proofs (Screenshots) ---
-    let proofs: string[] = [];
+     let screenshots: string[] = [];
 
     if (req.files && Array.isArray(req.files)) {
-    for (const file of req.files) {
-      const uploaded = await uploadFile(file.buffer, "payments/proofs");
-      proofs.push(uploaded.secure_url);
-    }
-  } else if (proof) {
-      proofs.push(proof); // fallback if client sends a URL
+      for (const file of req.files) {
+        console.log("Multer parsed file:", file.originalname);
+        const uploaded = await uploadFile(file.buffer, "payments/proofs");
+        screenshots.push(uploaded.secure_url);
+      }
+    } else if (proof) {
+      screenshots.push(proof);
     } else {
-      return res
-        .status(400)
-        .json({ message: "Proof image required (file or URL)" });
+      return res.status(400).json({ message: "Proof image required (file or URL)" });
     }
 
-    // --- Save in DB ---
- 
-  const topUp = await TopUpRequest.create({
-  user: req.user.id,
-  amount: numericAmount,
-  proof: proofs,   // since proofs is an array
-  status: "pending",
-  utrNumber: utrNumber || undefined,
-  paymentMethod: paymentMethod || "upi",
-});
-
+      const topUp = await TopUpRequest.create({
+        user: req.user.id,
+        amount: numericAmount,
+        proofUrls: uploadedProofs,   // ✅ array of urls
+        status: "pending",
+        utrNumber: utrNumber || undefined,
+        paymentMethod: paymentMethod || "upi",
+      });
 
     res.status(201).json({
       message: "Top-up request submitted successfully",
       data: topUp,
     });
   } catch (err) {
-    console.error("TopUp error:", err);
     res.status(500).json({
       message: "Failed to submit top-up request",
       error: err instanceof Error ? err.message : err,

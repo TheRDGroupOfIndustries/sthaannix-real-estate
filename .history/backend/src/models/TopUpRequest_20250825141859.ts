@@ -25,7 +25,7 @@ const TopUpRequestSchema = new Schema<ITopUpRequest>(
       index: true,
     },
     amount: { type: Number, required: true },
-   proof: { type: [String], required: true },
+    proof: { type: String, required: true },
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],

@@ -96,7 +96,7 @@ const handlePaymentSubmit = async (e) => {
 
     // append multiple images
     images.forEach((file) => {
-       formDataToSend.append("proof", file);
+     formDataToSend.append("proof", images[0]);
     });
 
     // correct API call

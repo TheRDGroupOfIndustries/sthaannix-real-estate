@@ -80,15 +80,15 @@ export const createTopUpRequest = async (req: Request, res: Response) => {
 
     // --- Save in DB ---
  
-  const topUp = await TopUpRequest.create({
+const topUp = await TopUpRequest.create({
   user: req.user.id,
   amount: numericAmount,
-  proof: proofs,   // since proofs is an array
+  proof: proofs[0],   // if schema = string
+  // proof: proofs,    // if schema = [string]
   status: "pending",
   utrNumber: utrNumber || undefined,
   paymentMethod: paymentMethod || "upi",
 });
-
 
     res.status(201).json({
       message: "Top-up request submitted successfully",

@@ -5,7 +5,7 @@ export type TopUpStatus = "pending" | "approved" | "rejected";
 export interface ITopUpRequest extends Document {
   user: mongoose.Types.ObjectId;
   amount: number;
-  proof: string[];
+  proof: string;
   status: TopUpStatus;
   reviewedBy?: mongoose.Types.ObjectId;
   reviewedAt?: Date;
@@ -25,7 +25,7 @@ const TopUpRequestSchema = new Schema<ITopUpRequest>(
       index: true,
     },
     amount: { type: Number, required: true },
-   proof: { type: [String], required: true },
+    proofUr: { type: String, required: true },
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],

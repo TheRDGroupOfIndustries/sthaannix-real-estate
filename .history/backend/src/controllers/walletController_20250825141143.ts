@@ -65,12 +65,12 @@ export const createTopUpRequest = async (req: Request, res: Response) => {
     // --- Handle Proofs (Screenshots) ---
     let proofs: string[] = [];
 
-    if (req.files && Array.isArray(req.files)) {
-    for (const file of req.files) {
-      const uploaded = await uploadFile(file.buffer, "payments/proofs");
-      proofs.push(uploaded.secure_url);
-    }
-  } else if (proof) {
+  if (req.files && Array.isArray(req.files)) {
+  for (const file of req.files) {
+    const uploaded = await uploadFile(file.buffer, "payments/proofs");
+    proofs.push(uploaded.secure_url);
+  }
+} else if (proof) {
       proofs.push(proof); // fallback if client sends a URL
     } else {
       return res
@@ -79,16 +79,15 @@ export const createTopUpRequest = async (req: Request, res: Response) => {
     }
 
     // --- Save in DB ---
- 
-  const topUp = await TopUpRequest.create({
-  user: req.user.id,
-  amount: numericAmount,
-  proof: proofs,   // since proofs is an array
-  status: "pending",
-  utrNumber: utrNumber || undefined,
-  paymentMethod: paymentMethod || "upi",
-});
-
+    const topUp = await TopUpRequest.create({
+      user: req.user.id,
+      amount: numericAmount,
+      proof: proofs[0], // ✅ if schema is still `proof: string`
+      // 🔹 If you update schema → use `proofs: proofs`
+      status: "pending",
+      utrNumber: utrNumber || undefined,
+      paymentMethod: paymentMethod || "upi",
+    });
 
     res.status(201).json({
       message: "Top-up request submitted successfully",

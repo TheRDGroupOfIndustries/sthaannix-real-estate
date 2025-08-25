@@ -184,7 +184,7 @@ const Appointments = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-white rounded-lg shadow-lg overflow-hiddena">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50">

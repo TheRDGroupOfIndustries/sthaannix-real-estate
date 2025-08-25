@@ -5,8 +5,6 @@ import { uploadFile } from "../utils/uploadToCloudinary";
 import TopUpRequest from "../models/TopUpRequest";
 import mongoose from "mongoose";
 
-
-
 // export const uploadPaymentProof = async (req: Request, res: Response) => {
 //   try {
 //     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
@@ -349,7 +347,7 @@ export const getAllPayments = async (req: Request, res: Response) => {
     if (status) filter.status = status;
 
     const payments = await Payment.find(filter)
-      .populate("user", "name email")
+      .populate("user", "name email role")
       .sort({ createdAt: -1 });
 
     res.json(payments);

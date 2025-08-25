@@ -343,7 +343,7 @@ export const getAllPayments = async (req: Request, res: Response) => {
         reviewedAt: p.reviewedAt,
         approvedBy: p.approvedBy,
         createdAt: p.createdAt,
-        updatedAt: p.updatedAt,
+        updatedAt: t.updateedAt,
       })),
       ...topUps.map((t) => ({
         _id: t._id,
@@ -357,7 +357,6 @@ export const getAllPayments = async (req: Request, res: Response) => {
         reviewedAt: t.reviewedAt,
         reviewedBy: t.reviewedBy,
         createdAt: t.createdAt,
-        updatedAt: t.updatedAt,
       })),
 
     ];

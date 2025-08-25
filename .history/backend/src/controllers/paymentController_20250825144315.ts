@@ -357,7 +357,6 @@ export const getAllPayments = async (req: Request, res: Response) => {
         reviewedAt: t.reviewedAt,
         reviewedBy: t.reviewedBy,
         createdAt: t.createdAt,
-        updatedAt: t.updatedAt,
       })),
 
     ];

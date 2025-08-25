@@ -105,7 +105,7 @@ export const getLeadsForMyProperties = async (req: Request, res: Response) => {
     if (!sellerRoles.includes(req.user.role) && req.user.role !== "admin") {
       return res.status(403).json({ message: "Not allowed" });
     }
- 
+  
     const query = req.user.role === "admin" ? {} : { owner: req.user.id };
 
     const leads = await Lead.find(query)

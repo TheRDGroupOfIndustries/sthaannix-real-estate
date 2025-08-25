@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { User, Camera } from "lucide-react";
 import { fetchUserProfile, updateUserProfile } from "../services/userService";
-import { toast } from 'react-hot-toast';
+import toast from "react-hot-toast";
 
 const UserProfile = () => {
   const [formData, setFormData] = useState({
@@ -10,27 +10,36 @@ const UserProfile = () => {
     email: "",
     phone: "",
   });
-  const [profileImage, setProfileImage] = useState("");
+
+  const [profileImage, setProfileImage] = useState(
+    "https://ui-avatars.com/api/?name=User&background=random"
+  );
+
   const [editMode, setEditMode] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // Load user profile from localStorage on mount
+  // Load user profile from backend
   useEffect(() => {
     async function loadProfile() {
     try {
     const profile = await fetchUserProfile();   
-   
+    //  if (storedProfile) {
+    //   try {
+        // const profile = JSON.parse(storedProfile);
         setFormData({
           name: profile.name || "",
           email: profile.email || "",
           phone: profile.phone || "",
         });
-        setProfileImage(profile.profileImage || "");
+        setProfileImage(
+          profile.profileImage ||
+            "https://via.placeholder.com/150?text=No+Image"
+        );
       } catch {
-         console.error("Failed to load profile");
+        toast.error("Failed to load profile");
       }
     }
-     loadProfile();
+    loadProfile();
   }, []);
 
   const handleChange = (e) => {
@@ -41,35 +50,32 @@ const UserProfile = () => {
     }));
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  // const handleImageChange = (e) => {
+  //   const file = e.target.files[0];
+  //   if (!file) return;
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setProfileImage(reader.result);
-    };
-    reader.readAsDataURL(file);
-  };
+  //   const reader = new FileReader();
+  //   reader.onloadend = () => {
+  //     setProfileImage(reader.result);
+  //   };
+  //   reader.readAsDataURL(file);
+  // };
 
-  const handleSubmit =async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
 
-     try {
-      const updatedProfile = { ...formData, profileImage };
+    try {
+      const updatedProfile = { ...formData };
       await updateUserProfile(updatedProfile);
-
-      toast.success("Profile updated successfully!");
+        toast.success("Profile updated successfully!");
       setEditMode(false);
-
     } catch (error) {
       toast.error("Failed to update profile");
     } finally {
       setSaving(false);
     }
   };
-
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8 mt-8">
       <h1 className="text-3xl font-bold mb-8 text-gray-900">User Profile</h1>
@@ -83,38 +89,15 @@ const UserProfile = () => {
         {/* Profile Image */}
         <div className="flex flex-col items-center">
           <div className="relative">
-            {profileImage ? (
-              <img
-                src={profileImage}
-                alt="Profile"
-                className="w-32 h-32 object-cover rounded-full border-4 border-blue-600 shadow"
-              />
-            ) : (
-              <div className="w-32 h-32 rounded-full bg-blue-200 flex items-center justify-center text-white text-4xl shadow">
-                <User />
-              </div>
-            )}
-            {editMode && (
-              <label
-                htmlFor="fileInput"
-                className="absolute bottom-0 right-0 bg-blue-600 p-2 rounded-full cursor-pointer hover:bg-blue-700"
-                title="Change profile image"
-              >
-                <Camera className="text-white w-5 h-5" />
-                <input
-                  type="file"
-                  id="fileInput"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleImageChange}
-                />
-              </label>
-            )}
+            <div className="w-32 h-32 flex items-center justify-center rounded-full shadow bg-blue-500 text-white text-4xl font-bold">
+              {formData.name ? formData.name.charAt(0).toUpperCase() : "U"}
+            </div>
           </div>
         </div>
 
         {/* Form fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Full Name
@@ -134,6 +117,7 @@ const UserProfile = () => {
             />
           </div>
 
+          {/* Email */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Email Address
@@ -153,6 +137,7 @@ const UserProfile = () => {
             />
           </div>
 
+          {/* Phone */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Phone Number

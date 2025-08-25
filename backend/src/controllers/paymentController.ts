@@ -5,8 +5,6 @@ import { uploadFile } from "../utils/uploadToCloudinary";
 import TopUpRequest from "../models/TopUpRequest";
 import mongoose from "mongoose";
 
-
-
 // export const uploadPaymentProof = async (req: Request, res: Response) => {
 //   try {
 //     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
@@ -121,10 +119,15 @@ export const uploadPaymentProof = async (req: Request, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
-    const { amount, purpose, utrNumber, proof, requestedRole } = req.body;
+    const { amount, purpose, utrNumber, proof, requestedRole, paymentMethod } = req.body;
     const user = await User.findById(req.user.id);
 
     if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Validate payment method
+    if (!["upi", "account", "whatsapp"].includes(paymentMethod)) {
+      return res.status(400).json({ message: "Invalid payment method" });
+    }
 
     // Validate amounts
     if (purpose === "registration" && amount < 1500) {
@@ -161,8 +164,9 @@ export const uploadPaymentProof = async (req: Request, res: Response) => {
       amount,
       purpose,
       utrNumber,
-      screenshot: screenshots.length === 1 ? screenshots[0] : screenshots, // support single or multiple
+      screenshot: screenshots.length === 1 ? screenshots[0] : screenshots,
       status: "pending",
+      paymentMethod, // ✅ save payment method
       meta: purpose === "role-upgrade" ? { requestedRole } : undefined,
     });
 
@@ -175,7 +179,6 @@ export const uploadPaymentProof = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error("Upload Payment Proof Error:", error);
 
-    //  Handle duplicate UTR gracefully
     if (error.code === 11000 && error.keyPattern?.utrNumber) {
       return res.status(400).json({
         success: false,
@@ -186,20 +189,42 @@ export const uploadPaymentProof = async (req: Request, res: Response) => {
     res.status(500).json({ 
       success: false,
       message: "Payment submission failed. Please try again later.",
-      error: error.message, // only safe message
+      error: error.message,
     });
   }
 };
 
-
-export const approvePayment = async (req: Request, res: Response) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
+export const getAllPayments = async (req: Request, res: Response) => {
   try {
     if (!req.user || req.user.role !== "admin") {
       return res.status(403).json({ message: "Admin access required" });
     }
 
+    const { status } = req.query;
+    const filter: any = {};
+    if (status) filter.status = status;
+
+    const payments = await Payment.find(filter)
+      .populate("user", "name email role")
+      .sort({ createdAt: -1 });
+
+    res.json(payments);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch payments", error });
+  }
+};
+
+export const approvePayment = async (req: Request, res: Response) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  
+  console.log("id :",req.params.id);
+  console.log("user :",req.user);
+  try {
+    if (!req.user || req.user.role !== "admin") {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+    
     const { id } = req.params;
     const payment = await Payment.findById(id).session(session);
 
@@ -272,8 +297,11 @@ export const approvePayment = async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    await session.abortTransaction();
-    res.status(500).json({ message: "Approval failed", error });
+    // await session.abortTransaction();
+    // res.status(500).json({ message: "Approval failed", error });
+     console.error("Approval error:", error); // Add this for backend visibility
+  await session.abortTransaction();
+  res.status(500).json({ message: "Approval failed", error: error });
   } finally {
     session.endSession();
   }
@@ -338,22 +366,4 @@ export const getMyPayments = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllPayments = async (req: Request, res: Response) => {
-  try {
-    if (!req.user || req.user.role !== "admin") {
-      return res.status(403).json({ message: "Admin access required" });
-    }
 
-    const { status } = req.query;
-    const filter: any = {};
-    if (status) filter.status = status;
-
-    const payments = await Payment.find(filter)
-      .populate("user", "name email")
-      .sort({ createdAt: -1 });
-
-    res.json(payments);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch payments", error });
-  }
-};

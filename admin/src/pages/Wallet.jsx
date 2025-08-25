@@ -3,24 +3,18 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Upload, ChevronDown, ClipboardCopy } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { paymentsAPI } from '../api/api';
+import api from "../api/api";
 
 const WHATSAPP_LINK = "https://api.whatsapp.com/send?phone=997690669";
 
-const Payment = () => {
+const Wallet = () => {
    const [formData, setFormData] = useState({
-    amount: 1500,
+    amount:"",
     paymentMethod: "",
   });
   const location = useLocation();
   const navigate = useNavigate();
 
-  // formData passed from Register page
-  // const {userData} = location.state || {};
-  // if (!userData) {
-  //   navigate("/register");
-  //   return null;
-  // }
 
   const [images, setImages] = useState([]);
   const [paymentRef, setPaymentRef] = useState("");
@@ -63,79 +57,84 @@ const Payment = () => {
     setShowUpiDetails(false);
   };
 
-  // const handlePaymentSubmit = async (e) => {
-  //   e.preventDefault();
-    
-  // const token = localStorage.getItem('token');
-  // if (!token) {
-  //   toast.error("Please login first");
-  //   navigate("/login");
-  //   return;
-  // }
 
-  //   if (!paymentRef.trim()) {
-  //     toast.error("Please enter Unique Transaction Reference");
-  //     return;
-  //   }
-  //   if (images.length === 0) {
-  //     toast.error("Please upload payment proof images");
-  //     return;
-  //   }
+const handlePaymentSubmit = async (e) => {
+  e.preventDefault();
 
-  //   setLoading(true);
-    
-  //   // Save payment record in localStorage (append)
-  //   // const paymentRecords = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
-  //    try {
-  //   const paymentData = {
-  //     id: Date.now().toString(),
-  //     amount: 1500,
-  //     user: formData,
-  //     paymentRef: paymentRef.trim(),
-  //     paymentMethod: selectedMethod,
-  //     timestamp: new Date().toISOString(),
-  //     images: images.map(file => URL.createObjectURL(file)),
-  //     status: "pending",
-  //   };
+  const token = localStorage.getItem("token");
+  if (!token) {
+    toast.error("Please login first");
+    navigate("/login");
+    return;
+  }
 
-  //   const response = await paymentsAPI.submitProof(paymentData);
-  //   if (response.success) {
-  //       toast.success("Payment submitted successfully! Your account will be activated after verification.");
-  //       navigate("/login");
-  //     } 
-  //     else {
-  //       toast.error(response.message || "Payment submission failed");
-  //     }
-  //   } 
-  //   catch (error) {
-  //     console.error("Payment submission error:", error);
-  //     toast.error(error.response?.data?.message || "Failed to submit payment. Please try again.");
-  //   }
-  //    finally {
-  //     setLoading(false);
-  //   }
-  // };
+  const utrNumber = paymentRef?.trim();
+  if (!utrNumber) {
+    toast.error("Please enter Unique Transaction Reference");
+    return;
+  }
 
-  //   paymentRecords.push(newPayment);
-  //   localStorage.setItem("paymentRecords", JSON.stringify(paymentRecords));
+  if (!images || images.length === 0) {
+    toast.error("Please upload payment proof images");
+    return;
+  }
 
-  //   setTimeout(() => {
-  //     setLoading(false);
-  //     toast.success("Payment submitted! Please login.");
-  //     navigate("/login");
-  //   }, 1500);
-  // };
+  setLoading(true);
+
+  try {
+    const formDataToSend = new FormData();
+    formDataToSend.append("amount", formData?.amount || "0");
+    formDataToSend.append("purpose", "promotion"); 
+    formDataToSend.append("utrNumber", utrNumber);
+
+    //  map payment method
+    let methodValue = "upi";
+    if (selectedMethod === "Account") methodValue = "account";
+    if (selectedMethod === "Whatsapp Deposit") methodValue = "whatsapp";
+
+    formDataToSend.append("paymentMethod", methodValue);
+
+    // append multiple images
+    images.forEach((file) => {
+      formDataToSend.append("screenshot", file);
+    });
+
+    // correct API call
+    const response = await api.post("/wallet/topup", formDataToSend, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    if (response?.status === 201 || response?.data?.payment) {
+      toast.success(
+        "Payment submitted successfully! Your account will be activated after verification."
+      );
+      navigate("/");
+    } else {
+      toast.error(response?.data?.message || "Payment submission failed");
+    }
+  } catch (error) {
+    console.error("Payment submission error:", error);
+    toast.error(
+      error?.response?.data?.message ||
+        "Failed to submit payment. Please try again."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-lg p-8 bg-white rounded-xl shadow-md space-y-6">
         <h2 className="text-3xl font-bold text-gray-900 text-center">
-          Registration Payment
+          Recharge Wallet
         </h2>
 
-        <p className="text-center text-lg font-semibold text-gray-700">
-          Registration Fee: ₹1500
-        </p>
+        {/* <p className="text-center text-lg font-semibold text-gray-700"> 
+        </p> */}
 
         <div className="flex justify-center gap-4 mb-4">
           {["UPI", "Account", "Whatsapp Deposit"].map(method => (
@@ -237,6 +236,24 @@ const Payment = () => {
         )}
 
         <div>
+        <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">
+            Amount *
+        </label>
+        <input
+            id="amount"
+            type="number"
+            value={formData.amount}
+            onChange={(e) =>
+            setFormData((prev) => ({ ...prev, amount: e.target.value }))
+            }
+            placeholder="Enter amount"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            required
+        />
+        </div>
+
+
+        <div>
           <label htmlFor="paymentRef" className="block text-sm font-medium text-gray-700 mb-1">
             Unique Transaction Reference *
           </label>
@@ -317,4 +334,4 @@ const Payment = () => {
   );
 };
 
-export default Payment;
+export default Wallet;

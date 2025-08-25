@@ -217,11 +217,14 @@ export const getAllPayments = async (req: Request, res: Response) => {
 export const approvePayment = async (req: Request, res: Response) => {
   const session = await mongoose.startSession();
   session.startTransaction();
+  
+  console.log("id :",req.params.id);
+  console.log("user :",req.user);
   try {
     if (!req.user || req.user.role !== "admin") {
       return res.status(403).json({ message: "Admin access required" });
     }
-
+    
     const { id } = req.params;
     const payment = await Payment.findById(id).session(session);
 
@@ -294,8 +297,11 @@ export const approvePayment = async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    await session.abortTransaction();
-    res.status(500).json({ message: "Approval failed", error });
+    // await session.abortTransaction();
+    // res.status(500).json({ message: "Approval failed", error });
+     console.error("Approval error:", error); // Add this for backend visibility
+  await session.abortTransaction();
+  res.status(500).json({ message: "Approval failed", error: error });
   } finally {
     session.endSession();
   }

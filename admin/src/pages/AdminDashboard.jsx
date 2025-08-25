@@ -20,6 +20,7 @@ import {
   Image,
 } from "lucide-react";
 import { adminAPI ,paymentsAPI} from "../api/api";
+import http from "../api/http";
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("users");
@@ -112,7 +113,7 @@ const approvePayment = async (id) => {
 
     if (res.status === 200) {
     
-      const updatedRes = await paymentsAPI.getAll();
+      const updatedRes = await http.patch(`/payment/admin/approve/${id}`)
       setPayments(updatedRes.data);
       toast.success("Payment approved successfully");
     } else {
@@ -517,8 +518,10 @@ const cancelPayment = async (id, reason) => {
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purpose</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">UTR Number</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
@@ -539,8 +542,10 @@ const cancelPayment = async (id, reason) => {
               >
                 <td className="px-6 py-4 whitespace-nowrap">{idx + 1}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{payment.user?.name}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{payment.user?.role}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{payment.user?.email}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{payment.purpose}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{payment?.paymentMethod}</td>
                 <td className="px-6 py-4 whitespace-nowrap font-mono">₹{payment.amount}</td>
                 <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">{payment.utrNumber}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -640,7 +645,7 @@ const cancelPayment = async (id, reason) => {
                             {new Date(payment.updatedAt).toLocaleString()}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            {/* {payment.utrNumber} */}
+                            {payment.paymentMethod}
                             </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex gap-2">

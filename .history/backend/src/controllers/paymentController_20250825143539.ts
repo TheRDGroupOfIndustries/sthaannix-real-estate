@@ -352,7 +352,7 @@ export const getAllPayments = async (req: Request, res: Response) => {
         amount: t.amount,
         status: t.status,
         proof: t.proof,               //  send array of images
-        paymentMethod: t.paymentMethod, //  include payment method
+        paymentMethod: t.paymentMethod, // ✅ include payment method
         reviewedAt: t.reviewedAt,
         reviewedBy: t.reviewedBy,
         createdAt: t.createdAt,

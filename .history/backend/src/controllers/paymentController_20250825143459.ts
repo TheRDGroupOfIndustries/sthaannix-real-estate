@@ -345,18 +345,18 @@ export const getAllPayments = async (req: Request, res: Response) => {
         createdAt: p.createdAt,
       })),
       ...topUps.map((t) => ({
-        _id: t._id,
-        type: "Wallet",
-        user: t.user,
-        utrNumber: t.utrNumber,
-        amount: t.amount,
-        status: t.status,
-        proof: t.proof,               //  send array of images
-        paymentMethod: t.paymentMethod, //  include payment method
-        reviewedAt: t.reviewedAt,
-        reviewedBy: t.reviewedBy,
-        createdAt: t.createdAt,
-      })),
+  _id: t._id,
+  type: "Wallet",
+  user: t.user,
+  utrNumber: t.utrNumber,
+  amount: t.amount,
+  status: t.status,
+  proof: t.proof,               // ✅ send array of images
+  paymentMethod: t.paymentMethod, // ✅ include payment method
+  reviewedAt: t.reviewedAt,
+  reviewedBy: t.reviewedBy,
+  createdAt: t.createdAt,
+})),
 
     ];
 

@@ -454,45 +454,29 @@ const cancelPayment = async (id, reason) => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">{payment?.paymentMethod}</td>
                         <td className="px-6 py-4 whitespace-nowrap">₹{payment.amount}</td>
-                     <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex gap-2">
-                      {payment.type === "Wallet" && payment.proof?.length > 0
-                        ? payment.proof.map((imgUrl, idx) => (
-                            <div
-                              key={idx}
-                              className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
-                              title="View Image"
-                              onClick={() => window.open(imgUrl, "_blank")}
-                            >
-                              <img
-                                src={imgUrl}
-                                alt={`payment-proof-${idx}`}
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
-                                <Image className="w-4 h-4" />
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex gap-2">
+          
+                            {
+                              <div
+                                key={payment._id}
+                                className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
+                                title="View Image"
+                                onClick={() => window.open(payment.screenshot, '_blank')}
+                              >
+                                <img
+                                  src={payment.screenshot}
+                                  alt={`payment-proof`}
+                                  className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
+                                  <Image className="w-4 h-4" />
+                                </div>
                               </div>
-                            </div>
-                          ))
-                        : payment.screenshot && (
-                            <div
-                              className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
-                              title="View Image"
-                              onClick={() => window.open(payment.screenshot, "_blank")}
-                            >
-                              <img
-                                src={payment.screenshot}
-                                alt="payment-proof"
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
-                                <Image className="w-4 h-4" />
-                              </div>
-                            </div>
-                          )}
-                    </div>
-                  </td>
-
+                              
+                              }
+                          </div>
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap text-center space-x-2">
                           <button
                             onClick={() => {

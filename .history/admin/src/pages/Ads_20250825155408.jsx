@@ -42,7 +42,7 @@ const handleSubmit = async (e) => {
   if (!currentUser?.id) return alert("User not found");
 
   try {
-    const response = await axios.post(`${Backendurl}/ad/create`, {
+    const response = await axios.post(`${Backendurl}/ad/cre`, {
       userId: currentUser.id, // use 'id' instead of '_id'
       propertyId: id,
       budget: Number(budget), // convert to number

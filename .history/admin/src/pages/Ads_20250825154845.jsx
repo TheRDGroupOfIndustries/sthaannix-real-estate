@@ -33,33 +33,30 @@ useEffect(() => {
   }
 }, []);
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  if (!platform) return alert("Please select a platform");
-  if (Number(budget) < 1500) return alert("Minimum advertisement budget is ₹1500");
+    if (!platform) return alert("Please select a platform");
+    if (budget < 1500) return alert("Minimum advertisement budget is ₹1500");
 
-  if (!currentUser?.id) return alert("User not found");
+    try {
+      const response = await axios.post("/api/ads", {
+        userId: user._id,
+        propertyId: id,
+        budget,
+        platform: [platform],
+        startDate,
+      });
 
-  try {
-    const response = await axios.post(`${Backendurl}/ad/create`, {
-      userId: currentUser.id, // use 'id' instead of '_id'
-      propertyId: id,
-      budget: Number(budget), // convert to number
-      platform: [platform],
-      startDate,
-    });
-
-    alert(response.data.message);
-    navigate("/ads-list"); // redirect after success
-  } catch (error) {
-    console.error(error);
-    alert(
-      error.response?.data?.message || "Error submitting ad request. Try again."
-    );
-  }
-};
-
+      alert(response.data.message);
+      navigate("/ads-list"); // redirect after success
+    } catch (error) {
+      console.error(error);
+      alert(
+        error.response?.data?.message || "Error submitting ad request. Try again."
+      );
+    }
+  };
 
   return (
     <div className="max-w-lg mx-auto p-6 m-5 border rounded shadow">

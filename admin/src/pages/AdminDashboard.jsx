@@ -32,7 +32,7 @@ const AdminDashboard = () => {
   // Payments state
   const [payments, setPayments] = useState([]);
   const [paymentsLoading, setPaymentsLoading] = useState(true);
-
+  const [stats, setStats] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
   // Fetch all users and their data
@@ -44,7 +44,25 @@ const AdminDashboard = () => {
       // console.log("fetchUsersData:", response.data.data);
 
       if (response.data.success) {
-        setUsers(response.data.users);
+        setUsers(response.data.data);
+      } else {
+        toast.error(response.data.message || "Failed to load data");
+      }
+    } catch (error) {
+      console.error("Error fetching admin data:", error);
+      toast.error("Error loading data");
+    } finally {
+      setUsersLoading(false);
+    }
+  };
+  const fetchAdminStats = async () => {
+    try {
+      setUsersLoading(true);
+      const response = await adminAPI.getStats();
+      // console.log("fetchAdminStats",response.data);
+
+      if (response.status == 200) {
+        setStats(response.data);
       } else {
         toast.error(response.data.message || "Failed to load data");
       }
@@ -64,7 +82,6 @@ const AdminDashboard = () => {
 
       console.log("loadPayments:", response.data.data);
 
-
       if (response.status === 200) {
         // Always ensure it's an array
         setPayments(response.data.data || []);
@@ -82,6 +99,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     if (activeTab === "users") {
       fetchUsersData();
+      fetchAdminStats();
     } else {
       loadPayments();
     }
@@ -166,33 +184,30 @@ const AdminDashboard = () => {
   };
 
   const approveWalletPayment = async (id, utrNumber, paymentMethod) => {
-  try {
-    const res = await paymentsAPI.walletApprove(id, utrNumber, paymentMethod);
-
-    if (res.status === 200) {
-      const updatedRes = await paymentsAPI.getAll();
-      setPayments(updatedRes.data.data); 
-      toast.success("Wallet Payment approved");
-    } else {
-      toast.error("Failed to approve payment");
-    }
-  } catch (error) {
-    console.error("Approve payment error:", error);
-    toast.error(error.response?.data?.message || "Error approving payment");
-  }
-};
-
-  
-
-  const cancelWalletPayment=async(id,reason)=>{
-
     try {
-      // Call backend reject API with reason
-      const res = await paymentsAPI.walletReject(id,reason);
+      const res = await paymentsAPI.walletApprove(id, utrNumber, paymentMethod);
 
       if (res.status === 200) {
         const updatedRes = await paymentsAPI.getAll();
-        setPayments(updatedRes.data.data); 
+        setPayments(updatedRes.data.data);
+        toast.success("Wallet Payment approved");
+      } else {
+        toast.error("Failed to approve payment");
+      }
+    } catch (error) {
+      console.error("Approve payment error:", error);
+      toast.error(error.response?.data?.message || "Error approving payment");
+    }
+  };
+
+  const cancelWalletPayment = async (id, reason) => {
+    try {
+      // Call backend reject API with reason
+      const res = await paymentsAPI.walletReject(id, reason);
+
+      if (res.status === 200) {
+        const updatedRes = await paymentsAPI.getAll();
+        setPayments(updatedRes.data.data);
         toast.success("Wallet Payment rejected");
       } else {
         toast.error("Failed to reject payment");
@@ -201,8 +216,7 @@ const AdminDashboard = () => {
       console.error("Reject payment error:", error);
       toast.error(error.response?.data?.message || "Error rejecting payment");
     }
-  }
-
+  };
 
   const pendingPayments = payments.filter((p) => p.status === "pending");
   const canceledPayments = payments.filter((p) => p.status === "rejected");
@@ -296,11 +310,108 @@ const AdminDashboard = () => {
         {/* Tab content */}
         {activeTab === "users" ? (
           <>
+            {/* Summary stats */}
+            <div className="mt-10 grid grid-cols-1 md:grid-cols-4 gap-6">
+              {/* Total Users */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
+              >
+                <div className="p-3 bg-blue-100 rounded-xl">
+                  <Users className="w-8 h-8 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-600">
+                    Total Users
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {stats?.users?.total ?? 0}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Broker: {stats?.users?.byRole?.broker ?? 0} | Owner:{" "}
+                    {stats?.users?.byRole?.owner ?? 0} | Builder:{" "}
+                    {stats?.users?.byRole?.builder ?? 0}
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* Total Properties */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
+              >
+                <div className="p-3 bg-green-100 rounded-xl">
+                  <Home className="w-8 h-8 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-600">
+                    Total Properties
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {stats?.properties?.total ?? 0}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Pending: {stats?.properties?.byStatus?.pending ?? 0} |
+                    Approved: {stats?.properties?.byStatus?.approved ?? 0}
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* Total Leads */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
+              >
+                <div className="p-3 bg-purple-100 rounded-xl">
+                  <ClipboardList className="w-8 h-8 text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-600">
+                    Total Leads
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {stats?.leads?.total ?? 0}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Open: {stats?.leads?.open ?? 0} | Closed:{" "}
+                    {stats?.leads?.closed ?? 0}
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* Wallet */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
+              >
+                <div className="p-3 bg-yellow-100 rounded-xl">
+                  <CreditCard className="w-8 h-8 text-yellow-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Total Revenuet</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    ₹
+                    {(stats?.adminRevenue?.finalRevenue ?? 0) }
+                  </p>
+                  
+                </div>
+              </motion.div>
+            </div>
             {/* Users Overview Content */}
-            <div className="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
+            <div className="overflow-x-auto bg-white rounded-xl shadow border border-gray-200 my-10">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      No
+                    </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       User Name
                     </th>
@@ -340,121 +451,48 @@ const AdminDashboard = () => {
                         transition={{ delay: idx * 0.05 }}
                         className="hover:bg-gray-50"
                       >
-                        <td className="px-6 py-4 whitespace-nowrap flex items-center gap-2">
-                          <User className="w-5 h-5 text-gray-400" />{" "}
-                          {user.name || "-"}
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {idx + 1}
                         </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <User className="w-5 h-5 text-gray-400" />
+                            {user.name || "-"}
+                          </div>
+                        </td>
+
                         <td className="px-6 py-4 whitespace-nowrap">
                           {user.role || "-"}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap flex items-center gap-1">
-                          <Mail className="w-4 h-4 text-gray-400" />
-                          {user.email || "-"}
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-1">
+                            <Mail className="w-4 h-4 text-gray-400" />
+                            {user.email || "-"}
+                          </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap flex items-center gap-1">
-                          <Phone className="w-4 h-4 text-gray-400" />
-                          {user.phone || "-"}
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-1">
+                            <Phone className="w-4 h-4 text-gray-400" />
+                            {user.phone || "-"}
+                          </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap flex items-center gap-1">
-                          <Home className="w-4 h-4 text-gray-400" />
-                          {user.properties?.length || 0}
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-1">
+                            <Home className="w-4 h-4 text-gray-400" />
+                            {user?.totalProperties || 0}
+                          </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap flex items-center gap-1">
-                          <ClipboardList className="w-4 h-4 text-gray-400" />
-                          {user.leads?.length || 0}
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-1">
+                            <ClipboardList className="w-4 h-4 text-gray-400" />
+                            {user?.totalLeads || 0}
+                          </div>
                         </td>
                       </motion.tr>
                     ))
                   )}
                 </tbody>
               </table>
-            </div>
-
-            {/* Summary stats */}
-            <div className="mt-10 grid grid-cols-1 md:grid-cols-4 gap-6">
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
-              >
-                <div className="p-3 bg-blue-100 rounded-xl">
-                  <Users className="w-8 h-8 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Total Users
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {users.length}
-                  </p>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
-              >
-                <div className="p-3 bg-green-100 rounded-xl">
-                  <Home className="w-8 h-8 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Total Properties
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {users.reduce(
-                      (acc, cur) => acc + (cur.properties?.length || 0),
-                      0
-                    )}
-                  </p>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
-              >
-                <div className="p-3 bg-purple-100 rounded-xl">
-                  <ClipboardList className="w-8 h-8 text-purple-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Total Leads
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {users.reduce(
-                      (acc, cur) => acc + (cur.leads?.length || 0),
-                      0
-                    )}
-                  </p>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
-              >
-                <div className="p-3 bg-yellow-100 rounded-xl">
-                  <CalendarCheck className="w-8 h-8 text-yellow-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Recent Activities
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {users.reduce(
-                      (acc, cur) => acc + (cur.activities?.length || 0),
-                      0
-                    )}
-                  </p>
-                </div>
-              </motion.div>
             </div>
           </>
         ) : (
@@ -588,12 +626,15 @@ const AdminDashboard = () => {
 
                         <td className="px-6 py-4 whitespace-nowrap text-center space-x-2">
                           <button
-                           onClick={() =>
+                            onClick={() =>
                               payment.type === "Wallet"
-                                ? approveWalletPayment(payment._id,payment.utrNumber,payment.paymentMethod)
+                                ? approveWalletPayment(
+                                    payment._id,
+                                    payment.utrNumber,
+                                    payment.paymentMethod
+                                  )
                                 : approvePayment(payment._id)
                             }
-
                             className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-green-600 text-white hover:bg-green-700 transition"
                             title="Approve Payment"
                           >
@@ -601,11 +642,14 @@ const AdminDashboard = () => {
                             Approve
                           </button>
                           <button
-                             onClick={() =>
-    payment.type === "Wallet"
-      ? cancelWalletPayment(payment._id, 'Payment Rejected BY Admin')
-      : cancelPayment(payment._id, "Payment Rejected")
-  }
+                            onClick={() =>
+                              payment.type === "Wallet"
+                                ? cancelWalletPayment(
+                                    payment._id,
+                                    "Payment Rejected BY Admin"
+                                  )
+                                : cancelPayment(payment._id, "Payment Rejected")
+                            }
                             className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-red-600 text-white hover:bg-red-700 transition"
                             title="Cancel Payment"
                           >

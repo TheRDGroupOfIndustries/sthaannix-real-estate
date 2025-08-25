@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Backendurl } from "../config/constants";
+import { toast } from "react-hot-toast";
 
 const Ads = ({ user }) => {
   const { id } = useParams(); // propertyId
@@ -29,17 +30,26 @@ useEffect(() => {
   if (userData) {
     const parsedUser = JSON.parse(userData);
     setUserName(parsedUser.name);
-    setCurrentUser(parsedUser); // save full user object
+    setCurrentUser(parsedUser); 
   }
 }, []);
 
 const handleSubmit = async (e) => {
   e.preventDefault();
 
-  if (!platform) return alert("Please select a platform");
-  if (Number(budget) < 1500) return alert("Minimum advertisement budget is ₹1500");
+  if (!platform) {
+    toast.error("Please select a platform");
+    return;
+  }
+  if (Number(budget) < 1500) {
+    toast.error("Minimum advertisement budget is ₹1500");
+    return;
+  }
 
-  if (!currentUser?.id) return alert("User not found");
+  if (!currentUser?.id) {
+    toast.error("User not found");
+    return;
+  }
 
   try {
     const response = await axios.post(`${Backendurl}/ad/create`, {
@@ -50,11 +60,11 @@ const handleSubmit = async (e) => {
       startDate,
     });
 
-    alert(response.data.message);
-    navigate("/ads-list"); // redirect after success
+    toast.success(response.data.message);
+    navigate("/dashboard"); // redirect after success
   } catch (error) {
     console.error(error);
-    alert(
+    toast.error(
       error.response?.data?.message || "Error submitting ad request. Try again."
     );
   }

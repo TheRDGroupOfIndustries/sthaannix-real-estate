@@ -235,7 +235,6 @@ import PropertyListings from "./pages/List";
 import Add from "./pages/Add";
 import Update from "./pages/Update";
 import Appointments from "./pages/Appointments";
-import Wallet from "./pages/Wallet";
 
 export const Backendurl = import.meta.env.VITE_API_BASE_URL;
 
@@ -404,8 +403,6 @@ const App = () => {
                 path="/payment"
                 element={getUser() ? <Payment /> : <Navigate to="/login" replace />}
               />
-
-                <Route path="/wallet" element={<Wallet/>} />
 
               {/* Fallback */}
               <Route path="*" element={<Navigate to="/login" replace />} />

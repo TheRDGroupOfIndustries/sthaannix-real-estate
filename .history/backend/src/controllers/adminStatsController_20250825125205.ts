@@ -61,7 +61,6 @@ export const getAdminStats = async (_req: Request, res: Response) => {
 };
 
 
-
 export const getUserStats = async (req: Request, res: Response) => {
   try {
     const stats = await User.aggregate([

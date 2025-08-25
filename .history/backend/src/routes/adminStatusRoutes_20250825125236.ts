@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authenticate } from "../middlewares/authenticate";
 import { adminOnly } from "../middlewares/adminOnly";
-import { getAdminStats,getUserStats } from "../controllers/adminStatsController";
+import { getAdminStats } from "../controllers/adminStatsController";
 
 const router = Router();
 

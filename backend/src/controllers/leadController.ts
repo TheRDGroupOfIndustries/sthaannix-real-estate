@@ -20,7 +20,7 @@ export const createLead = async (req: Request, res: Response) => {
         .status(403)
         .json({ message: "Only buyers can send enquiries" });
     }
-
+ 
     const { propertyId, message } = req.body as {
       propertyId: string;
       message?: string;

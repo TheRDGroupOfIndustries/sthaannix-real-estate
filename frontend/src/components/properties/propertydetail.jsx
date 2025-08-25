@@ -138,17 +138,17 @@ const PropertyDetails = () => {
   }, [property, localStorageKey]);
 
   // const parseAmenities = (amenities) => {
-  //   if (!amenities || !Array.isArray(amenities)) return [];
+  //   if (!amenities || !Array.isArray(amenities)) return [];
 
-  //   try {
-  //     if (typeof amenities[0] === "string") {
-  //       return JSON.parse(amenities[0].replace(/'/g, '"'));
-  //     }
-  //     return amenities;
-  //   } catch (error) {
-  //     console.error("Error parsing amenities:", error);
-  //     return [];
-  //   }
+  //   try {
+  //     if (typeof amenities[0] === "string") {
+  //       return JSON.parse(amenities[0].replace(/'/g, '"'));
+  //     }
+  //     return amenities;
+  //   } catch (error) {
+  //     console.error("Error parsing amenities:", error);
+  //     return [];
+  //   }
   // };
 
   const parseAmenities = (amenities) => {
@@ -240,13 +240,18 @@ const PropertyDetails = () => {
     setInquirySubmitting(true);
 
     try {
-      await submitInquiry({
-        propertyId: property._id,
-        propertyTitle: property.title,
-        ...inquiryData,
-      });
+      const payload = {
+        propertyId: property._id, // Must include this
+        ownerId: property.owner, // This is likely also required
+        name: inquiryData.name,
+        email: inquiryData.email,
+        phone: inquiryData.phone,
+        message: inquiryData.message,
+      };
 
-      // For now simulate success
+      // Call the service function with the complete payload
+      await submitInquiry(payload);
+
       setInquirySuccess(true);
       setTimeout(() => {
         setInquirySuccess(false);
@@ -285,7 +290,6 @@ const PropertyDetails = () => {
 
     return () => clearInterval(interval);
   }, [images]);
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 pt-16">

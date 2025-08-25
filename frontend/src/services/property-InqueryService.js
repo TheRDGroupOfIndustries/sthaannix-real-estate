@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Backendurl } from "../App";
-
+import http from "../api/http";
 // Fetch all properties
 export const fetchProperties = async (filters = {}) => {
   try {
@@ -30,24 +30,16 @@ export const fetchPropertyDetail = async (id) => {
 // Submit inquiry
 export const submitInquiry = async (inquiryData) => {
   try {
-    const token = localStorage.getItem("authToken");
-
-    const response = await axios.post(
-      `${Backendurl}/leads/create`,
-      inquiryData,
-      {
-        headers: {
-          Authorization: token ? `Bearer ${token}` : "",
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await http.post("/leads/create", inquiryData);
+    console.log("Inquiry submitted successfully:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error submitting inquiry:", error);
     throw error;
   }
 };
+
+
 
 export const fetchInquiryys = async () => {
   try {

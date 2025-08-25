@@ -8,9 +8,10 @@ export interface IPayment extends Document {
   screenshot: string | string[];
   utrNumber?: string;
   approvedBy?: Types.ObjectId;
+  rejectedBy?: Types.ObjectId; // 👈 add this
   reviewedAt?: Date;
   reason?: string;
-  paymentMethod: "upi" | "account" | "whatsapp";   
+  paymentMethod: "upi" | "account" | "whatsapp";
   meta?: {
     requestedRole?: "broker" | "builder" | "owner";
   };
@@ -32,13 +33,14 @@ const PaymentSchema = new Schema<IPayment>(
       enum: ["pending", "approved", "rejected"],
       default: "pending",
     },
-    screenshot: { type: Schema.Types.Mixed, required: true }, 
+    screenshot: { type: Schema.Types.Mixed, required: true },
     utrNumber: { type: String, unique: true, sparse: true },
+
     approvedBy: { type: Schema.Types.ObjectId, ref: "User" },
+    rejectedBy: { type: Schema.Types.ObjectId, ref: "User" }, // 👈 added here
     reviewedAt: { type: Date },
     reason: { type: String },
 
-    //  New field for payment method
     paymentMethod: {
       type: String,
       enum: ["upi", "account", "whatsapp"],
@@ -60,11 +62,3 @@ const PaymentSchema = new Schema<IPayment>(
 
 const Payment = mongoose.model<IPayment>("Payment", PaymentSchema);
 export default Payment;
-
-
-
-
-
-
-
-

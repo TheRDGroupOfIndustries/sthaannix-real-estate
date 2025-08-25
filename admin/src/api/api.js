@@ -125,7 +125,7 @@ export const paymentsAPI = {
   approve: (id) => api.patch(`/payment/admin/approve/${id}`),
   reject: (id, reason) => api.patch(`/payment/admin/reject/${id}`, { reason }),
 };
-
+ 
 
 export default api;
 

@@ -19,20 +19,20 @@ import {
   FileText,
   Image,
 } from "lucide-react";
-import { adminAPI ,paymentsAPI} from "../api/api";
+import { adminAPI, paymentsAPI } from "../api/api";
 import http from "../api/http";
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("users");
-  
+
   // Users state
   const [users, setUsers] = useState([]);
   const [usersLoading, setUsersLoading] = useState(true);
-  
+
   // Payments state
   const [payments, setPayments] = useState([]);
   const [paymentsLoading, setPaymentsLoading] = useState(true);
-  
+
   const [refreshing, setRefreshing] = useState(false);
 
   // Fetch all users and their data
@@ -55,15 +55,15 @@ const AdminDashboard = () => {
   };
 
   // Load payments from localStorage
-  const loadPayments =async () => {
-
+  const loadPayments = async () => {
     try {
       setPaymentsLoading(true);
-     const response = await paymentsAPI.getAll();
-      console.log("loadPayments:",response.data);
-      
-      if (response.status==200) {
-         setPayments(response.data);
+      const response = await paymentsAPI.getAll();
+      console.log("loadPayments:", response.data);
+
+      if (response.status === 200) {
+        // Always ensure it's an array
+        setPayments(response.data.data || []);
       } else {
         toast.error(response.data.message || "Failed to load data");
       }
@@ -71,9 +71,8 @@ const AdminDashboard = () => {
       console.error("Error fetching admin data:", error);
       toast.error("Error loading data");
     } finally {
-       setPaymentsLoading(false);
+      setPaymentsLoading(false);
     }
-   
   };
 
   useEffect(() => {
@@ -107,62 +106,59 @@ const AdminDashboard = () => {
   //   toast.success("Payment approved");
   // };
 
-// const approvePayment = async (id) => {
-//   try {
-//     const res = await paymentsAPI.approve(id);
+  // const approvePayment = async (id) => {
+  //   try {
+  //     const res = await paymentsAPI.approve(id);
 
-//     if (res.status === 200) {
-    
-//       const updatedRes = await http.patch(`/payment/admin/approve/${id}`)
-//       setPayments(updatedRes.data);
-//       toast.success("Payment approved successfully");
-//     } else {
-//       toast.error("Failed to approve payment");
-//     }
-//   } catch (error) {
-//     toast.error(error.response?.data?.message || "Error approving payment");
-//   }
-// };
+  //     if (res.status === 200) {
+
+  //       const updatedRes = await http.patch(`/payment/admin/approve/${id}`)
+  //       setPayments(updatedRes.data);
+  //       toast.success("Payment approved successfully");
+  //     } else {
+  //       toast.error("Failed to approve payment");
+  //     }
+  //   } catch (error) {
+  //     toast.error(error.response?.data?.message || "Error approving payment");
+  //   }
+  // };
 
   const approvePayment = async (id) => {
-  try {
-    const res = await paymentsAPI.approve(id);
+    try {
+      const res = await paymentsAPI.approve(id);
 
-    if (res.status === 200) {
-      // Instead of making another patch, reload payments
-      const updatedRes = await paymentsAPI.getAll();
-      setPayments(updatedRes.data);
-
-      toast.success("Payment approved successfully");
-    } else {
-      toast.error("Failed to approve payment");
+      if (res.status === 200) {
+        const updatedRes = await paymentsAPI.getAll();
+        setPayments(updatedRes.data.data || []); // ✅ fixed
+        toast.success("Payment approved successfully");
+      } else {
+        toast.error("Failed to approve payment");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Error approving payment");
     }
-  } catch (error) {
-    toast.error(error.response?.data?.message || "Error approving payment");
-  }
-};
+  };
 
-const cancelPayment = async (id, reason) => {
-  try {
-    // Call backend reject API with reason
-    const res = await paymentsAPI.reject(id, reason);
+  // Cancel payment
+  const cancelPayment = async (id, reason) => {
+    try {
+      const res = await paymentsAPI.reject(id, reason);
 
-    if (res.status === 200) {
-      const updatedRes = await paymentsAPI.getAll();
-      setPayments(updatedRes.data);
-
-      toast.success("Payment rejected");
-    } else {
-      toast.error("Failed to reject payment");
+      if (res.status === 200) {
+        const updatedRes = await paymentsAPI.getAll();
+        setPayments(updatedRes.data.data || []); // ✅ fixed
+        toast.success("Payment rejected");
+      } else {
+        toast.error("Failed to reject payment");
+      }
+    } catch (error) {
+      console.error("Reject payment error:", error);
+      toast.error(error.response?.data?.message || "Error rejecting payment");
     }
-  } catch (error) {
-    console.error("Reject payment error:", error);
-    toast.error(error.response?.data?.message || "Error rejecting payment");
-  }
-};
+  };
 
-  const pendingPayments = payments.filter(p => p.status === "pending");
-  const canceledPayments = payments.filter(p => p.status === "rejected");
+  const pendingPayments = payments.filter((p) => p.status === "pending");
+  const canceledPayments = payments.filter((p) => p.status === "rejected");
 
   const loading = activeTab === "users" ? usersLoading : paymentsLoading;
 
@@ -242,7 +238,9 @@ const cancelPayment = async (id, reason) => {
               disabled={refreshing}
               className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 transition-colors disabled:opacity-50"
             >
-              <RefreshCw className={`w-5 h-5 ${refreshing ? "animate-spin" : ""}`} />
+              <RefreshCw
+                className={`w-5 h-5 ${refreshing ? "animate-spin" : ""}`}
+              />
               {refreshing ? "Refreshing" : "Refresh"}
             </button>
           </div>
@@ -279,7 +277,10 @@ const cancelPayment = async (id, reason) => {
                 <tbody className="divide-y divide-gray-100">
                   {users.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="text-center py-8 text-gray-500">
+                      <td
+                        colSpan={6}
+                        className="text-center py-8 text-gray-500"
+                      >
                         No users found
                       </td>
                     </tr>
@@ -293,9 +294,12 @@ const cancelPayment = async (id, reason) => {
                         className="hover:bg-gray-50"
                       >
                         <td className="px-6 py-4 whitespace-nowrap flex items-center gap-2">
-                          <User className="w-5 h-5 text-gray-400" /> {user.name || "-"}
+                          <User className="w-5 h-5 text-gray-400" />{" "}
+                          {user.name || "-"}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">{user.role || "-"}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {user.role || "-"}
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap flex items-center gap-1">
                           <Mail className="w-4 h-4 text-gray-400" />
                           {user.email || "-"}
@@ -330,8 +334,12 @@ const cancelPayment = async (id, reason) => {
                   <Users className="w-8 h-8 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total Users</p>
-                  <p className="text-2xl font-bold text-gray-900">{users.length}</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    Total Users
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {users.length}
+                  </p>
                 </div>
               </motion.div>
 
@@ -345,9 +353,14 @@ const cancelPayment = async (id, reason) => {
                   <Home className="w-8 h-8 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total Properties</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    Total Properties
+                  </p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {users.reduce((acc, cur) => acc + (cur.properties?.length || 0), 0)}
+                    {users.reduce(
+                      (acc, cur) => acc + (cur.properties?.length || 0),
+                      0
+                    )}
                   </p>
                 </div>
               </motion.div>
@@ -362,9 +375,14 @@ const cancelPayment = async (id, reason) => {
                   <ClipboardList className="w-8 h-8 text-purple-600" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total Leads</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    Total Leads
+                  </p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {users.reduce((acc, cur) => acc + (cur.leads?.length || 0), 0)}
+                    {users.reduce(
+                      (acc, cur) => acc + (cur.leads?.length || 0),
+                      0
+                    )}
                   </p>
                 </div>
               </motion.div>
@@ -379,9 +397,14 @@ const cancelPayment = async (id, reason) => {
                   <CalendarCheck className="w-8 h-8 text-yellow-600" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Recent Activities</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    Recent Activities
+                  </p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {users.reduce((acc, cur) => acc + (cur.activities?.length || 0), 0)}
+                    {users.reduce(
+                      (acc, cur) => acc + (cur.activities?.length || 0),
+                      0
+                    )}
                   </p>
                 </div>
               </motion.div>
@@ -415,6 +438,9 @@ const cancelPayment = async (id, reason) => {
                         Transaction Ref
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Purpose
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Date & Time
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -440,59 +466,79 @@ const cancelPayment = async (id, reason) => {
                         transition={{ delay: idx * 0.05 }}
                         className="hover:bg-gray-50"
                       >
-                        <td className="px-6 py-4 whitespace-nowrap">{idx + 1}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {idx + 1}
+                        </td>
 
-                        <td className="px-6 py-4 whitespace-nowrap">{payment?.user?.name}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">{payment?.user?.role}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">{payment?.user?.email}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {payment?.user?.name}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {payment?.user?.role}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {payment?.user?.email}
+                        </td>
 
                         <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">
                           {payment.utrNumber}
                         </td>
+                        <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">
+                          {payment.type}
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           {new Date(payment.createdAt).toLocaleString()}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">{payment?.paymentMethod}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">₹{payment.amount}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {payment?.paymentMethod}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          ₹{payment.amount}
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex gap-2">
-                            {/* {payment.images?.map((imgUrl, i) => (
-                              <div
-                                key={i}
-                                className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
-                                title="View Image"
-                                onClick={() => window.open(payment.screenshot, '_blank')}
-                              >
-                                <img
-                                  src={payment.screenshot}
-                                  alt={`payment-proof-${i}`}
-                                  className="w-full h-full object-cover"
-                                />
-                                <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
-                                  <Image className="w-4 h-4" />
-                                </div>
-                              </div>
-                            ))} */}
-                            {
-                              <div
-                                key={payment._id}
-                                className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
-                                title="View Image"
-                                onClick={() => window.open(payment.screenshot, '_blank')}
-                              >
-                                <img
-                                  src={payment.screenshot}
-                                  alt={`payment-proof`}
-                                  className="w-full h-full object-cover"
-                                />
-                                <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
-                                  <Image className="w-4 h-4" />
-                                </div>
-                              </div>
-                              
-                              }
+                            {payment.type === "Wallet" &&
+                            payment.proof?.length > 0
+                              ? payment.proof.map((imgUrl, idx) => (
+                                  <div
+                                    key={idx}
+                                    className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
+                                    title="View Image"
+                                    onClick={() =>
+                                      window.open(imgUrl, "_blank")
+                                    }
+                                  >
+                                    <img
+                                      src={imgUrl}
+                                      alt={`payment-proof-${idx}`}
+                                      className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
+                                      <Image className="w-4 h-4" />
+                                    </div>
+                                  </div>
+                                ))
+                              : payment.screenshot && (
+                                  <div
+                                    className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
+                                    title="View Image"
+                                    onClick={() =>
+                                      window.open(payment.screenshot, "_blank")
+                                    }
+                                  >
+                                    <img
+                                      src={payment.screenshot}
+                                      alt="payment-proof"
+                                      className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
+                                      <Image className="w-4 h-4" />
+                                    </div>
+                                  </div>
+                                )}
                           </div>
                         </td>
+
                         <td className="px-6 py-4 whitespace-nowrap text-center space-x-2">
                           <button
                             onClick={() => {
@@ -505,7 +551,9 @@ const cancelPayment = async (id, reason) => {
                             Approve
                           </button>
                           <button
-                            onClick={() => cancelPayment(payment._id,"Payment Rejected")}
+                            onClick={() =>
+                              cancelPayment(payment._id, "Payment Rejected")
+                            }
                             className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-red-600 text-white hover:bg-red-700 transition"
                             title="Cancel Payment"
                           >
@@ -520,9 +568,8 @@ const cancelPayment = async (id, reason) => {
               </div>
             )}
 
-            
-{/* Approved payments section */}
-{/* <section className="mt-16">
+            {/* Approved payments section */}
+            {/* <section className="mt-16">
   <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
     <CheckCircle className="w-6 h-6 text-green-600" />
     Approved Payments
@@ -604,8 +651,6 @@ const cancelPayment = async (id, reason) => {
   )}
 </section> */}
 
-
-
             {/* Canceled payments section */}
             <section className="mt-16">
               <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
@@ -656,11 +701,19 @@ const cancelPayment = async (id, reason) => {
                           transition={{ delay: idx * 0.05 }}
                           className="hover:bg-gray-50"
                         >
-                          <td className="px-6 py-4 whitespace-nowrap">{idx + 1}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {idx + 1}
+                          </td>
 
-                          <td className="px-6 py-4 whitespace-nowrap">{payment.user?.name}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{payment.user?.role}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{payment.user?.email}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {payment.user?.name}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {payment.user?.role}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {payment.user?.email}
+                          </td>
 
                           <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">
                             {payment.utrNumber}
@@ -670,7 +723,7 @@ const cancelPayment = async (id, reason) => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             {payment?.paymentMethod}
-                            </td>
+                          </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex gap-2">
                               {/* {payment.images?.map((imgUrl, i) => (
@@ -691,23 +744,24 @@ const cancelPayment = async (id, reason) => {
                                 </div>
                               ))} */}
 
-                               {
-                              <div
-                                key={payment._id}
-                                className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
-                                title="View Image"
-                                onClick={() => window.open(payment.screenshot, '_blank')}
-                              >
-                                <img
-                                  src={payment.screenshot}
-                                  alt={`payment-proof`}
-                                  className="w-full h-full object-cover"
-                                />
-                                <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
-                                  <Image className="w-4 h-4" />
+                              {
+                                <div
+                                  key={payment._id}
+                                  className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
+                                  title="View Image"
+                                  onClick={() =>
+                                    window.open(payment.screenshot, "_blank")
+                                  }
+                                >
+                                  <img
+                                    src={payment.screenshot}
+                                    alt={`payment-proof`}
+                                    className="w-full h-full object-cover"
+                                  />
+                                  <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
+                                    <Image className="w-4 h-4" />
+                                  </div>
                                 </div>
-                              </div>
-                              
                               }
                             </div>
                           </td>

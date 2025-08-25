@@ -9,8 +9,6 @@ const Revenue = () => {
   const [loading, setLoading] = useState(true);
   const [revenue, setRevenue] = useState(null);
 
-  console.log("rev: ",revenue);
-  
   useEffect(() => {
     const fetchRevenue = async () => {
       try {
@@ -70,17 +68,16 @@ const Revenue = () => {
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-  <div className="flex items-center gap-3 mb-2">
-    <BarChart2 className="w-8 h-8 text-blue-600" />
-    <h1 className="text-3xl font-bold text-gray-900">
-      Admin Revenue Report
-    </h1>
-  </div>
-  <p className="text-gray-600">
-      View the total revenue earned by the admin.
-  </p>
-</div>
-
+          <div className="flex items-center gap-3 mb-2">
+            <BarChart2 className="w-8 h-8 text-blue-600" />
+            <h1 className="text-3xl font-bold text-gray-900">
+              Admin Revenue Report
+            </h1>
+          </div>
+          <p className="text-gray-600">
+            View the total revenue earned by the admin.
+          </p>
+        </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

@@ -28,7 +28,7 @@ const AdminDashboard = () => {
   // Users state
   const [users, setUsers] = useState([]);
   const [usersLoading, setUsersLoading] = useState(true);
-  const [stats,setStats]=useState([]);
+  const [stats, setStats] = useState([]);
   // Payments state
   const [payments, setPayments] = useState([]);
   const [paymentsLoading, setPaymentsLoading] = useState(true);
@@ -40,7 +40,7 @@ const AdminDashboard = () => {
     try {
       setUsersLoading(true);
       const response = await adminAPI.getUsersData();
-      // console.log("fetchUsersData:", response.data.data);
+      console.log("fetchUsersData:", response.data.data);
       if (response.data.success) {
         setUsers(response.data.data);
       } else {
@@ -54,12 +54,13 @@ const AdminDashboard = () => {
     }
   };
 
-  const fetchAdminStats=async()=>{
-
-     try {
+  const fetchAdminStats = async () => {
+    try {
       setUsersLoading(true);
       const response = await adminAPI.getStats();
-      if (response.status==200) {
+      // console.log("fetchAdminStats",response);
+      
+      if (response.status == 200) {
         setStats(response.data);
       } else {
         toast.error(response.data.message || "Failed to load data");
@@ -70,8 +71,7 @@ const AdminDashboard = () => {
     } finally {
       setUsersLoading(false);
     }
-  }
-  
+  };
 
   // Load payments from localStorage
   const loadPayments = async () => {
@@ -81,8 +81,7 @@ const AdminDashboard = () => {
       // console.log("loadPayments:", response.data);
 
       if (response.status == 200) {
-        setPayments(response.data);
-
+        setPayments(response.data.data);
       } else {
         toast.error(response.data.message || "Failed to load data");
       }
@@ -273,9 +272,9 @@ const AdminDashboard = () => {
         {activeTab === "users" ? (
           <>
             {/* Summary stats */}
-            
-            
-            {/* <div className="mt-10 grid grid-cols-1 md:grid-cols-4 gap-6">
+
+            <div className="mt-10 grid grid-cols-1 md:grid-cols-4 gap-6">
+              {/* Total Users */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -289,11 +288,17 @@ const AdminDashboard = () => {
                     Total Users
                   </p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {users.length}
+                    {stats?.users?.total ?? 0}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Broker: {stats?.users?.byRole?.broker ?? 0} | Owner:{" "}
+                    {stats?.users?.byRole?.owner ?? 0} | Builder:{" "}
+                    {stats?.users?.byRole?.builder ?? 0}
                   </p>
                 </div>
               </motion.div>
 
+              {/* Total Properties */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -308,14 +313,16 @@ const AdminDashboard = () => {
                     Total Properties
                   </p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {users.reduce(
-                      (acc, cur) => acc + (cur.properties?.length || 0),
-                      0
-                    )}
+                    {stats?.properties?.total ?? 0}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Pending: {stats?.properties?.byStatus?.pending ?? 0} |
+                    Approved: {stats?.properties?.byStatus?.approved ?? 0}
                   </p>
                 </div>
               </motion.div>
 
+              {/* Total Leads */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -330,14 +337,16 @@ const AdminDashboard = () => {
                     Total Leads
                   </p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {users.reduce(
-                      (acc, cur) => acc + (cur.leads?.length || 0),
-                      0
-                    )}
+                    {stats?.leads?.total ?? 0}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Open: {stats?.leads?.open ?? 0} | Closed:{" "}
+                    {stats?.leads?.closed ?? 0}
                   </p>
                 </div>
               </motion.div>
 
+              {/* Wallet */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -345,105 +354,17 @@ const AdminDashboard = () => {
                 className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
               >
                 <div className="p-3 bg-yellow-100 rounded-xl">
-                  <CalendarCheck className="w-8 h-8 text-yellow-600" />
+                  <CreditCard className="w-8 h-8 text-yellow-600" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Recent Activities
-                  </p>
+                  <p className="text-sm font-medium text-gray-600">Total Revenue</p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {users.reduce(
-                      (acc, cur) => acc + (cur.activities?.length || 0),
-                      0
-                    )}
-                  </p>
+                ₹{stats?.adminRevenue?.finalRevenue}
+              </p>
                 </div>
               </motion.div>
-            </div> */}
-       
-     <div className="mt-10 grid grid-cols-1 md:grid-cols-4 gap-6">
-  {/* Total Users */}
-  <motion.div
-    initial={{ opacity: 0, y: 10 }}
-    animate={{ opacity: 1, y: 0 }}
-    className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
-  >
-    <div className="p-3 bg-blue-100 rounded-xl">
-      <Users className="w-8 h-8 text-blue-600" />
-    </div>
-    <div>
-      <p className="text-sm font-medium text-gray-600">Total Users</p>
-      <p className="text-2xl font-bold text-gray-900">{stats?.users?.total ?? 0}</p>
-      <p className="text-xs text-gray-500">
-        Broker: {stats?.users?.byRole?.broker ?? 0} | Owner: {stats?.users?.byRole?.owner ?? 0} | Builder: {stats?.users?.byRole?.builder ?? 0}
-      </p>
-    </div>
-  </motion.div>
+            </div>
 
-  {/* Total Properties */}
-  <motion.div
-    initial={{ opacity: 0, y: 10 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay: 0.1 }}
-    className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
-  >
-    <div className="p-3 bg-green-100 rounded-xl">
-      <Home className="w-8 h-8 text-green-600" />
-    </div>
-    <div>
-      <p className="text-sm font-medium text-gray-600">Total Properties</p>
-      <p className="text-2xl font-bold text-gray-900">{stats?.properties?.total ?? 0}</p>
-      <p className="text-xs text-gray-500">
-        Pending: {stats?.properties?.byStatus?.pending ?? 0} | Approved: {stats?.properties?.byStatus?.approved ?? 0}
-      </p>
-    </div>
-  </motion.div>
-
-  {/* Total Leads */}
-  <motion.div
-    initial={{ opacity: 0, y: 10 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay: 0.2 }}
-    className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
-  >
-    <div className="p-3 bg-purple-100 rounded-xl">
-      <ClipboardList className="w-8 h-8 text-purple-600" />
-    </div>
-    <div>
-      <p className="text-sm font-medium text-gray-600">Total Leads</p>
-      <p className="text-2xl font-bold text-gray-900">{stats?.leads?.total ?? 0}</p>
-      <p className="text-xs text-gray-500">
-        Open: {stats?.leads?.open ?? 0} | Closed: {stats?.leads?.closed ?? 0}
-      </p>
-    </div>
-  </motion.div>
-
-  {/* Wallet */}
-  <motion.div
-    initial={{ opacity: 0, y: 10 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay: 0.3 }}
-    className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
-  >
-    <div className="p-3 bg-yellow-100 rounded-xl">
-      <CreditCard className="w-8 h-8 text-yellow-600" />
-    </div>
-    <div>
-      <p className="text-sm font-medium text-gray-600">Wallet</p>
-      <p className="text-2xl font-bold text-gray-900">
-        ₹{(stats?.wallet?.totalCredits ?? 0) - (stats?.wallet?.totalDebits ?? 0)}
-      </p>
-      <p className="text-xs text-gray-500">
-        Credits: ₹{stats?.wallet?.totalCredits ?? 0} | Debits: ₹{stats?.wallet?.totalDebits ?? 0}
-      </p>
-    </div>
-  </motion.div>
-</div>
-
-
-       
-
-       
             {/* Users Overview Content */}
             <div className="overflow-x-auto bg-white rounded-xl shadow border border-gray-200 my-10">
               <table className="min-w-full divide-y divide-gray-200">
@@ -492,7 +413,7 @@ const AdminDashboard = () => {
                         className="hover:bg-gray-50"
                       >
                         <td className="px-6 py-4 whitespace-nowrap">
-                         {idx+1}
+                          {idx + 1}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-2">
@@ -500,7 +421,7 @@ const AdminDashboard = () => {
                             {user.name || "-"}
                           </div>
                         </td>
-                        
+
                         <td className="px-6 py-4 whitespace-nowrap">
                           {user.role || "-"}
                         </td>
@@ -519,13 +440,13 @@ const AdminDashboard = () => {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-1">
                             <Home className="w-4 h-4 text-gray-400" />
-                            {user.properties?.length || 0}
+                            {user?.totalProperties || 0}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-1">
                             <ClipboardList className="w-4 h-4 text-gray-400" />
-                            {user.leads?.length || 0}
+                            {user?.totalLeads || 0}
                           </div>
                         </td>
                       </motion.tr>
@@ -622,15 +543,15 @@ const AdminDashboard = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex gap-2">
-                            {/* {payment.images?.map((imgUrl, i) => (
+                            {payment.proof?.map((imgUrl, i) => (
                               <div
                                 key={i}
                                 className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
                                 title="View Image"
-                                onClick={() => window.open(payment.screenshot, '_blank')}
+                                onClick={() => window.open(imgUrl, '_blank')}
                               >
                                 <img
-                                  src={payment.screenshot}
+                                  src={imgUrl}
                                   alt={`payment-proof-${i}`}
                                   className="w-full h-full object-cover"
                                 />
@@ -638,8 +559,8 @@ const AdminDashboard = () => {
                                   <Image className="w-4 h-4" />
                                 </div>
                               </div>
-                            ))} */}
-                            {
+                            ))}
+                            {/* {
                               <div
                                 key={payment._id}
                                 className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
@@ -657,7 +578,7 @@ const AdminDashboard = () => {
                                   <Image className="w-4 h-4" />
                                 </div>
                               </div>
-                            }
+                            } */}
                           </div>
                         </td>
 

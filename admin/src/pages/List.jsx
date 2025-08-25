@@ -1,10 +1,10 @@
 // import { useState, useEffect } from "react";
-// import { 
-//   Trash2, 
-//   Edit3, 
-//   Search, 
-//   Filter, 
-//   Plus, 
+// import {
+//   Trash2,
+//   Edit3,
+//   Search,
+//   Filter,
+//   Plus,
 //   Home,
 //   BedDouble,
 //   Bath,
@@ -67,7 +67,7 @@
 //   const parseAmenities = (amenities) => {
 //     if (!amenities || !Array.isArray(amenities)) return [];
 //     try {
-//       return typeof amenities[0] === "string" 
+//       return typeof amenities[0] === "string"
 //         ? JSON.parse(amenities[0].replace(/'/g, '"'))
 //         : amenities;
 //     } catch (error) {
@@ -102,12 +102,12 @@
 
 //   const filteredProperties = properties
 //     .filter(property => {
-//       const matchesSearch = !searchTerm || 
+//       const matchesSearch = !searchTerm ||
 //         [property.title, property.location, property.type]
 //           .some(field => field.toLowerCase().includes(searchTerm.toLowerCase()));
-      
+
 //       const matchesType = filterType === "all" || property.type.toLowerCase() === filterType.toLowerCase();
-      
+
 //       return matchesSearch && matchesType;
 //     })
 //     .sort((a, b) => {
@@ -126,9 +126,9 @@
 //   // Animation variants
 //   const containerVariants = {
 //     hidden: { opacity: 0 },
-//     visible: { 
+//     visible: {
 //       opacity: 1,
-//       transition: { 
+//       transition: {
 //         duration: 0.6,
 //         staggerChildren: 0.1
 //       }
@@ -142,12 +142,12 @@
 
 //   const cardVariants = {
 //     hidden: { opacity: 0, scale: 0.95 },
-//     visible: { 
-//       opacity: 1, 
+//     visible: {
+//       opacity: 1,
 //       scale: 1,
 //       transition: { duration: 0.3 }
 //     },
-//     hover: { 
+//     hover: {
 //       y: -5,
 //       scale: 1.02,
 //       transition: { duration: 0.2 }
@@ -156,7 +156,7 @@
 
 //   if (loading) {
 //     return (
-//       <motion.div 
+//       <motion.div
 //         initial={{ opacity: 0 }}
 //         animate={{ opacity: 1 }}
 //         className="min-h-screen pt-20 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100"
@@ -167,7 +167,7 @@
 //             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
 //             className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-6"
 //           />
-//           <motion.h3 
+//           <motion.h3
 //             initial={{ opacity: 0, y: 10 }}
 //             animate={{ opacity: 1, y: 0 }}
 //             transition={{ delay: 0.2 }}
@@ -175,7 +175,7 @@
 //           >
 //             Loading Properties
 //           </motion.h3>
-//           <motion.p 
+//           <motion.p
 //             initial={{ opacity: 0, y: 10 }}
 //             animate={{ opacity: 1, y: 0 }}
 //             transition={{ delay: 0.4 }}
@@ -189,7 +189,7 @@
 //   }
 
 //   return (
-//     <motion.div 
+//     <motion.div
 //       variants={containerVariants}
 //       initial="hidden"
 //       animate="visible"
@@ -197,7 +197,7 @@
 //     >
 //       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 //         {/* Header Section */}
-//         <motion.div 
+//         <motion.div
 //           variants={itemVariants}
 //           className="mb-8"
 //         >
@@ -229,7 +229,7 @@
 //                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
 //                 <span className="hidden sm:inline">Refresh</span>
 //               </motion.button>
-              
+
 //               <Link to="/add">
 //                 <motion.button
 //                   whileHover={{ scale: 1.05 }}
@@ -245,7 +245,7 @@
 //         </motion.div>
 
 //         {/* Stats Cards */}
-//         <motion.div 
+//         <motion.div
 //           initial={{ opacity: 0, y: 20 }}
 //           animate={{ opacity: 1, y: 0 }}
 //           exit={{ opacity: 0, y: 20 }}
@@ -263,7 +263,7 @@
 //               </div>
 //             </div>
 //           </div>
-          
+
 //           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
 //             <div className="flex items-center justify-between">
 //               <div>
@@ -277,7 +277,7 @@
 //               </div>
 //             </div>
 //           </div>
-          
+
 //           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
 //             <div className="flex items-center justify-between">
 //               <div>
@@ -291,7 +291,7 @@
 //               </div>
 //             </div>
 //           </div>
-          
+
 //           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
 //             <div className="flex items-center justify-between">
 //               <div>
@@ -308,7 +308,7 @@
 //         </motion.div>
 
 //         {/* Search and Filters */}
-//         <motion.div 
+//         <motion.div
 //         initial={{ opacity: 0, y: 20 }}
 //           animate={{ opacity: 1, y: 0 }}
 //           variants={itemVariants}
@@ -368,8 +368,8 @@
 //                 <button
 //                   onClick={() => setViewMode('grid')}
 //                   className={`p-2 rounded-lg transition-colors ${
-//                     viewMode === 'grid' 
-//                       ? 'bg-blue-100 text-blue-600' 
+//                     viewMode === 'grid'
+//                       ? 'bg-blue-100 text-blue-600'
 //                       : 'text-gray-400 hover:text-gray-600'
 //                   }`}
 //                 >
@@ -378,8 +378,8 @@
 //                 <button
 //                   onClick={() => setViewMode('list')}
 //                   className={`p-2 rounded-lg transition-colors ${
-//                     viewMode === 'list' 
-//                       ? 'bg-blue-100 text-blue-600' 
+//                     viewMode === 'list'
+//                       ? 'bg-blue-100 text-blue-600'
 //                       : 'text-gray-400 hover:text-gray-600'
 //                   }`}
 //                 >
@@ -390,7 +390,7 @@
 //           </div>
 //         </motion.div>
 //         {/* Property Grid */}
-//         <motion.div 
+//         <motion.div
 //         initial={{ opacity: 0, y: 20 }}
 //           animate={{ opacity: 1, y: 0 }}
 //           variants={itemVariants}
@@ -410,8 +410,8 @@
 //                   No properties found
 //                 </h3>
 //                 <p className="text-gray-500 mb-6">
-//                   {searchTerm || filterType !== "all" 
-//                     ? "Try adjusting your search criteria or filters" 
+//                   {searchTerm || filterType !== "all"
+//                     ? "Try adjusting your search criteria or filters"
 //                     : "Get started by adding your first property"
 //                   }
 //                 </p>
@@ -431,8 +431,8 @@
 //             </motion.div>
 //           ) : (
 //             <div className={`grid gap-6 ${
-//               viewMode === 'grid' 
-//                 ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' 
+//               viewMode === 'grid'
+//                 ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3'
 //                 : 'grid-cols-1'
 //             }`}>
 //               <AnimatePresence>
@@ -451,8 +451,8 @@
 //                   >
 //                     {/* Property Image */}
 //                     <div className={`relative ${
-//                       viewMode === 'list' 
-//                         ? 'sm:w-80 h-48 sm:h-auto flex-shrink-0' 
+//                       viewMode === 'list'
+//                         ? 'sm:w-80 h-48 sm:h-auto flex-shrink-0'
 //                         : 'h-56'
 //                     }`}>
 //                       <img
@@ -462,7 +462,7 @@
 //                         loading="lazy"
 //                       />
 //                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      
+
 //                       {/* Property Type Badge */}
 //                       <div className="absolute top-4 left-4">
 //                         <span className="px-3 py-1 bg-white/90 backdrop-blur-sm text-gray-800 text-sm font-medium rounded-full shadow-sm">
@@ -473,8 +473,8 @@
 //                       {/* Status Badge */}
 //                       <div className="absolute top-4 right-4">
 //                         <span className={`px-3 py-1 text-xs font-medium rounded-full backdrop-blur-sm shadow-sm ${
-//                           property.availability === 'rent' 
-//                             ? 'bg-green-500/90 text-white' 
+//                           property.availability === 'rent'
+//                             ? 'bg-green-500/90 text-white'
 //                             : 'bg-blue-500/90 text-white'
 //                         }`}>
 //                           For {property.availability}
@@ -483,7 +483,7 @@
 
 //                       {/* Action Buttons */}
 //                       <div className="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
-//                         <Link 
+//                         <Link
 //                           to={`/update/${property._id}`}
 //                           className="p-2 bg-white/90 backdrop-blur-sm text-blue-600 rounded-full hover:bg-blue-600 hover:text-white transition-all duration-200 shadow-lg"
 //                         >
@@ -571,7 +571,7 @@
 //                             Listed {new Date(property.createdAt).toLocaleDateString()}
 //                           </div>
 //                           <div className="flex items-center gap-2">
-//                             <Link 
+//                             <Link
 //                               to={`/update/${property._id}`}
 //                               className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
 //                             >
@@ -600,15 +600,13 @@
 
 // export default PropertyListings;
 
-
-
 import { useState, useEffect } from "react";
-import { 
-  Trash2, 
-  Edit3, 
-  Search, 
-  Filter, 
-  Plus, 
+import {
+  Trash2,
+  Edit3,
+  Search,
+  Filter,
+  Plus,
   Home,
   BedDouble,
   Bath,
@@ -622,12 +620,15 @@ import {
   TrendingUp,
   Star,
   ChevronDown,
-  RefreshCw
+  RefreshCw,
+  Clipboard,
+  Landmark,
+  TableProperties,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { propertiesAPI } from "../api/api"; 
+import { propertiesAPI } from "../api/api";
 
 const PropertyListings = () => {
   const [properties, setProperties] = useState([]);
@@ -642,17 +643,20 @@ const PropertyListings = () => {
   const fetchProperties = async () => {
     try {
       setLoading(true);
-      const response = await propertiesAPI.get(); 
+      const response = await propertiesAPI.get();
       // console.log("res: ",response.data);
-      
+
       if (response.data) {
-        const parsedProperties = response.data.map(property => ({
+        const parsedProperties = response.data.map((property) => ({
           _id: property._id,
           title: property.title,
-          description:property.description,
-          location: typeof property.location === "object" 
-            ? `${property.location.address}, ${property.location.city},${property.location.pincode}, ${property.location.state || ""}` 
-            : property.location,
+          description: property.description,
+          location:
+            typeof property.location === "object"
+              ? `${property.location.address}, ${property.location.city},${
+                  property.location.pincode
+                }, ${property.location.state || ""}`
+              : property.location,
           type: property.propertyType,
           availability: property.transactionType,
           price: property.price,
@@ -661,7 +665,7 @@ const PropertyListings = () => {
           sqft: property.size || 0,
           image: property.images || ["/placeholder.jpg"],
           amenities: parseAmenities(property.amenities || []),
-          createdAt: property.createdAt || new Date().toISOString()
+          createdAt: property.createdAt || new Date().toISOString(),
         }));
         setProperties(parsedProperties);
       } else {
@@ -687,7 +691,7 @@ const PropertyListings = () => {
   const parseAmenities = (amenities) => {
     if (!amenities || !Array.isArray(amenities)) return [];
     try {
-      return typeof amenities[0] === "string" 
+      return typeof amenities[0] === "string"
         ? JSON.parse(amenities[0].replace(/'/g, '"'))
         : amenities;
     } catch (error) {
@@ -718,13 +722,17 @@ const PropertyListings = () => {
   };
 
   const filteredProperties = properties
-    .filter(property => {
-      const matchesSearch = !searchTerm || 
-        [property.title, property.location, property.type]
-          .some(field => field.toLowerCase().includes(searchTerm.toLowerCase()));
-      
-      const matchesType = filterType === "all" || property.type.toLowerCase() === filterType.toLowerCase();
-      
+    .filter((property) => {
+      const matchesSearch =
+        !searchTerm ||
+        [property.title, property.location, property.type].some((field) =>
+          field.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+      const matchesType =
+        filterType === "all" ||
+        property.type.toLowerCase() === filterType.toLowerCase();
+
       return matchesSearch && matchesType;
     })
     .sort((a, b) => {
@@ -743,37 +751,37 @@ const PropertyListings = () => {
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
+    visible: {
       opacity: 1,
-      transition: { 
+      transition: {
         duration: 0.6,
-        staggerChildren: 0.1
-      }
-    }
+        staggerChildren: 0.1,
+      },
+    },
   };
 
   const itemVariants = {
     initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 }
+    animate: { opacity: 1, y: 0 },
   };
 
   const cardVariants = {
     hidden: { opacity: 0, scale: 0.95 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       scale: 1,
-      transition: { duration: 0.3 }
+      transition: { duration: 0.3 },
     },
-    hover: { 
+    hover: {
       y: -5,
       scale: 1.02,
-      transition: { duration: 0.2 }
-    }
+      transition: { duration: 0.2 },
+    },
   };
 
   if (loading) {
     return (
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="min-h-screen pt-20 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100"
@@ -784,7 +792,7 @@ const PropertyListings = () => {
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-6"
           />
-          <motion.h3 
+          <motion.h3
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -792,7 +800,7 @@ const PropertyListings = () => {
           >
             Loading Properties
           </motion.h3>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
@@ -806,7 +814,7 @@ const PropertyListings = () => {
   }
 
   return (
-    <motion.div 
+    <motion.div
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -814,10 +822,7 @@ const PropertyListings = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
-        <motion.div 
-          variants={itemVariants}
-          className="mb-8"
-        >
+        <motion.div variants={itemVariants} className="mb-8">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
             <div className="space-y-2">
               <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent ">
@@ -843,10 +848,12 @@ const PropertyListings = () => {
                 disabled={refreshing}
                 className="flex items-center gap-2 px-4 py-2 text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50"
               >
-                <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+                <RefreshCw
+                  className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`}
+                />
                 <span className="hidden sm:inline">Refresh</span>
               </motion.button>
-              
+
               <Link to="/add">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -862,141 +869,107 @@ const PropertyListings = () => {
         </motion.div>
 
         {/* Stats Cards */}
-        {/* <motion.div 
+
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
           variants={itemVariants}
-          className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8"
+          className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8"
         >
+          {/* Total Properties */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Properties</p>
-                <p className="text-2xl font-bold text-gray-900">{properties.length}</p>
-              </div>
+            <div className="flex items-center gap-4">
               <div className="p-3 bg-blue-50 rounded-xl">
-                <Home className="w-6 h-6 text-blue-600" />
+                <TableProperties  className="w-6 h-6 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Total Properties
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {properties?.length || 0}
+                </p>
               </div>
             </div>
-            
           </div>
-          
+
+          {/* For Rent */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-green-50 rounded-xl">
+                <Home  className="w-6 h-6 text-green-600" />
+              </div>
               <div>
                 <p className="text-sm font-medium text-gray-600">For Rent</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {properties.filter(p => p.availability === 'rent').length}
+                  {properties?.filter((p) => p.availability === "rent")
+                    .length || 0}
                 </p>
-              </div>
-              <div className="p-3 bg-green-50 rounded-xl">
-                <Calendar className="w-6 h-6 text-green-600" />
               </div>
             </div>
           </div>
-          
+
+          {/* For Buy */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">For Sale</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {properties.filter(p => p.availability === 'sale').length}
-                </p>
-              </div>
+            <div className="flex items-center gap-4">
               <div className="p-3 bg-purple-50 rounded-xl">
                 <TrendingUp className="w-6 h-6 text-purple-600" />
               </div>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Avg. Price</p>
+                <p className="text-sm font-medium text-gray-600">For Buy</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  ₹{properties.length > 0 ? Math.round(properties.reduce((sum, p) => sum + p.price, 0) / properties.length / 100000) : 0}L
+                  {properties?.filter((p) => p.availability === "buy").length ||
+                    0}
                 </p>
               </div>
+            </div>
+          </div>
+
+{/* For Lease */}
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-yellow-50 rounded-xl">
+                <Clipboard className="w-6 h-6 text-yellow-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">For Lease</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {properties?.filter((p) => p.availability === "lease")
+                    .length || 0}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Avg. Price */}
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div className="flex items-center gap-4">
               <div className="p-3 bg-orange-50 rounded-xl">
                 <Star className="w-6 h-6 text-orange-600" />
               </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">Avg. Price</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  ₹
+                  {properties?.length > 0
+                    ? Math.round(
+                        properties.reduce((sum, p) => sum + (p.price || 0), 0) /
+                          properties.length /
+                          100000
+                      )
+                    : 0}
+                  L
+                </p>
+              </div>
             </div>
           </div>
-        </motion.div> */}
 
-
-<motion.div 
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  exit={{ opacity: 0, y: 20 }}
-  variants={itemVariants}
-  className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8"
->
-  {/* Total Properties */}
-  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-    <div className="flex items-center gap-4">
-      <div className="p-3 bg-blue-50 rounded-xl">
-        <Home className="w-6 h-6 text-blue-600" />
-      </div>
-      <div>
-        <p className="text-sm font-medium text-gray-600">Total Properties</p>
-        <p className="text-2xl font-bold text-gray-900">{properties.length}</p>
-      </div>
-    </div>
-  </div>
-
-  {/* For Rent */}
-  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-    <div className="flex items-center gap-4">
-      <div className="p-3 bg-green-50 rounded-xl">
-        <Calendar className="w-6 h-6 text-green-600" />
-      </div>
-      <div>
-        <p className="text-sm font-medium text-gray-600">For Rent</p>
-        <p className="text-2xl font-bold text-gray-900">
-          {properties.filter(p => p.availability === 'rent').length}
-        </p>
-      </div>
-    </div>
-  </div>
-
-  {/* For Sale */}
-  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-    <div className="flex items-center gap-4">
-      <div className="p-3 bg-purple-50 rounded-xl">
-        <TrendingUp className="w-6 h-6 text-purple-600" />
-      </div>
-      <div>
-        <p className="text-sm font-medium text-gray-600">For Buy</p>
-        <p className="text-2xl font-bold text-gray-900">
-          {properties.filter(p => p.availability === 'buy').length}
-        </p>
-      </div>
-    </div>
-  </div>
-
-  {/* Avg. Price */}
-  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-    <div className="flex items-center gap-4">
-      <div className="p-3 bg-orange-50 rounded-xl">
-        <Star className="w-6 h-6 text-orange-600" />
-      </div>
-      <div>
-        <p className="text-sm font-medium text-gray-600">Avg. Price</p>
-        <p className="text-2xl font-bold text-gray-900">
-          ₹{properties.length > 0 ? Math.round(properties.reduce((sum, p) => sum + p.price, 0) / properties.length / 100000) : 0}L
-        </p>
-      </div>
-    </div>
-  </div>
-</motion.div>
-
-
+          
+        </motion.div>
 
         {/* Search and Filters */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           variants={itemVariants}
@@ -1026,7 +999,11 @@ const PropertyListings = () => {
                 >
                   <Filter className="w-4 h-4" />
                   <span>Filters</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform ${
+                      showFilters ? "rotate-180" : ""
+                    }`}
+                  />
                 </button>
 
                 <select
@@ -1034,18 +1011,12 @@ const PropertyListings = () => {
                   onChange={(e) => setFilterType(e.target.value)}
                   className="px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                 >
-                  {/* <option value="all">All Types</option>
-                  <option value="house">Houses</option>
-                  <option value="apartment">Apartments</option>
-                  <option value="villa">Villas</option>
-                  <option value="office">Offices</option> */}
                   <option value="all">All Types</option>
-<option value="plot">Plots</option>
-<option value="apartment">Apartments</option>
-<option value="commercial">Commercial</option>
-<option value="villa">Villas</option>
-<option value="house">Houses</option>
-
+                  <option value="plot">Plots</option>
+                  <option value="apartment">Apartments</option>
+                  <option value="commercial">Commercial</option>
+                  <option value="villa">Villas</option>
+                  <option value="house">Houses</option>
                 </select>
 
                 <select
@@ -1061,21 +1032,21 @@ const PropertyListings = () => {
 
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setViewMode('grid')}
+                  onClick={() => setViewMode("grid")}
                   className={`p-2 rounded-lg transition-colors ${
-                    viewMode === 'grid' 
-                      ? 'bg-blue-100 text-blue-600' 
-                      : 'text-gray-400 hover:text-gray-600'
+                    viewMode === "grid"
+                      ? "bg-blue-100 text-blue-600"
+                      : "text-gray-400 hover:text-gray-600"
                   }`}
                 >
                   <Grid3X3 className="w-5 h-5" />
                 </button>
                 <button
-                  onClick={() => setViewMode('list')}
+                  onClick={() => setViewMode("list")}
                   className={`p-2 rounded-lg transition-colors ${
-                    viewMode === 'list' 
-                      ? 'bg-blue-100 text-blue-600' 
-                      : 'text-gray-400 hover:text-gray-600'
+                    viewMode === "list"
+                      ? "bg-blue-100 text-blue-600"
+                      : "text-gray-400 hover:text-gray-600"
                   }`}
                 >
                   <List className="w-5 h-5" />
@@ -1085,7 +1056,7 @@ const PropertyListings = () => {
           </div>
         </motion.div>
         {/* Property Grid */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           variants={itemVariants}
@@ -1105,12 +1076,11 @@ const PropertyListings = () => {
                   No properties found
                 </h3>
                 <p className="text-gray-500 mb-6">
-                  {searchTerm || filterType !== "all" 
-                    ? "Try adjusting your search criteria or filters" 
-                    : "Get started by adding your first property"
-                  }
+                  {searchTerm || filterType !== "all"
+                    ? "Try adjusting your search criteria or filters"
+                    : "Get started by adding your first property"}
                 </p>
-                {(!searchTerm && filterType === "all") && (
+                {!searchTerm && filterType === "all" && (
                   <Link to="/add">
                     <motion.button
                       whileHover={{ scale: 1.05 }}
@@ -1125,11 +1095,13 @@ const PropertyListings = () => {
               </div>
             </motion.div>
           ) : (
-            <div className={`grid gap-6 ${
-              viewMode === 'grid' 
-                ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' 
-                : 'grid-cols-1'
-            }`}>
+            <div
+              className={`grid gap-6 ${
+                viewMode === "grid"
+                  ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
+                  : "grid-cols-1"
+              }`}
+            >
               <AnimatePresence>
                 {filteredProperties.map((property, index) => (
                   <motion.div
@@ -1141,15 +1113,17 @@ const PropertyListings = () => {
                     whileHover="hover"
                     transition={{ delay: index * 0.05 }}
                     className={`bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group ${
-                      viewMode === 'list' ? 'flex flex-col sm:flex-row' : ''
+                      viewMode === "list" ? "flex flex-col sm:flex-row" : ""
                     }`}
                   >
                     {/* Property Image */}
-                    <div className={`relative ${
-                      viewMode === 'list' 
-                        ? 'sm:w-80 h-48 sm:h-auto flex-shrink-0' 
-                        : 'h-56'
-                    }`}>
+                    <div
+                      className={`relative ${
+                        viewMode === "list"
+                          ? "sm:w-80 h-48 sm:h-auto flex-shrink-0"
+                          : "h-56"
+                      }`}
+                    >
                       <img
                         src={property.image[0] || "/placeholder.jpg"}
                         alt={property.title}
@@ -1157,7 +1131,7 @@ const PropertyListings = () => {
                         loading="lazy"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      
+
                       {/* Property Type Badge */}
                       <div className="absolute top-4 left-4">
                         <span className="px-3 py-1 bg-white/90 backdrop-blur-sm text-gray-800 text-sm font-medium rounded-full shadow-sm">
@@ -1167,18 +1141,20 @@ const PropertyListings = () => {
 
                       {/* Status Badge */}
                       <div className="absolute top-4 right-4">
-                        <span className={`px-3 py-1 text-xs font-medium rounded-full backdrop-blur-sm shadow-sm ${
-                          property.availability === 'rent' 
-                            ? 'bg-green-500/90 text-white' 
-                            : 'bg-blue-500/90 text-white'
-                        }`}>
+                        <span
+                          className={`px-3 py-1 text-xs font-medium rounded-full backdrop-blur-sm shadow-sm ${
+                            property.availability === "rent"
+                              ? "bg-green-500/90 text-white"
+                              : "bg-blue-500/90 text-white"
+                          }`}
+                        >
                           For {property.availability}
                         </span>
                       </div>
 
                       {/* Action Buttons */}
                       <div className="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                        <Link 
+                        <Link
                           to={`/update/${property._id}`}
                           className="p-2 bg-white/90 backdrop-blur-sm text-blue-600 rounded-full hover:bg-blue-600 hover:text-white transition-all duration-200 shadow-lg"
                         >
@@ -1187,7 +1163,9 @@ const PropertyListings = () => {
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
-                          onClick={() => handleRemoveProperty(property._id, property.title)}
+                          onClick={() =>
+                            handleRemoveProperty(property._id, property.title)
+                          }
                           className="p-2 bg-white/90 backdrop-blur-sm text-red-600 rounded-full hover:bg-red-600 hover:text-white transition-all duration-200 shadow-lg"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -1196,7 +1174,13 @@ const PropertyListings = () => {
                     </div>
 
                     {/* Property Details */}
-                    <div className={`p-6 flex-1 ${viewMode === 'list' ? 'flex flex-col justify-between' : ''}`}>
+                    <div
+                      className={`p-6 flex-1 ${
+                        viewMode === "list"
+                          ? "flex flex-col justify-between"
+                          : ""
+                      }`}
+                    >
                       <div>
                         <div className="mb-4">
                           <h3 className="text-xl font-semibold text-gray-900  line-clamp-2">
@@ -1213,7 +1197,9 @@ const PropertyListings = () => {
                             </p>
                             <div className="flex items-center gap-1">
                               <Eye className="w-4 h-4 text-gray-400" />
-                              <span className="text-sm text-gray-500">2.4k views</span>
+                              <span className="text-sm text-gray-500">
+                                2.4k views
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -1222,17 +1208,27 @@ const PropertyListings = () => {
                         <div className="grid grid-cols-3 gap-4 mb-6">
                           <div className="text-center p-3 bg-gray-50 rounded-xl">
                             <BedDouble className="w-5 h-5 text-gray-400 mx-auto mb-1" />
-                            <div className="text-sm font-medium text-gray-900">{property.beds}</div>
-                            <div className="text-xs text-gray-500">Bedrooms</div>
+                            <div className="text-sm font-medium text-gray-900">
+                              {property.beds}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              Bedrooms
+                            </div>
                           </div>
                           <div className="text-center p-3 bg-gray-50 rounded-xl">
                             <Bath className="w-5 h-5 text-gray-400 mx-auto mb-1" />
-                            <div className="text-sm font-medium text-gray-900">{property.baths}</div>
-                            <div className="text-xs text-gray-500">Bathrooms</div>
+                            <div className="text-sm font-medium text-gray-900">
+                              {property.baths}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              Bathrooms
+                            </div>
                           </div>
                           <div className="text-center p-3 bg-gray-50 rounded-xl">
                             <Maximize className="w-5 h-5 text-gray-400 mx-auto mb-1" />
-                            <div className="text-sm font-medium text-gray-900">{property.sqft}</div>
+                            <div className="text-sm font-medium text-gray-900">
+                              {property.sqft}
+                            </div>
                             <div className="text-xs text-gray-500">Sq Ft</div>
                           </div>
                         </div>
@@ -1240,17 +1236,21 @@ const PropertyListings = () => {
                         {/* Amenities */}
                         {property.amenities.length > 0 && (
                           <div className="border-t pt-4">
-                            <h4 className="text-sm font-medium text-gray-900 mb-3">Top Amenities</h4>
+                            <h4 className="text-sm font-medium text-gray-900 mb-3">
+                              Top Amenities
+                            </h4>
                             <div className="flex flex-wrap gap-2">
-                              {property.amenities.slice(0, 4).map((amenity, index) => (
-                                <span
-                                  key={index}
-                                  className="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full"
-                                >
-                                  <Building className="w-3 h-3 mr-1" />
-                                  {amenity}
-                                </span>
-                              ))}
+                              {property.amenities
+                                .slice(0, 4)
+                                .map((amenity, index) => (
+                                  <span
+                                    key={index}
+                                    className="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full"
+                                  >
+                                    <Building className="w-3 h-3 mr-1" />
+                                    {amenity}
+                                  </span>
+                                ))}
                               {property.amenities.length > 4 && (
                                 <span className="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
                                   +{property.amenities.length - 4} more
@@ -1261,20 +1261,26 @@ const PropertyListings = () => {
                         )}
                       </div>
 
-                      {viewMode === 'list' && (
+                      {viewMode === "list" && (
                         <div className="flex items-center justify-between pt-4 mt-4 border-t">
                           <div className="text-sm text-gray-500">
-                            Listed {new Date(property.createdAt).toLocaleDateString()}
+                            Listed{" "}
+                            {new Date(property.createdAt).toLocaleDateString()}
                           </div>
                           <div className="flex items-center gap-2">
-                            <Link 
+                            <Link
                               to={`/update/${property._id}`}
                               className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
                             >
                               <Edit3 className="w-4 h-4" />
                             </Link>
                             <button
-                              onClick={() => handleRemoveProperty(property._id, property.title)}
+                              onClick={() =>
+                                handleRemoveProperty(
+                                  property._id,
+                                  property.title
+                                )
+                              }
                               className="p-2 text-gray-400 hover:text-red-600 transition-colors"
                             >
                               <Trash2 className="w-4 h-4" />

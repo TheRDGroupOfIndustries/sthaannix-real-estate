@@ -23,11 +23,10 @@ const BrokerDashboard = () => {
       return;
     }
 
-    if (activeTab === "properties") {
-      fetchProperties();
-    } else {
-      loadPayments(user.email);
-    }
+   if (activeTab === "properties") fetchProperties();
+    else if (activeTab === "payments") loadPayments(user.email);
+    else if (activeTab === "ads") loadAds(user.id);
+
   }, [activeTab]);
 
   const fetchProperties = async () => {
@@ -73,6 +72,28 @@ const loadPayments = async (email) => {
     setLoading(false);
   }
 };
+
+// Fetch ads
+  const loadAds = async (userId) => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await api.get("/ad/get", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // Filter ads created by this broker
+      const userAds = res.data.campaigns.filter(
+        (ad) => ad.user?._id === userId
+      );
+      setAds(userAds);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to load advertisement details");
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   const handleDeleteProperty = async (id) => {
@@ -151,6 +172,17 @@ const loadPayments = async (email) => {
           }`}
         >
            Payment History
+        </button>
+
+          <button
+          onClick={() => setActiveTab("ads")}
+          className={`px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === "ads"
+              ? "bg-blue-600 text-white"
+              : "bg-white text-gray-700 hover:bg-gray-100"
+          }`}
+        >
+           Advertisment Detail
         </button>
       </div>
 
@@ -281,7 +313,11 @@ const loadPayments = async (email) => {
             </tbody>
           </table>
         </div>
-      )}
+      ) 
+    }
+      
+
+      
     </div>
   );
 };

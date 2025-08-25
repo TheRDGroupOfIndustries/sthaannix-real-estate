@@ -14,7 +14,7 @@ import {
   Send,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
-import {Backendurl } from "../config/constants";
+import { Backendurl } from "../config/constants";
 import http from "../api/http";
 
 const Appointments = () => {
@@ -29,10 +29,10 @@ const Appointments = () => {
   const fetchAppointments = async () => {
     try {
       setLoading(true);
-      const response= await http.get(`${Backendurl}/leads/my-properties`);
-      console.log("fetchAppointments:",response.data);
-      
-      if (response.status==200) {
+      const response = await http.get(`${Backendurl}/leads/my-properties`);
+      console.log("fetchAppointments:", response.data);
+
+      if (response.status == 200) {
         // Filter out appointments with missing user data
         const validAppointments = response.data.filter(
           (apt) => apt.buyer._id && apt.property._id
@@ -49,17 +49,14 @@ const Appointments = () => {
     }
   };
 
-  const handleStatusChange = async ( id,newStatus,responseMessage) => {
+  const handleStatusChange = async (id, newStatus, responseMessage) => {
     try {
-       setLoadingAction({ id, status: newStatus }); 
-      const response = await http.put(
-        `${Backendurl}/leads/${id}/status`,
-        {
-          status: newStatus,
-          responseMessage:responseMessage
-        }
-      );
-      if (response.status==200) {
+      setLoadingAction({ id, status: newStatus });
+      const response = await http.put(`${Backendurl}/leads/${id}/status`, {
+        status: newStatus,
+        responseMessage: responseMessage,
+      });
+      if (response.status == 200) {
         toast.success(`Appointment ${newStatus} successfully`);
         fetchAppointments();
       } else {
@@ -68,8 +65,7 @@ const Appointments = () => {
     } catch (error) {
       console.error("Error updating appointment:", error);
       toast.error("Failed to update appointment status");
-    }
-    finally{
+    } finally {
       setLoadingAction(null);
     }
   };
@@ -111,18 +107,18 @@ const Appointments = () => {
   }, []);
 
   const filteredAppointments = appointments.filter((apt) => {
-  const search = searchTerm.toLowerCase();
+    const search = searchTerm.toLowerCase();
 
-  const matchesSearch =
-    searchTerm === "" ||
-    (apt.property?.title?.toLowerCase().includes(search)) ||
-    (apt.buyer?.name?.toLowerCase().includes(search)) ||
-    (apt.buyer?.email?.toLowerCase().includes(search));
+    const matchesSearch =
+      searchTerm === "" ||
+      apt.property?.title?.toLowerCase().includes(search) ||
+      apt.buyer?.name?.toLowerCase().includes(search) ||
+      apt.buyer?.email?.toLowerCase().includes(search);
 
-  const matchesFilter = filter === "all" || apt.status === filter;
+    const matchesFilter = filter === "all" || apt.status === filter;
 
-  return matchesSearch && matchesFilter;
-});
+    return matchesSearch && matchesFilter;
+  });
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -151,7 +147,8 @@ const Appointments = () => {
         {/* Header and Search Section - Keep existing code */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-1">
+            <h1 className="text-3xl font-bold text-gray-900 mb-1 flex items-center gap-2">
+              <Calendar className="w-8 h-8 text-blue-500" />
               Leads
             </h1>
             <p className="text-gray-600">
@@ -178,7 +175,7 @@ const Appointments = () => {
                 onChange={(e) => setFilter(e.target.value)}
                 className="rounded-lg border border-gray-200 px-4 py-2 focus:ring-2 focus:ring-blue-500"
               >
-                <option value="all" >All Leads</option>
+                <option value="all">All Leads</option>
                 {/* <option value="pending">Pending</option> */}
                 <option value="open">Open</option>
                 <option value="closed">Closed</option>
@@ -230,7 +227,6 @@ const Appointments = () => {
                           </p>
                           <p className="text-sm text-gray-500">
                             {appointment.property.location.city}
-
                           </p>
                         </div>
                       </div>
@@ -257,15 +253,20 @@ const Appointments = () => {
                         <Calendar className="w-5 h-5 text-gray-400 mr-2" />
                         <div>
                           <p className="font-medium text-gray-900">
-                            {new Date(appointment.createdAt).toLocaleDateString()}
+                            {new Date(
+                              appointment.createdAt
+                            ).toLocaleDateString()}
                           </p>
                           <div className="flex items-center text-sm text-gray-500">
                             {/* <Clock className="w-4 h-4 mr-1" /> */}
-                            {new Date(appointment.createdAt).toLocaleTimeString('en-US', {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                              hour12: true
-                            })}
+                            {new Date(appointment.createdAt).toLocaleTimeString(
+                              "en-US",
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: true,
+                              }
+                            )}
                           </div>
                         </div>
                       </div>
@@ -344,37 +345,52 @@ const Appointments = () => {
 
                     {/* Actions */}
                     <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() =>
-                              handleStatusChange( appointment._id,"open",appointment.message)
-                            }
-                             disabled={loadingAction?.id === appointment._id && loadingAction?.status === "open"}
-                            className="p-1 bg-green-500 text-white rounded hover:bg-green-600"
-                             title="Open"
-                          >
-                            {loadingAction?.id === appointment._id && loadingAction?.status === "open" ? (
-    <Loader className="animate-spin w-4 h-4" />
-  ) : (
-    <Check className="w-4 h-4" />
-  )}
-                                                            
-                          </button>
-                          <button
-                            onClick={() =>
-                              handleStatusChange( appointment._id,"closed", "cancelled")
-                            }
-                        disabled={loadingAction?.id === appointment._id && loadingAction?.status === "closed"}
-                            className="p-1 bg-red-500 text-white rounded hover:bg-red-600"
-                             title="Close"
-                          >
-                          {loadingAction?.id === appointment._id && loadingAction?.status === "closed" ? (
-    <Loader className="animate-spin w-4 h-4" />
-  ) : (
-    <X className="w-4 h-4" />
-  )}
-                          </button>
-                        </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() =>
+                            handleStatusChange(
+                              appointment._id,
+                              "open",
+                              appointment.message
+                            )
+                          }
+                          disabled={
+                            loadingAction?.id === appointment._id &&
+                            loadingAction?.status === "open"
+                          }
+                          className="p-1 bg-green-500 text-white rounded hover:bg-green-600"
+                          title="Open"
+                        >
+                          {loadingAction?.id === appointment._id &&
+                          loadingAction?.status === "open" ? (
+                            <Loader className="animate-spin w-4 h-4" />
+                          ) : (
+                            <Check className="w-4 h-4" />
+                          )}
+                        </button>
+                        <button
+                          onClick={() =>
+                            handleStatusChange(
+                              appointment._id,
+                              "closed",
+                              "cancelled"
+                            )
+                          }
+                          disabled={
+                            loadingAction?.id === appointment._id &&
+                            loadingAction?.status === "closed"
+                          }
+                          className="p-1 bg-red-500 text-white rounded hover:bg-red-600"
+                          title="Close"
+                        >
+                          {loadingAction?.id === appointment._id &&
+                          loadingAction?.status === "closed" ? (
+                            <Loader className="animate-spin w-4 h-4" />
+                          ) : (
+                            <X className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
                     </td>
                   </motion.tr>
                 ))}
@@ -383,9 +399,7 @@ const Appointments = () => {
           </div>
 
           {filteredAppointments.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              No Leads found
-            </div>
+            <div className="text-center py-8 text-gray-500">No Leads found</div>
           )}
         </div>
       </div>

@@ -3,6 +3,7 @@ import User from "../models/User";
 import Property from "../models/Property";
 import Lead from "../models/Lead";
 import TopUpRequest from "../models/TopUpRequest";
+import AdminRevenue, { IAdminRevenue } from "../models/adminRevenue";
 
 export const getAdminStats = async (_req: Request, res: Response) => {
   try {
@@ -16,8 +17,9 @@ export const getAdminStats = async (_req: Request, res: Response) => {
       leadsClosed,
       totalCredits,
       totalDebits,
+      adminRevenueDoc,
     ] = await Promise.all([
-      User.countDocuments(),
+       User.countDocuments({ role: { $ne: "user" } }),
       User.aggregate([{ $group: { _id: "$role", count: { $sum: 1 } } }]),
       Property.countDocuments(),
       Property.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
@@ -32,27 +34,25 @@ export const getAdminStats = async (_req: Request, res: Response) => {
         { $match: { type: "debit" } },
         { $group: { _id: null, total: { $sum: "$amount" } } },
       ]),
+      AdminRevenue.findOne({}).lean() as Promise<IAdminRevenue | null>, 
     ]);
 
     res.json({
       users: {
         total: totalUsers,
-        byRole: usersByRole.reduce(
-          (acc: any, r) => ({ ...acc, [r._id]: r.count }),
-          {}
-        ),
+        byRole: usersByRole.reduce((acc: any, r) => ({ ...acc, [r._id]: r.count }), {}),
       },
       properties: {
         total: totalProperties,
-        byStatus: propertiesByStatus.reduce(
-          (acc: any, r) => ({ ...acc, [r._id]: r.count }),
-          {}
-        ),
+        byStatus: propertiesByStatus.reduce((acc: any, r) => ({ ...acc, [r._id]: r.count }), {}),
       },
       leads: { total: totalLeads, open: leadsOpen, closed: leadsClosed },
       wallet: {
         totalCredits: totalCredits[0]?.total || 0,
         totalDebits: totalDebits[0]?.total || 0,
+      },
+      adminRevenue: {
+        finalRevenue: adminRevenueDoc?.finalRevenue ?? 0, // <-- safe access
       },
     });
   } catch (err) {
@@ -61,11 +61,16 @@ export const getAdminStats = async (_req: Request, res: Response) => {
 };
 
 
-
 export const getUserStats = async (req: Request, res: Response) => {
   try {
     const stats = await User.aggregate([
       {
+        $match: {
+          role: { $ne: "user" }, //user role not include
+        },
+      },
+      {
+        
         $lookup: {
           from: "properties",
           localField: "_id",

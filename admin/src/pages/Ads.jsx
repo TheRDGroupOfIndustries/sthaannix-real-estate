@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Backendurl } from "../config/constants";
+import { toast } from "react-hot-toast";
 
 const Ads = ({ user }) => {
   const { id } = useParams(); // propertyId
@@ -12,6 +13,7 @@ const Ads = ({ user }) => {
   const [platform, setPlatform] = useState("");
   const [startDate, setStartDate] = useState("");
   const [userName, setUserName] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
 
   // Fetch property details if id exists
   useEffect(() => {
@@ -23,41 +25,54 @@ const Ads = ({ user }) => {
     }
   }, [id]);
 
-  useEffect(() => {
+useEffect(() => {
   const userData = localStorage.getItem("user");
   if (userData) {
     const parsedUser = JSON.parse(userData);
-    setUserName(parsedUser.name); // get name from stored user object
+    setUserName(parsedUser.name);
+    setCurrentUser(parsedUser); 
   }
 }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!platform) return alert("Please select a platform");
-    if (budget < 1500) return alert("Minimum advertisement budget is ₹1500");
+  if (!platform) {
+    toast.error("Please select a platform");
+    return;
+  }
+  if (Number(budget) < 1500) {
+    toast.error("Minimum advertisement budget is ₹1500");
+    return;
+  }
 
-    try {
-      const response = await axios.post("/api/ads", {
-        userId: user._id,
-        propertyId: id,
-        budget,
-        platform: [platform],
-        startDate,
-      });
+  if (!currentUser?.id) {
+    toast.error("User not found");
+    return;
+  }
 
-      alert(response.data.message);
-      navigate("/ads-list"); // redirect after success
-    } catch (error) {
-      console.error(error);
-      alert(
-        error.response?.data?.message || "Error submitting ad request. Try again."
-      );
-    }
-  };
+  try {
+    const response = await axios.post(`${Backendurl}/ad/create`, {
+      userId: currentUser.id, // use 'id' instead of '_id'
+      propertyId: id,
+      budget: Number(budget), // convert to number
+      platform: [platform],
+      startDate,
+    });
+
+    toast.success(response.data.message);
+    navigate("/dashboard"); // redirect after success
+  } catch (error) {
+    console.error(error);
+    toast.error(
+      error.response?.data?.message || "Error submitting ad request. Try again."
+    );
+  }
+};
+
 
   return (
-    <div className="max-w-lg mx-auto p-6 border rounded shadow">
+    <div className="max-w-lg mx-auto p-6 m-5 border rounded shadow">
       <h2 className="text-2xl font-semibold mb-4">Submit Advertisement</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">

@@ -3,12 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { Plus, Edit3, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { motion } from "framer-motion";
-import axios from "axios";
 import api from "../api/api";
 import { paymentsAPI } from '../api/api';
 
 
-const BuilderDashboard = () => {
+const PropertyOwnerDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("properties");
   const [properties, setProperties] = useState([]);
@@ -19,16 +18,25 @@ const BuilderDashboard = () => {
       date: "2024-05-01",
       time: "14:30",
       paymentMethod: "Bank Account",
+     
     },
-]);
+    {
+      no: 2,
+      uniqueTransactionRef: "TXN789012",
+      date: "2024-05-15",
+      time: "10:45",
+      paymentMethod: "UPI",
+      
+    }
+  ]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    console.log("BuilderDashboard: ",user);
+    console.log("PropertyOwnerDashboard: ",user);
     
-    if (!user || user.role !== "builder") {
-      toast.error("Unauthorized. Please login as Builder.");
+    if (!user || user.role !== "owner") {
+      toast.error("Unauthorized. Please login as Owner.");
       navigate("/login");
       return;
     }
@@ -39,7 +47,6 @@ const BuilderDashboard = () => {
       loadPayments(user.email);
     }
   }, [activeTab]);
-
 
   const fetchProperties = async () => {
   setLoading(true);
@@ -65,7 +72,6 @@ const BuilderDashboard = () => {
   }
 };
 
-
   const handleDeleteProperty = async (id) => {
     if (window.confirm("Are you sure you want to delete this property?")) {
       try {
@@ -84,7 +90,6 @@ const BuilderDashboard = () => {
     }
   };
 
- 
 const loadPayments = async (email) => {
   setLoading(true);
   try {
@@ -105,8 +110,7 @@ const loadPayments = async (email) => {
   }
 };
 
-
-  const handleDeletePayment = (id) => {
+ const handleDeletePayment = (id) => {
     if (window.confirm("Are you sure you want to delete this payment record?")) {
       const allPayments = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
       const updatedPayments = allPayments.filter(p => p.id !== id);
@@ -117,7 +121,7 @@ const loadPayments = async (email) => {
   };
 
   return (
-   <div className="min-h-screen pt-16 px-6 bg-gray-50 max-w-7xl mx-auto">
+     <div className="min-h-screen pt-16 px-6 bg-gray-50 max-w-7xl mx-auto">
        <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Broker Dashboard</h1>
     <div className="flex space-x-5"> {/* ✅ 20px gap between buttons */}
@@ -162,7 +166,7 @@ const loadPayments = async (email) => {
               : "bg-white text-gray-700 hover:bg-gray-100"
           }`}
         >
-           Payment History
+          Payment History
         </button>
       </div>
 
@@ -179,6 +183,7 @@ const loadPayments = async (email) => {
                 key={property._id}
                 className="bg-white p-4 rounded-lg shadow group hover:shadow-lg transition relative"
               >
+                
             <img
             src={
               property.images && property.images.length > 0
@@ -188,7 +193,8 @@ const loadPayments = async (email) => {
             alt={property.title}
             className="w-full h-48 object-cover rounded-lg mb-4"
           />
-                <h2 className="font-semibold text-lg mb-1">{property.title}</h2>
+
+            <h2 className="font-semibold text-lg mb-1">{property.title}</h2>
               <p className="text-gray-600 mb-1">{property.location?.address}</p>
               <p className="text-blue-600 font-bold mb-2">
                 ₹{property.price.toLocaleString()}
@@ -239,14 +245,14 @@ const loadPayments = async (email) => {
         )
       ) : payments.length === 0 ? (
         <div className="text-center py-20 text-lg text-gray-600">
-         No payment records found.
+          No payment records found.
         </div>
       ) : (
         <div className="overflow-x-auto bg-white rounded-xl shadow-md border border-gray-200">
           <table className="min-w-full">
             <thead className="bg-gray-100">
               <tr>
-                {["No", "Unique Transaction Ref", "Date", "Time", "Payment Method", "Action"].map((head) => (
+                {["No", "Unique Transaction Reference", "Date", "Time", "Method", "Action"].map((head) => (
                   <th key={head} className="text-left p-3 border-b border-gray-300">
                     {head}
                   </th>
@@ -254,7 +260,7 @@ const loadPayments = async (email) => {
               </tr>
             </thead>
             <tbody>
-             {payments.map((payment, idx) => (
+              {payments.map((payment, idx) => (
                 <tr key={payment.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">{idx + 1}</td>
                   <td className="px-6 py-4 font-mono text-sm whitespace-nowrap">
@@ -287,4 +293,4 @@ const loadPayments = async (email) => {
   );
 };
 
-export default BuilderDashboard;
+export default PropertyOwnerDashboard;

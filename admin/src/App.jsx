@@ -405,6 +405,16 @@ const App = () => {
                 element={getUser() ? <Payment /> : <Navigate to="/login" replace />}
               />
 
+
+              <Route
+                path="/revenue"
+                element={
+                  <PrivateRoute allowedRoles={["admin"]}>
+                    <Appointments />
+                  </PrivateRoute>
+                }
+              />
+
                 <Route path="/wallet" element={<Wallet/>} />
 
               {/* Fallback */}

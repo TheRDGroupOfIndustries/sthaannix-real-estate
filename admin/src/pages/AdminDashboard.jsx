@@ -421,6 +421,9 @@ const cancelPayment = async (id, reason) => {
                         Payment Method
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Amount
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Payment Proof
                       </th>
                       <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -438,16 +441,19 @@ const cancelPayment = async (id, reason) => {
                         className="hover:bg-gray-50"
                       >
                         <td className="px-6 py-4 whitespace-nowrap">{idx + 1}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">{payment.user?.name}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">{payment.user?.role}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">{payment.user?.email}</td>
+
+                        <td className="px-6 py-4 whitespace-nowrap">{payment?.user?.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">{payment?.user?.role}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">{payment?.user?.email}</td>
+
                         <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">
                           {payment.utrNumber}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           {new Date(payment.createdAt).toLocaleString()}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">{payment.paymentMethod}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">{payment?.paymentMethod}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">₹{payment.amount}</td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex gap-2">
                             {/* {payment.images?.map((imgUrl, i) => (
@@ -516,7 +522,7 @@ const cancelPayment = async (id, reason) => {
 
             
 {/* Approved payments section */}
-<section className="mt-16">
+{/* <section className="mt-16">
   <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
     <CheckCircle className="w-6 h-6 text-green-600" />
     Approved Payments
@@ -596,7 +602,7 @@ const cancelPayment = async (id, reason) => {
       </table>
     </div>
   )}
-</section>
+</section> */}
 
 
 
@@ -651,9 +657,11 @@ const cancelPayment = async (id, reason) => {
                           className="hover:bg-gray-50"
                         >
                           <td className="px-6 py-4 whitespace-nowrap">{idx + 1}</td>
+
                           <td className="px-6 py-4 whitespace-nowrap">{payment.user?.name}</td>
                           <td className="px-6 py-4 whitespace-nowrap">{payment.user?.role}</td>
                           <td className="px-6 py-4 whitespace-nowrap">{payment.user?.email}</td>
+
                           <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">
                             {payment.utrNumber}
                           </td>
@@ -661,7 +669,7 @@ const cancelPayment = async (id, reason) => {
                             {new Date(payment.updatedAt).toLocaleString()}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            {payment.paymentMethod}
+                            {payment?.paymentMethod}
                             </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex gap-2">

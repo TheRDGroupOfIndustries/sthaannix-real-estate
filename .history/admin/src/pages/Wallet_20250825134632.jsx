@@ -111,7 +111,7 @@ const handlePaymentSubmit = async (e) => {
       toast.success(
         "Payment submitted successfully! Your account will be activated after verification."
       );
-      navigate("/dashboard");
+      navigate("");
     } else {
       toast.error(response?.data?.message || "Payment submission failed");
     }

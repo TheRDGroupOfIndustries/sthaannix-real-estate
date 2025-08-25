@@ -63,7 +63,7 @@ const AdminDashboard = () => {
       console.log("loadPayments:",response.data);
       
       if (response.status==200) {
-         setPayments(response.data.data);
+         setPayments(response.data.d);
       } else {
         toast.error(response.data.message || "Failed to load data");
       }

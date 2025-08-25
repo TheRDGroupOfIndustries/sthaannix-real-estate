@@ -391,9 +391,6 @@ const App = () => {
                   </PrivateRoute>
                 }
               />
-              
-              <Route path="/ads/:id" element={<Ads/>} />
-
               <Route
                 path="/appointments"
                 element={
@@ -421,6 +418,7 @@ const App = () => {
 
                 <Route path="/wallet" element={<Wallet/>} />
 
+                <Route path="/ad" element={<Ads/>} />
 
               {/* Fallback */}
               <Route path="*" element={<Navigate to="/login" replace />} />

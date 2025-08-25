@@ -89,6 +89,7 @@ export const submitAdRequest = async (req: Request, res: Response) => {
   }
 };
 
+
 // Admin gets all ad requests
 export const getAllAdRequests = async (req: Request, res: Response) => {
   try {

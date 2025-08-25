@@ -136,7 +136,7 @@ const loadPayments = async (email) => {
           className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
         >
           <Plus size={20} />
-          Wallet
+          W
         </button>
       )}
     </div>
@@ -195,7 +195,7 @@ const loadPayments = async (email) => {
               </p>
               <div className="flex justify-between text-sm text-gray-500 mb-3">
                 <span>{property.bhk} BHK</span>
-                {/* <span>{property.bathroom} Baths</span> */}
+                <span>{property.bathroom} Baths</span>
                 <span>{property.size} Sq Ft</span>
               </div>
 

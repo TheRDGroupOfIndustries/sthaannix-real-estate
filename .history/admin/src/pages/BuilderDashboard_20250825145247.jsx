@@ -195,7 +195,7 @@ const loadPayments = async (email) => {
               </p>
               <div className="flex justify-between text-sm text-gray-500 mb-3">
                 <span>{property.bhk} BHK</span>
-                {/* <span>{property.bathroom} Baths</span> */}
+                <span>{property.bathroom} Baths</span>
                 <span>{property.size} Sq Ft</span>
               </div>
 

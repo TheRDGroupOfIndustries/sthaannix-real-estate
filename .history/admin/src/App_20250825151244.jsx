@@ -392,8 +392,6 @@ const App = () => {
                 }
               />
               
-              <Route path="/ads/:id" element={<Ads/>} />
-
               <Route
                 path="/appointments"
                 element={

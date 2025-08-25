@@ -391,9 +391,6 @@ const App = () => {
                   </PrivateRoute>
                 }
               />
-              
-              <Route path="/ads/:id" element={<Ads/>} />
-
               <Route
                 path="/appointments"
                 element={

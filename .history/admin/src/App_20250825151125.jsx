@@ -236,7 +236,7 @@ import Add from "./pages/Add";
 import Update from "./pages/Update";
 import Appointments from "./pages/Appointments";
 import Wallet from "./pages/Wallet";
-import Ads from "./pages/ads";
+import A
 
 export const Backendurl = import.meta.env.VITE_API_BASE_URL;
 
@@ -391,9 +391,6 @@ const App = () => {
                   </PrivateRoute>
                 }
               />
-              
-              <Route path="/ads/:id" element={<Ads/>} />
-
               <Route
                 path="/appointments"
                 element={
@@ -421,6 +418,7 @@ const App = () => {
 
                 <Route path="/wallet" element={<Wallet/>} />
 
+                <Route path="/ad" element={<Ads/>} />
 
               {/* Fallback */}
               <Route path="*" element={<Navigate to="/login" replace />} />

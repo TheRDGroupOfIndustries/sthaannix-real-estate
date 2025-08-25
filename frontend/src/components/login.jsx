@@ -119,6 +119,8 @@ const Login = () => {
       const response = await loginUser(formData);
       if (response.data) {
         await login(response.data.token, response.data.user);
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
         toast.success("Login successful!");
         navigate("/");
       } else {

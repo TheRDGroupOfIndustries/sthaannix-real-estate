@@ -39,8 +39,10 @@ const AdminDashboard = () => {
   const fetchUsersData = async () => {
     try {
       setUsersLoading(true);
-      const response = await adminAPI.getPendingUsers();
-      // console.log("fetchUsersData:",response);
+
+      const response = await adminAPI.getUsersData();
+      // console.log("fetchUsersData:", response.data.data);
+
       if (response.data.success) {
         setUsers(response.data.users);
       } else {
@@ -59,7 +61,9 @@ const AdminDashboard = () => {
     try {
       setPaymentsLoading(true);
       const response = await paymentsAPI.getAll();
-      console.log("loadPayments:", response.data);
+
+      console.log("loadPayments:", response.data.data);
+
 
       if (response.status === 200) {
         // Always ensure it's an array
@@ -129,7 +133,9 @@ const AdminDashboard = () => {
 
       if (res.status === 200) {
         const updatedRes = await paymentsAPI.getAll();
+
         setPayments(updatedRes.data.data || []); // ✅ fixed
+
         toast.success("Payment approved successfully");
       } else {
         toast.error("Failed to approve payment");
@@ -146,7 +152,9 @@ const AdminDashboard = () => {
 
       if (res.status === 200) {
         const updatedRes = await paymentsAPI.getAll();
+
         setPayments(updatedRes.data.data || []); // ✅ fixed
+
         toast.success("Payment rejected");
       } else {
         toast.error("Failed to reject payment");
@@ -156,6 +164,45 @@ const AdminDashboard = () => {
       toast.error(error.response?.data?.message || "Error rejecting payment");
     }
   };
+
+  const approveWalletPayment = async (id, utrNumber, paymentMethod) => {
+  try {
+    const res = await paymentsAPI.walletApprove(id, utrNumber, paymentMethod);
+
+    if (res.status === 200) {
+      const updatedRes = await paymentsAPI.getAll();
+      setPayments(updatedRes.data.data); 
+      toast.success("Wallet Payment approved");
+    } else {
+      toast.error("Failed to approve payment");
+    }
+  } catch (error) {
+    console.error("Approve payment error:", error);
+    toast.error(error.response?.data?.message || "Error approving payment");
+  }
+};
+
+  
+
+  const cancelWalletPayment=async(id,reason)=>{
+
+    try {
+      // Call backend reject API with reason
+      const res = await paymentsAPI.walletReject(id,reason);
+
+      if (res.status === 200) {
+        const updatedRes = await paymentsAPI.getAll();
+        setPayments(updatedRes.data.data); 
+        toast.success("Wallet Payment rejected");
+      } else {
+        toast.error("Failed to reject payment");
+      }
+    } catch (error) {
+      console.error("Reject payment error:", error);
+      toast.error(error.response?.data?.message || "Error rejecting payment");
+    }
+  }
+
 
   const pendingPayments = payments.filter((p) => p.status === "pending");
   const canceledPayments = payments.filter((p) => p.status === "rejected");
@@ -541,9 +588,12 @@ const AdminDashboard = () => {
 
                         <td className="px-6 py-4 whitespace-nowrap text-center space-x-2">
                           <button
-                            onClick={() => {
-                              approvePayment(payment._id);
-                            }}
+                           onClick={() =>
+                              payment.type === "Wallet"
+                                ? approveWalletPayment(payment._id,payment.utrNumber,payment.paymentMethod)
+                                : approvePayment(payment._id)
+                            }
+
                             className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-green-600 text-white hover:bg-green-700 transition"
                             title="Approve Payment"
                           >
@@ -551,9 +601,11 @@ const AdminDashboard = () => {
                             Approve
                           </button>
                           <button
-                            onClick={() =>
-                              cancelPayment(payment._id, "Payment Rejected")
-                            }
+                             onClick={() =>
+    payment.type === "Wallet"
+      ? cancelWalletPayment(payment._id, 'Payment Rejected BY Admin')
+      : cancelPayment(payment._id, "Payment Rejected")
+  }
                             className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-red-600 text-white hover:bg-red-700 transition"
                             title="Cancel Payment"
                           >
@@ -679,6 +731,9 @@ const AdminDashboard = () => {
                           Email
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Purpose
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Transaction Ref
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -713,6 +768,9 @@ const AdminDashboard = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             {payment.user?.email}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {payment?.type}
                           </td>
 
                           <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">

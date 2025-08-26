@@ -292,6 +292,7 @@ const handleDeletePayment = async (id, type) => {
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unique Transaction Reference</th>
+             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
             <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
@@ -302,6 +303,7 @@ const handleDeletePayment = async (id, type) => {
             <tr key={payment.id} className="hover:bg-gray-50">
               <td className="px-6 py-4 whitespace-nowrap">{idx + 1}</td>
               <td className="px-6 py-4 font-mono text-sm whitespace-nowrap">{payment.utrNumber || "-"}</td>
+               <td className="px-6 py-4 whitespace-nowrap">{payment.amount || "-"}</td>
               <td className="px-6 py-4 whitespace-nowrap">{new Date(payment.createdAt).toLocaleString()}</td>
               <td className="px-6 py-4 whitespace-nowrap">{payment.purpose || "Wallet Top-up"}</td>
               <td className="px-6 py-4 whitespace-nowrap text-center">

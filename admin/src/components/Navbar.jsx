@@ -96,7 +96,7 @@ const Navbar = () => {
        { path: '/appointments', label: 'Leads', icon: Calendar },
     ],
     builder: [
-    { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+      { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
       { path: '/leads', label: 'My Leads', icon: Calendar },
       { path: '/add', label: 'Add Property', icon: PlusSquare },
        { path: '/appointments', label: 'Leads', icon: Calendar },

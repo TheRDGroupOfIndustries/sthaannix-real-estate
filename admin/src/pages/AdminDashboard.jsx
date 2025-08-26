@@ -1,26 +1,13 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { motion } from "framer-motion";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import {
-  Users,
-  Home,
-  Mail,
-  Phone,
-  User,
-  ClipboardList,
-  RefreshCw,
-  BarChart2,
-  CalendarCheck,
-  CreditCard,
-  CheckCircle,
-  XCircle,
-  FileText,
-  Image,
-} from "lucide-react";
+import { Users, RefreshCw, CreditCard, FileText, Home } from "lucide-react";
 import { adminAPI, paymentsAPI } from "../api/api";
-import http from "../api/http";
+import UsersOverview from "../components/UsersOverview";
+import PaymentApproval from "../components/PaymentApproval";
+import AdsApproval from "../components/AdsApproval";
+import PropertyApproval from "../components/PropertyApproval";
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("users");
@@ -34,6 +21,14 @@ const AdminDashboard = () => {
   const [paymentsLoading, setPaymentsLoading] = useState(true);
   const [stats, setStats] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Ads state
+  const [ads, setAds] = useState([]);
+  const [adsLoading, setAdsLoading] = useState(true);
+
+  // Properties state
+  const [properties, setProperties] = useState([]);
+  const [propertiesLoading, setPropertiesLoading] = useState(true);
 
   // Fetch all users and their data
   const fetchUsersData = async () => {
@@ -74,7 +69,7 @@ const AdminDashboard = () => {
     }
   };
 
-  // Load payments from localStorage
+  // Load payments
   const loadPayments = async () => {
     try {
       setPaymentsLoading(true);
@@ -96,12 +91,52 @@ const AdminDashboard = () => {
     }
   };
 
+
+  // Load ads (implement your adminAPI.getAdsData())
+  const loadAds = async () => {
+    try {
+      setAdsLoading(true);
+      const response = await adminAPI.getAdsData();
+      if (response.status === 200) {
+        setAds(response.data.data || []);
+      } else {
+        toast.error(response.data.message || "Failed to load ads");
+      }
+    } catch {
+      toast.error("Error loading ads");
+    } finally {
+      setAdsLoading(false);
+    }
+  };
+
+  // Load properties (implement your adminAPI.getPropertiesData())
+  const loadProperties = async () => {
+    try {
+      setPropertiesLoading(true);
+      const response = await adminAPI.getPropertiesData();
+      if (response.status === 200) {
+        setProperties(response.data.data || []);
+      } else {
+        toast.error(response.data.message || "Failed to load properties");
+      }
+    } catch {
+      toast.error("Error loading properties");
+    } finally {
+      setPropertiesLoading(false);
+    }
+  };
+
+
   useEffect(() => {
     if (activeTab === "users") {
       fetchUsersData();
       fetchAdminStats();
-    } else {
+    } else if (activeTab === "payments") {
       loadPayments();
+    } else if (activeTab === "ads") {
+      // loadAds();
+    } else if (activeTab === "properties") {
+      // loadProperties();
     }
   }, [activeTab]);
 
@@ -109,8 +144,13 @@ const AdminDashboard = () => {
     setRefreshing(true);
     if (activeTab === "users") {
       await fetchUsersData();
-    } else {
-      loadPayments();
+      await fetchAdminStats();
+    } else if (activeTab === "payments") {
+      await loadPayments();
+    } else if (activeTab === "ads") {
+      // await loadAds();
+    } else if (activeTab === "properties") {
+      // await loadProperties();
     }
     setTimeout(() => {
       setRefreshing(false);
@@ -119,32 +159,6 @@ const AdminDashboard = () => {
   };
 
   // Payment actions
-  // const approvePayment = (id) => {
-  //   const updated = payments.map(p =>
-  //     p.id === id ? { ...p, status: "approved", approvalTimestamp: new Date().toISOString() } : p
-  //   );
-  //   setPayments(updated);
-  //   localStorage.setItem("paymentRecords", JSON.stringify(updated));
-  //   toast.success("Payment approved");
-  // };
-
-  // const approvePayment = async (id) => {
-  //   try {
-  //     const res = await paymentsAPI.approve(id);
-
-  //     if (res.status === 200) {
-
-  //       const updatedRes = await http.patch(`/payment/admin/approve/${id}`)
-  //       setPayments(updatedRes.data);
-  //       toast.success("Payment approved successfully");
-  //     } else {
-  //       toast.error("Failed to approve payment");
-  //     }
-  //   } catch (error) {
-  //     toast.error(error.response?.data?.message || "Error approving payment");
-  //   }
-  // };
-
   const approvePayment = async (id) => {
     try {
       const res = await paymentsAPI.approve(id);
@@ -186,9 +200,11 @@ const AdminDashboard = () => {
   const approveWalletPayment = async (id, utrNumber, paymentMethod) => {
     try {
       const res = await paymentsAPI.walletApprove(id, utrNumber, paymentMethod);
-
+      console.log("rapprove: ",res);
+      
       if (res.status === 200) {
         const updatedRes = await paymentsAPI.getAll();
+        
         setPayments(updatedRes.data.data);
         toast.success("Wallet Payment approved");
       } else {
@@ -256,15 +272,28 @@ const AdminDashboard = () => {
         <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-3">
             <h1 className="text-3xl font-bold text-gray-900">
-              {activeTab === "users" ? (
+              {activeTab === "users" && (
                 <>
-                  <Users className="w-8 h-8 text-blue-600 inline mr-2" />
-                  Admin Dashboard
+                  <Users className="w-8 h-8 text-blue-600 inline mr-2" /> Admin
+                  Dashboard
                 </>
-              ) : (
+              )}
+              {activeTab === "payments" && (
                 <>
-                  <CreditCard className="w-8 h-8 text-blue-600 inline mr-2" />
-                  Payment Approvals
+                  <CreditCard className="w-8 h-8 text-blue-600 inline mr-2" />{" "}
+                  Payment Approval
+                </>
+              )}
+              {activeTab === "ads" && (
+                <>
+                  <FileText className="w-8 h-8 text-blue-600 inline mr-2" /> Ads
+                  Approval
+                </>
+              )}
+              {activeTab === "properties" && (
+                <>
+                  <Home className="w-8 h-8 text-blue-600 inline mr-2" />{" "}
+                  Property Approval
                 </>
               )}
             </h1>
@@ -290,7 +319,27 @@ const AdminDashboard = () => {
                     : "bg-white text-gray-700 hover:bg-gray-100"
                 }`}
               >
-                Payment Approvals
+                Payment Approval
+              </button>
+              <button
+                onClick={() => setActiveTab("ads")}
+                className={`px-4 py-2 text-sm font-medium transition-colors ${
+                  activeTab === "ads"
+                    ? "bg-blue-600 text-white"
+                    : "bg-white text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                Ads Approval
+              </button>
+              <button
+                onClick={() => setActiveTab("properties")}
+                className={`px-4 py-2 text-sm font-medium transition-colors ${
+                  activeTab === "properties"
+                    ? "bg-blue-600 text-white"
+                    : "bg-white text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                Property Approval
               </button>
             </div>
 
@@ -308,573 +357,34 @@ const AdminDashboard = () => {
         </div>
 
         {/* Tab content */}
-        {activeTab === "users" ? (
-          <>
-            {/* Summary stats */}
-            <div className="mt-10 grid grid-cols-1 md:grid-cols-4 gap-6">
-              {/* Total Users */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
-              >
-                <div className="p-3 bg-blue-100 rounded-xl">
-                  <Users className="w-8 h-8 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Total Users
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {stats?.users?.total ?? 0}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Broker: {stats?.users?.byRole?.broker ?? 0} | Owner:{" "}
-                    {stats?.users?.byRole?.owner ?? 0} | Builder:{" "}
-                    {stats?.users?.byRole?.builder ?? 0}
-                  </p>
-                </div>
-              </motion.div>
-
-              {/* Total Properties */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
-              >
-                <div className="p-3 bg-green-100 rounded-xl">
-                  <Home className="w-8 h-8 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Total Properties
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {stats?.properties?.total ?? 0}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Pending: {stats?.properties?.byStatus?.pending ?? 0} |
-                    Approved: {stats?.properties?.byStatus?.approved ?? 0}
-                  </p>
-                </div>
-              </motion.div>
-
-              {/* Total Leads */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
-              >
-                <div className="p-3 bg-purple-100 rounded-xl">
-                  <ClipboardList className="w-8 h-8 text-purple-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Total Leads
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {stats?.leads?.total ?? 0}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Open: {stats?.leads?.open ?? 0} | Closed:{" "}
-                    {stats?.leads?.closed ?? 0}
-                  </p>
-                </div>
-              </motion.div>
-
-              {/* Wallet */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4"
-              >
-                <div className="p-3 bg-yellow-100 rounded-xl">
-                  <CreditCard className="w-8 h-8 text-yellow-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Total Revenuet</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    ₹
-                    {(stats?.adminRevenue?.finalRevenue ?? 0) }
-                  </p>
-                  
-                </div>
-              </motion.div>
-            </div>
-            {/* Users Overview Content */}
-            <div className="overflow-x-auto bg-white rounded-xl shadow border border-gray-200 my-10">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      No
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      User Name
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Role
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Email
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Phone
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Properties
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Leads
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {users.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={6}
-                        className="text-center py-8 text-gray-500"
-                      >
-                        No users found
-                      </td>
-                    </tr>
-                  ) : (
-                    users.map((user, idx) => (
-                      <motion.tr
-                        key={user._id || idx}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: idx * 0.05 }}
-                        className="hover:bg-gray-50"
-                      >
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {idx + 1}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-2">
-                            <User className="w-5 h-5 text-gray-400" />
-                            {user.name || "-"}
-                          </div>
-                        </td>
-
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {user.role || "-"}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-1">
-                            <Mail className="w-4 h-4 text-gray-400" />
-                            {user.email || "-"}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-1">
-                            <Phone className="w-4 h-4 text-gray-400" />
-                            {user.phone || "-"}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-1">
-                            <Home className="w-4 h-4 text-gray-400" />
-                            {user?.totalProperties || 0}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-1">
-                            <ClipboardList className="w-4 h-4 text-gray-400" />
-                            {user?.totalLeads || 0}
-                          </div>
-                        </td>
-                      </motion.tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </>
-        ) : (
-          <>
-            {/* Payment Approvals Content */}
-            {pendingPayments.length === 0 ? (
-              <p className="text-center text-gray-500 py-20 text-lg bg-white rounded-xl shadow border border-gray-200">
-                No pending payments for approval.
-              </p>
-            ) : (
-              <div className="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        No
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Name
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Role
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Email
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Transaction Ref
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Purpose
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Date & Time
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Payment Method
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Amount
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Payment Proof
-                      </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {pendingPayments.map((payment, idx) => (
-                      <motion.tr
-                        key={payment._id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: idx * 0.05 }}
-                        className="hover:bg-gray-50"
-                      >
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {idx + 1}
-                        </td>
-
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {payment?.user?.name}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {payment?.user?.role}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {payment?.user?.email}
-                        </td>
-
-                        <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">
-                          {payment.utrNumber}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">
-                          {payment.type}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {new Date(payment.createdAt).toLocaleString()}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {payment?.paymentMethod}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          ₹{payment.amount}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex gap-2">
-                            {payment.type === "Wallet" &&
-                            payment.proof?.length > 0
-                              ? payment.proof.map((imgUrl, idx) => (
-                                  <div
-                                    key={idx}
-                                    className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
-                                    title="View Image"
-                                    onClick={() =>
-                                      window.open(imgUrl, "_blank")
-                                    }
-                                  >
-                                    <img
-                                      src={imgUrl}
-                                      alt={`payment-proof-${idx}`}
-                                      className="w-full h-full object-cover"
-                                    />
-                                    <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
-                                      <Image className="w-4 h-4" />
-                                    </div>
-                                  </div>
-                                ))
-                              : payment.screenshot && (
-                                  <div
-                                    className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
-                                    title="View Image"
-                                    onClick={() =>
-                                      window.open(payment.screenshot, "_blank")
-                                    }
-                                  >
-                                    <img
-                                      src={payment.screenshot}
-                                      alt="payment-proof"
-                                      className="w-full h-full object-cover"
-                                    />
-                                    <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
-                                      <Image className="w-4 h-4" />
-                                    </div>
-                                  </div>
-                                )}
-                          </div>
-                        </td>
-
-                        <td className="px-6 py-4 whitespace-nowrap text-center space-x-2">
-                          <button
-                            onClick={() =>
-                              payment.type === "Wallet"
-                                ? approveWalletPayment(
-                                    payment._id,
-                                    payment.utrNumber,
-                                    payment.paymentMethod
-                                  )
-                                : approvePayment(payment._id)
-                            }
-                            className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-green-600 text-white hover:bg-green-700 transition"
-                            title="Approve Payment"
-                          >
-                            <CheckCircle className="w-4 h-4" />
-                            Approve
-                          </button>
-                          <button
-                            onClick={() =>
-                              payment.type === "Wallet"
-                                ? cancelWalletPayment(
-                                    payment._id,
-                                    "Payment Rejected BY Admin"
-                                  )
-                                : cancelPayment(payment._id, "Payment Rejected")
-                            }
-                            className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-red-600 text-white hover:bg-red-700 transition"
-                            title="Cancel Payment"
-                          >
-                            <XCircle className="w-4 h-4" />
-                            Cancel
-                          </button>
-                        </td>
-                      </motion.tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {/* Approved payments section */}
-            {/* <section className="mt-16">
-  <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-    <CheckCircle className="w-6 h-6 text-green-600" />
-    Approved Payments
-  </h2>
-  {payments.filter(p => p.status === "approved").length === 0 ? (
-    
-    <p className="text-gray-500 bg-white rounded-xl p-4 shadow border border-gray-200">
-      No approved payments yet.
-    </p>
-  ) : (
-    <div className="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
-     
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purpose</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">UTR Number</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reviewed At</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Screenshot</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-100">
-          {payments
-            .filter(p => p.status === "approved")
-            .map((payment, idx) => (
-              <motion.tr
-                key={payment._id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05 }}
-                className="hover:bg-gray-50"
-              >
-                <td className="px-6 py-4 whitespace-nowrap">{idx + 1}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{payment.user?.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{payment.user?.role}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{payment.user?.email}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{payment.purpose}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{payment?.paymentMethod}</td>
-                <td className="px-6 py-4 whitespace-nowrap font-mono">₹{payment.amount}</td>
-                <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">{payment.utrNumber}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {new Date(payment.createdAt).toLocaleString()}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {payment.reviewedAt ? new Date(payment.reviewedAt).toLocaleString() : "-"}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {payment.screenshot ? (
-                    <div
-                      className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
-                      title="View Screenshot"
-                      onClick={() => window.open(payment.screenshot, "_blank")}
-                    >
-                      <img
-                        src={payment.screenshot}
-                        alt="payment-proof"
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
-                        <Image className="w-4 h-4" />
-                      </div>
-                    </div>
-                  ) : (
-                    "-"
-                  )}
-                </td>
-              </motion.tr>
-            ))}
-        </tbody>
-      </table>
-    </div>
-  )}
-</section> */}
-
-            {/* Canceled payments section */}
-            <section className="mt-16">
-              <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <FileText className="w-6 h-6 text-gray-600" />
-                Canceled Payments
-              </h2>
-              {canceledPayments.length === 0 ? (
-                <p className="text-gray-500 bg-white rounded-xl p-4 shadow border border-gray-200">
-                  No canceled payments.
-                </p>
-              ) : (
-                <div className="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          No
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Name
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Role
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Email
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Purpose
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Transaction Ref
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date & Time
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Payment Method
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Payment Proof
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {canceledPayments.map((payment, idx) => (
-                        <motion.tr
-                          key={payment._id}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: idx * 0.05 }}
-                          className="hover:bg-gray-50"
-                        >
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {idx + 1}
-                          </td>
-
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {payment.user?.name}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {payment.user?.role}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {payment.user?.email}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {payment?.type}
-                          </td>
-
-                          <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">
-                            {payment.utrNumber}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {new Date(payment.updatedAt).toLocaleString()}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {payment?.paymentMethod}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex gap-2">
-                              {/* {payment.images?.map((imgUrl, i) => (
-                                <div
-                                  key={i}
-                                  className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
-                                  title="View Image"
-                                  onClick={() => window.open(imgUrl, '_blank')}
-                                >
-                                  <img
-                                    src={imgUrl}
-                                    alt={`payment-proof-${i}`}
-                                    className="w-full h-full object-cover"
-                                  />
-                                  <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
-                                    <Image className="w-4 h-4" />
-                                  </div>
-                                </div>
-                              ))} */}
-
-                              {
-                                <div
-                                  key={payment._id}
-                                  className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
-                                  title="View Image"
-                                  onClick={() =>
-                                    window.open(payment.screenshot, "_blank")
-                                  }
-                                >
-                                  <img
-                                    src={payment.screenshot}
-                                    alt={`payment-proof`}
-                                    className="w-full h-full object-cover"
-                                  />
-                                  <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
-                                    <Image className="w-4 h-4" />
-                                  </div>
-                                </div>
-                              }
-                            </div>
-                          </td>
-                        </motion.tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </section>
-          </>
+        {activeTab === "users" && (
+          <UsersOverview
+            users={users}
+            stats={stats}
+            usersLoading={usersLoading}
+          />
+        )}
+        {activeTab === "payments" && (
+          <PaymentApproval
+            payments={payments}
+            pendingPayments={pendingPayments}
+            canceledPayments={canceledPayments}
+            paymentsLoading={paymentsLoading}
+            approvePayment={approvePayment}
+            cancelPayment={cancelPayment}
+            approveWalletPayment={approveWalletPayment}
+            cancelWalletPayment={cancelWalletPayment}
+          />
+        )}
+        {activeTab === "ads" && (
+          <AdsApproval
+          //  ads={ads} adsLoading={adsLoading}
+          />
+        )}
+        {activeTab === "properties" && (
+          <PropertyApproval
+          // properties={properties} propertiesLoading={propertiesLoading}
+          />
         )}
       </div>
     </div>

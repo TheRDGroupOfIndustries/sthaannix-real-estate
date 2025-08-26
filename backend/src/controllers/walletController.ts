@@ -136,7 +136,7 @@ export const reviewTopUpRequest = async (req: Request, res: Response) => {
 
     const { id } = req.params;
     const { action, reason, utrNumber, paymentMethod } = req.body as {
-      action: "approve" | "reject";
+      action: "approved" | "rejected";
       reason?: string;
       utrNumber?: string;
       paymentMethod?: "upi" | "account" | "whatsapp";
@@ -168,11 +168,11 @@ export const reviewTopUpRequest = async (req: Request, res: Response) => {
       topUp.paymentMethod = paymentMethod; // ✅ now safe
     }
 
-    if (action === "approve") {
+    if (action === "approved") {
       topUp.status = "approved";
       user.walletBalance += topUp.amount;
       await user.save({ session });
-    } else if (action === "reject") {
+    } else if (action === "rejected") {
       topUp.status = "rejected";
       topUp.reason = reason;
     }

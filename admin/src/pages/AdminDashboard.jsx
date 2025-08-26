@@ -21,15 +21,17 @@ const AdminDashboard = () => {
   const [paymentsLoading, setPaymentsLoading] = useState(true);
   const [stats, setStats] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [statsLoading, setStatsLoading] = useState(true);
 
   // Ads state
   const [ads, setAds] = useState([]);
   const [adsLoading, setAdsLoading] = useState(true);
 
   // Properties state
-  const [properties, setProperties] = useState([]);
-  const [propertiesLoading, setPropertiesLoading] = useState(true);
-
+  const [propertyLoading, setPropertyLoading] = useState(false);
+  const [loadingId, setLoadingId] = useState(null);
+  const [pendingProperties, setPendingProperties] = useState([]);
+  const [rejectedProperties, setRejectedProperties] = useState([]);
   // Fetch all users and their data
   const fetchUsersData = async () => {
     try {
@@ -52,7 +54,7 @@ const AdminDashboard = () => {
   };
   const fetchAdminStats = async () => {
     try {
-      setUsersLoading(true);
+      setStatsLoading(true);
       const response = await adminAPI.getStats();
       // console.log("fetchAdminStats",response.data);
 
@@ -65,7 +67,7 @@ const AdminDashboard = () => {
       console.error("Error fetching admin data:", error);
       toast.error("Error loading data");
     } finally {
-      setUsersLoading(false);
+      setStatsLoading(false);
     }
   };
 
@@ -78,8 +80,7 @@ const AdminDashboard = () => {
       console.log("loadPayments:", response.data.data);
 
       if (response.status === 200) {
-        // Always ensure it's an array
-        setPayments(response.data.data || []);
+        setPayments(response.data.data ?? []);
       } else {
         toast.error(response.data.message || "Failed to load data");
       }
@@ -91,41 +92,111 @@ const AdminDashboard = () => {
     }
   };
 
-
   // Load ads (implement your adminAPI.getAdsData())
   const loadAds = async () => {
     try {
       setAdsLoading(true);
-      const response = await adminAPI.getAdsData();
+      const response = await adminAPI.getAllAdRequests();
+      //   console.log("loadAds: ", response.data);
+
       if (response.status === 200) {
-        setAds(response.data.data || []);
+        setAds(response.data.campaigns || []);
       } else {
         toast.error(response.data.message || "Failed to load ads");
       }
-    } catch {
+    } catch (error) {
+      console.error("Error loading ads:", error);
       toast.error("Error loading ads");
     } finally {
       setAdsLoading(false);
     }
   };
 
-  // Load properties (implement your adminAPI.getPropertiesData())
-  const loadProperties = async () => {
+  // Approve ad campaign
+  const approveAd = async (id) => {
     try {
-      setPropertiesLoading(true);
-      const response = await adminAPI.getPropertiesData();
-      if (response.status === 200) {
-        setProperties(response.data.data || []);
+      const res = await adminAPI.updateAdStatus(id, "approved");
+      if (res.status === 200) {
+        toast.success("Ad approved");
+        await loadAds();
       } else {
-        toast.error(response.data.message || "Failed to load properties");
+        toast.error("Failed to approve ad");
       }
-    } catch {
-      toast.error("Error loading properties");
-    } finally {
-      setPropertiesLoading(false);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Error approving ad");
     }
   };
 
+  // Reject ad campaign
+  const rejectAd = async (id) => {
+    try {
+      const res = await adminAPI.updateAdStatus(id, "rejected");
+      if (res.status === 200) {
+        toast.success("Ad rejected");
+        await loadAds();
+      } else {
+        toast.error("Failed to reject ad");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Error rejecting ad");
+    }
+  };
+
+  // Load properties (implement your adminAPI.getPropertiesData())
+  const loadProperties = async () => {
+    setPropertyLoading(true);
+    try {
+      const [pendingRes, rejectedRes] = await Promise.all([
+        adminAPI.getProperties("pending"),
+        adminAPI.getProperties("rejected"),
+      ]);
+      console.log("rejectedRes: ", rejectedRes);
+
+      if (pendingRes.status === 200) {
+        setPendingProperties(pendingRes.data);
+      } else {
+        toast.error("Failed to fetch pending properties");
+      }
+      if (rejectedRes.status === 200) {
+        setRejectedProperties(rejectedRes.data);
+      } else {
+        toast.error("Failed to fetch rejected properties");
+      }
+    } catch (error) {
+      console.error("Error fetching properties:", error);
+      toast.error("Error fetching properties");
+    } finally {
+      setPropertyLoading(false);
+    }
+  };
+
+  const handleStatusChange = async (id, status) => {
+    setLoadingId(id);
+    try {
+      if (status === "approved") {
+        await adminAPI.approveProperty(id);
+        toast.success("Property approved");
+      } else if (status === "rejected") {
+        const reason =
+          prompt("Enter reason for rejection") || "No reason provided";
+        if (reason === null) {
+          setLoadingId(null);
+          return;
+        }
+
+        const res = await adminAPI.rejectProperty(id, reason);
+        console.log("rejectProperty: ", res);
+
+        toast.success("Property rejected");
+      }
+      await loadProperties();
+    } catch (error) {
+      console.error("Status change error:", error);
+      toast.error("Failed to update property status");
+    } finally {
+      setLoadingId(null);
+    }
+  };
 
   useEffect(() => {
     if (activeTab === "users") {
@@ -134,9 +205,9 @@ const AdminDashboard = () => {
     } else if (activeTab === "payments") {
       loadPayments();
     } else if (activeTab === "ads") {
-      // loadAds();
+      loadAds();
     } else if (activeTab === "properties") {
-      // loadProperties();
+      loadProperties();
     }
   }, [activeTab]);
 
@@ -148,9 +219,9 @@ const AdminDashboard = () => {
     } else if (activeTab === "payments") {
       await loadPayments();
     } else if (activeTab === "ads") {
-      // await loadAds();
+      await loadAds();
     } else if (activeTab === "properties") {
-      // await loadProperties();
+      await loadProperties();
     }
     setTimeout(() => {
       setRefreshing(false);
@@ -166,7 +237,7 @@ const AdminDashboard = () => {
       if (res.status === 200) {
         const updatedRes = await paymentsAPI.getAll();
 
-        setPayments(updatedRes.data.data || []); // ✅ fixed
+        setPayments(updatedRes.data?.data ?? []);
 
         toast.success("Payment approved successfully");
       } else {
@@ -185,7 +256,7 @@ const AdminDashboard = () => {
       if (res.status === 200) {
         const updatedRes = await paymentsAPI.getAll();
 
-        setPayments(updatedRes.data.data || []); // ✅ fixed
+        setPayments(updatedRes.data.data ?? []); // ✅ fixed
 
         toast.success("Payment rejected");
       } else {
@@ -200,12 +271,12 @@ const AdminDashboard = () => {
   const approveWalletPayment = async (id, utrNumber, paymentMethod) => {
     try {
       const res = await paymentsAPI.walletApprove(id, utrNumber, paymentMethod);
-      console.log("rapprove: ",res);
-      
+      console.log("rapprove: ", res);
+
       if (res.status === 200) {
         const updatedRes = await paymentsAPI.getAll();
-        
-        setPayments(updatedRes.data.data);
+
+        setPayments(updatedRes.data.data ?? []);
         toast.success("Wallet Payment approved");
       } else {
         toast.error("Failed to approve payment");
@@ -220,11 +291,11 @@ const AdminDashboard = () => {
     try {
       // Call backend reject API with reason
       const res = await paymentsAPI.walletReject(id, reason);
-      console.log("cancelWalletPayment: ",res);
-      
+      console.log("cancelWalletPayment: ", res);
+
       if (res.status === 200) {
         const updatedRes = await paymentsAPI.getAll();
-        setPayments(updatedRes.data.data);
+        setPayments(updatedRes.data.data ?? []);
         toast.success("Wallet Payment rejected");
       } else {
         toast.error("Failed to reject payment");
@@ -238,7 +309,11 @@ const AdminDashboard = () => {
   const pendingPayments = payments.filter((p) => p.status === "pending");
   const canceledPayments = payments.filter((p) => p.status === "rejected");
 
-  const loading = activeTab === "users" ? usersLoading : paymentsLoading;
+  const loading =
+    (activeTab === "users" && usersLoading) ||
+    (activeTab === "payments" && paymentsLoading) ||
+    (activeTab === "ads" && adsLoading) ||
+    (activeTab === "properties" && propertyLoading);
 
   if (loading) {
     return (
@@ -363,6 +438,7 @@ const AdminDashboard = () => {
             users={users}
             stats={stats}
             usersLoading={usersLoading}
+            statsLoading={statsLoading}
           />
         )}
         {activeTab === "payments" && (
@@ -379,12 +455,19 @@ const AdminDashboard = () => {
         )}
         {activeTab === "ads" && (
           <AdsApproval
-          //  ads={ads} adsLoading={adsLoading}
+            ads={ads}
+            adsLoading={adsLoading}
+            approveAd={approveAd}
+            rejectAd={rejectAd}
           />
         )}
         {activeTab === "properties" && (
           <PropertyApproval
-          // properties={properties} propertiesLoading={propertiesLoading}
+            propertyLoading={propertyLoading}
+            loadingId={loadingId}
+            pendingProperties={pendingProperties}
+            rejectedProperties={rejectedProperties}
+            handleStatusChange={handleStatusChange}
           />
         )}
       </div>

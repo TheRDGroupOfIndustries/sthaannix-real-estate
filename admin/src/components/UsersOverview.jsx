@@ -1,8 +1,16 @@
 import { motion } from "framer-motion";
-import { Users, Home, Mail, Phone, User, ClipboardList, CreditCard } from "lucide-react";
+import {
+  Users,
+  Home,
+  Mail,
+  Phone,
+  User,
+  ClipboardList,
+  CreditCard,
+} from "lucide-react";
 
-const UsersOverview = ({users,stats,usersLoading}) => {
-  if (usersLoading) {
+const UsersOverview = ({ users, stats, usersLoading, statsLoading }) => {
+  if (usersLoading || statsLoading) {
     return (
       <motion.div
         initial={{ opacity: 0 }}
@@ -21,7 +29,7 @@ const UsersOverview = ({users,stats,usersLoading}) => {
             transition={{ delay: 0.2 }}
             className="text-xl font-semibold text-gray-700 mb-2"
           >
-            Loading Users Data...
+            Loading Users & Stats...
           </motion.h3>
         </div>
       </motion.div>
@@ -39,9 +47,13 @@ const UsersOverview = ({users,stats,usersLoading}) => {
           </div>
           <div>
             <p className="text-sm font-medium text-gray-600">Total Users</p>
-            <p className="text-2xl font-bold text-gray-900">{stats?.users?.total ?? 0}</p>
+            <p className="text-2xl font-bold text-gray-900">
+              {stats?.users?.total ?? 0}
+            </p>
             <p className="text-xs text-gray-500">
-              Broker: {stats?.users?.byRole?.broker ?? 0} | Owner: {stats?.users?.byRole?.owner ?? 0} | Builder: {stats?.users?.byRole?.builder ?? 0}
+              Broker: {stats?.users?.byRole?.broker ?? 0} | Owner:{" "}
+              {stats?.users?.byRole?.owner ?? 0} | Builder:{" "}
+              {stats?.users?.byRole?.builder ?? 0}
             </p>
           </div>
         </motion.div>
@@ -51,10 +63,15 @@ const UsersOverview = ({users,stats,usersLoading}) => {
             <Home className="w-8 h-8 text-green-600" />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-600">Total Properties</p>
-            <p className="text-2xl font-bold text-gray-900">{stats?.properties?.total ?? 0}</p>
+            <p className="text-sm font-medium text-gray-600">
+              Total Properties
+            </p>
+            <p className="text-2xl font-bold text-gray-900">
+              {stats?.properties?.total ?? 0}
+            </p>
             <p className="text-xs text-gray-500">
-              Pending: {stats?.properties?.byStatus?.pending ?? 0} | Approved: {stats?.properties?.byStatus?.approved ?? 0}
+              Pending: {stats?.properties?.byStatus?.pending ?? 0} | Approved:{" "}
+              {stats?.properties?.byStatus?.approved ?? 0}
             </p>
           </div>
         </motion.div>
@@ -65,9 +82,12 @@ const UsersOverview = ({users,stats,usersLoading}) => {
           </div>
           <div>
             <p className="text-sm font-medium text-gray-600">Total Leads</p>
-            <p className="text-2xl font-bold text-gray-900">{stats?.leads?.total ?? 0}</p>
+            <p className="text-2xl font-bold text-gray-900">
+              {stats?.leads?.total ?? 0}
+            </p>
             <p className="text-xs text-gray-500">
-              Open: {stats?.leads?.open ?? 0} | Closed: {stats?.leads?.closed ?? 0}
+              Open: {stats?.leads?.open ?? 0} | Closed:{" "}
+              {stats?.leads?.closed ?? 0}
             </p>
           </div>
         </motion.div>
@@ -78,7 +98,9 @@ const UsersOverview = ({users,stats,usersLoading}) => {
           </div>
           <div>
             <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-            <p className="text-2xl font-bold text-gray-900">₹{stats?.adminRevenue?.finalRevenue ?? 0}</p>
+            <p className="text-2xl font-bold text-gray-900">
+              ₹{stats?.adminRevenue?.finalRevenue ?? 0}
+            </p>
           </div>
         </motion.div>
       </div>
@@ -88,13 +110,27 @@ const UsersOverview = ({users,stats,usersLoading}) => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Properties</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Leads</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                No
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                User Name
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Role
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Email
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Phone
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Properties
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Leads
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -106,7 +142,12 @@ const UsersOverview = ({users,stats,usersLoading}) => {
               </tr>
             ) : (
               users.map((user, idx) => (
-                <motion.tr key={user._id || idx} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }}>
+                <motion.tr
+                  key={user._id || idx}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.05 }}
+                >
                   <td className="px-6 py-4">{idx + 1}</td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">

@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
   BedDouble,
   Bath,
@@ -233,7 +235,12 @@ const PropertyDetails = () => {
     e.preventDefault();
 
     if (!inquiryData.name || !inquiryData.email || !inquiryData.phone) {
-      alert("Please fill in all required fields.");
+      toast.error("Please fill in all required fields.");
+      return;
+    }
+
+    if (!property?._id) {
+      toast.error("Property not loaded yet.");
       return;
     }
 
@@ -241,16 +248,16 @@ const PropertyDetails = () => {
 
     try {
       const payload = {
-        propertyId: property._id, // Must include this
-        ownerId: property.owner, // This is likely also required
+        propertyId: property._id,
         name: inquiryData.name,
         email: inquiryData.email,
         phone: inquiryData.phone,
         message: inquiryData.message,
       };
 
-      // Call the service function with the complete payload
       await submitInquiry(payload);
+
+      toast.success("Inquiry submitted successfully!");
 
       setInquirySuccess(true);
       setTimeout(() => {
@@ -264,7 +271,15 @@ const PropertyDetails = () => {
       }, 3000);
     } catch (err) {
       console.error("Inquiry submission error:", err);
-      alert("Failed to submit inquiry. Please try again.");
+
+      // handle backend error messages
+      if (err.response?.status === 400) {
+        toast.error(err.response.data.message || "Bad request");
+      } else if (err.response?.status === 401) {
+        toast.error("Unauthorized. Please log in.");
+      } else {
+        toast.error("Failed to submit inquiry. Please try again.");
+      }
     } finally {
       setInquirySubmitting(false);
     }

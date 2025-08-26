@@ -97,17 +97,19 @@ export const adminAPI = {
   getPendingUsers: () => api.get("/admin/pending-users"),
   approveUser: (id) => api.patch(`/admin/approve-user/${id}`),
   rejectUser: (id) => api.patch(`/admin/reject-user/${id}`),
-  approveProperty: (id) => api.patch(`/admin/approve-property/${id}`),
-  // rejectProperty: (id) => api.patch(`/admin/reject-property/${id}`),
   deleteProperty: (id) => api.delete(`/admin/property/${id}`),
+  getProperties: (status) =>
+    api.get("/admin/properties", { params: { status } }),
+  approveProperty: (id) => api.patch(`/admin/approve-property/${id}`),
+  rejectProperty: (id, reason) =>
+    api.patch(`/admin/reject-property/${id}`, { reason }),
   getUsersData:()=>api.get("/admin"),
   getStats: () => api.get("/admin/stats"),
   getTopups: () => api.get("/admin/topups"),
   reviewTopup: (id, action) => api.patch(`/admin/topups/${id}`, { action }),
-  getProperties: (status) =>
-    api.get("/admin/properties", { params: { status } }),
-  rejectProperty: (id, reason) =>
-    api.patch(`/admin/reject-property/${id}`, { reason }),
+  getAllAdRequests: () => api.get("/ad/get"),
+  updateAdStatus:(id,status)=>api.put(`/ad/${id}/status`,{status})
+
 };
 
 
@@ -125,9 +127,9 @@ export const paymentsAPI = {
   getAll: () => api.get('/payment/admin/all'),
   approve: (id) => api.patch(`/payment/admin/approve/${id}`),
   reject: (id, reason) => api.patch(`/payment/admin/reject/${id}`, { reason }),
-  walletReject:(id,reason)=>api.patch(`/wallet/topups/${id}`,{action:'reject',reason}),
+  walletReject:(id,reason)=>api.patch(`/wallet/topups/${id}`,{status:'rejected',reason}),
   walletApprove: (id, utrNumber, paymentMethod) => api.patch(`/wallet/topups/${id}`, {
-    action: "approve",
+    status: "approved",
     utrNumber,
     paymentMethod,
   }),

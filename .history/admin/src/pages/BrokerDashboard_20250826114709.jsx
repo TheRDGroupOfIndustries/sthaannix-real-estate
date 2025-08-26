@@ -6,26 +6,25 @@ import axios from "axios";
 import api from "../api/api";
 import { paymentsAPI } from '../api/api';
 
-
-const PropertyOwnerDashboard = () => {
-   const navigate = useNavigate();
+const BrokerDashboard = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("properties");
   const [properties, setProperties] = useState([]);
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [ads, setAds] = useState([]);
 
-useEffect(() => {
+  useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    console.log("PropertyOwnerDashboard: ",user);
+    console.log("BrokerDashboard: ",user);
     
-    if (!user || user.role !== "owner") {
-      toast.error("Unauthorized. Please login as Owner.");
+    if (!user || user.role !== "broker") {
+      toast.error("Unauthorized. Please login as Broker.");
       navigate("/login");
       return;
     }
 
-     if (activeTab === "properties") fetchProperties();
+   if (activeTab === "properties") fetchProperties();
     else if (activeTab === "payments") loadPayments(user.email);
     else if (activeTab === "ads") loadAds(user.id);
 
@@ -354,6 +353,7 @@ const handleDeletePayment = async (id, type) => {
             No Image
           </div>
         )}
+
       </td>
 
               <td className="px-6 py-4">{ad.property?.title || "-"}</td>
@@ -380,4 +380,4 @@ const handleDeletePayment = async (id, type) => {
   );
 };
 
-export default PropertyOwnerDashboard;
+export default BrokerDashboard;

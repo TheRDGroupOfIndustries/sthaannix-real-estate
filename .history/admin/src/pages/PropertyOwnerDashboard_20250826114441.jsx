@@ -354,6 +354,7 @@ const handleDeletePayment = async (id, type) => {
             No Image
           </div>
         )}
+        <span className="font-medium">{ad.property?.title || "-"}</span>
       </td>
 
               <td className="px-6 py-4">{ad.property?.title || "-"}</td>

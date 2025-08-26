@@ -130,7 +130,6 @@ const handleDeletePayment = async (id, type) => {
   }
 };
 
-
     //  Handle delete ad
   const handleDeleteAds = async (id) => {
     if (!window.confirm("Are you sure you want to delete this ad?")) return;
@@ -328,6 +327,7 @@ const handleDeletePayment = async (id, type) => {
         <thead className="bg-gray-50">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Property</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Budget</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Platform</th>
@@ -340,6 +340,22 @@ const handleDeletePayment = async (id, type) => {
           {ads.map((ad, idx) => (
             <tr key={ad._id} className="hover:bg-gray-50">
               <td className="px-6 py-4">{idx + 1}</td>
+
+         <td className="px-6 py-4 flex items-center gap-3">
+        {ad.property?.images?.length > 0 ? (
+          <img
+            src={ad.property.images[0]}
+            alt={ad.property.title}
+            className="w-16 h-12 object-cover rounded"
+          />
+        ) : (
+          <div className="w-16 h-12 bg-gray-200 rounded flex items-center justify-center text-gray-400 text-xs">
+            No Image
+          </div>
+        )}
+        <span className="font-medium">{ad.property?.title || "-"}</span>
+      </td>
+
               <td className="px-6 py-4">{ad.property?.title || "-"}</td>
               <td className="px-6 py-4">₹{ad.budget.toLocaleString()}</td>
               <td className="px-6 py-4">{ad.platform.join(", ")}</td>

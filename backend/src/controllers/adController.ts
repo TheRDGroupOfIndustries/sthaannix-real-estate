@@ -93,8 +93,8 @@ export const submitAdRequest = async (req: Request, res: Response) => {
 export const getAllAdRequests = async (req: Request, res: Response) => {
   try {
     const campaigns = await AdCampaign.find()
-      .populate("user", "name email") // fetch user details
-      .populate("property", "title price") // fetch property details
+      .populate("property") // get full property details
+      .populate("user", "name email phone walletBalance")// fetch property details
       .sort({ createdAt: -1 }); // newest first
 
     return res.status(200).json({
@@ -160,7 +160,8 @@ export const getUserAdRequests = async (req: Request, res: Response) => {
     const userId = (req as any).user.id; // from JWT middleware
 
     const campaigns = await AdCampaign.find({ user: userId })
-      .populate("property", "title price")
+      .populate("property") // get full property details
+      .populate("user", "name email phone walletBalance") // fetch specific user fields
       .sort({ createdAt: -1 });
 
     return res.status(200).json({
@@ -177,7 +178,6 @@ export const getUserAdRequests = async (req: Request, res: Response) => {
     });
   }
 };
-
 
 
 // Delete ad request

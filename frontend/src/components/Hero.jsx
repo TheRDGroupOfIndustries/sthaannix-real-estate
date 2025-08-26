@@ -14,6 +14,12 @@ const quickFilters = [
   { label: "Studios", icon: Home, count: "1.2k+" }
 ];
 
+const transactionTypes = [
+  { label: "Buy", icon: Home, value: "buy" },
+  { label: "Rent", icon: Home, value: "rent" },
+  { label: "Lease", icon: Home, value: "lease" }
+];
+
 const stats = [
   { icon: Users, value: "50K+", label: "Happy Customers", color: "from-blue-500 to-cyan-500" },
   { icon: Home, value: "25K+", label: "Properties Listed", color: "from-green-500 to-emerald-500" },
@@ -72,11 +78,17 @@ const Hero = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [propertyType, setPropertyType] = useState("All");
+  const [transactionType, setTransactionType] = useState("All");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const handleSubmit = (location = searchQuery) => {
     if (location.trim()) {
-      navigate(`/properties?location=${encodeURIComponent(location)}&type=${propertyType}`);
+      const queryParams = new URLSearchParams({
+        location: encodeURIComponent(location),
+        type: propertyType,
+        transaction: transactionType
+      });
+      navigate(`/properties?${queryParams.toString()}`);
     }
   };
 
@@ -198,7 +210,6 @@ const Hero = () => {
                   className="text-gray-700 text-xl sm:text-2xl mb-12 max-w-3xl mx-auto leading-relaxed font-medium"
                 >
                   Discover exceptional properties in prime locations with our 
-                  {/* <span className="text-blue-600 font-semibold"> AI-powered search</span> and  */}
                   <span className="text-purple-600 font-semibold"> expert guidance</span>
                 </motion.p>
               </motion.div>
@@ -230,6 +241,26 @@ const Hero = () => {
                     ))}
                   </div>
 
+                  {/* Transaction Type Filters */}
+                  <div className="flex flex-wrap justify-center gap-3 mb-6">
+                    {transactionTypes.map((type) => (
+                      <motion.button
+                        key={type.value}
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => setTransactionType(type.value)}
+                        className={`px-6 py-3 rounded-2xl font-semibold text-sm transition-all duration-300 flex items-center gap-2 ${
+                          transactionType === type.value
+                            ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        <type.icon className="w-4 h-4" />
+                        <span>{type.label}</span>
+                      </motion.button>
+                    ))}
+                  </div>
+
                   {/* Search Input */}
                   <div className="flex flex-col lg:flex-row gap-4">
                     <div className="relative flex-1">
@@ -245,7 +276,7 @@ const Hero = () => {
                           setIsSearchFocused(true);
                         }}
                         onBlur={() => setIsSearchFocused(false)}
-                        placeholder="Enter city, locality, or landmark..."
+                        placeholder="Search by address, city, state, pincode or transaction type..."
                         className="w-full pl-12 pr-6 py-4 rounded-2xl border-2 border-gray-200 bg-white/90 
                           focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 
                           text-lg placeholder-gray-500 font-medium"
@@ -279,7 +310,7 @@ const Hero = () => {
                   </div>
 
                   {/* Enhanced Location Suggestions */}
-                  <AnimatePresence>
+                  {/* <AnimatePresence>
                     {showSuggestions && searchQuery.length === 0 && (
                       <motion.div
                         initial={{ opacity: 0, y: -20, scale: 0.95 }}
@@ -291,39 +322,41 @@ const Hero = () => {
                       >
                         <div className="p-6">
                           <div className="flex items-center justify-between mb-4">
-                            {/* <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                               <TrendingUp className="w-5 h-5 text-orange-500" />
-                              Popular Locations
+                              Popular Search Options
                             </h3>
-                            <span className="text-sm text-gray-500">Choose from trending areas</span> */}
                           </div>
                           
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            {popularLocations.map((location, index) => (
+                            {transactionTypes.map((type, index) => (
                               <motion.button
-                                key={location}
+                                key={type.value}
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: index * 0.1 }}
-                                onClick={() => handleLocationClick(location)}
-                                className="flex items-center justify-between p-4 hover:bg-blue-50 rounded-xl 
+                                onClick={() => {
+                                  setSearchQuery(type.label);
+                                  handleSubmit(type.label);
+                                }}
+                                className="flex items-center justify-between p-4 hover:bg-green-50 rounded-xl 
                                   transition-all duration-300 text-left group border border-transparent 
-                                  hover:border-blue-200 hover:shadow-md"
+                                  hover:border-green-200 hover:shadow-md"
                               >
                                 <div className="flex items-center gap-3">
-                                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 
+                                  <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 
                                     rounded-full flex items-center justify-center">
-                                    <MapPin className="w-5 h-5 text-white" />
+                                    <Home className="w-5 h-5 text-white" />
                                   </div>
                                   <div>
-                                    <span className="font-semibold text-gray-900 group-hover:text-blue-600 
-                                      transition-colors">{location}</span>
+                                    <span className="font-semibold text-gray-900 group-hover:text-green-600 
+                                      transition-colors">{type.label}</span>
                                     <div className="text-xs text-gray-500">
-                                      {Math.floor(Math.random() * 500) + 100}+ properties
+                                      Properties for {type.label.toLowerCase()}
                                     </div>
                                   </div>
                                 </div>
-                                <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 
+                                <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-green-600 
                                   group-hover:translate-x-1 transition-all duration-300" />
                               </motion.button>
                             ))}
@@ -331,7 +364,7 @@ const Hero = () => {
                         </div>
                       </motion.div>
                     )}
-                  </AnimatePresence>
+                  </AnimatePresence> */}
                 </div>
               </motion.div>
 

@@ -99,6 +99,19 @@ const PropertyCard = ({ property }) => {
           alt={property.title}
           className="w-full h-full object-cover"
         />
+
+      {/* Property Tags */}
+        <div className="absolute top-4 left-4 flex flex-col gap-2">
+          <motion.span
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="bg-gradient-to-r from-blue-600 to-blue-500 text-white 
+              px-3 py-1 rounded-full text-sm font-medium shadow-lg text-transform: capitalize"
+          >
+            {property.propertyType}
+          </motion.span>
+        
+        </div>
       </div>
 
       {/* Content */}

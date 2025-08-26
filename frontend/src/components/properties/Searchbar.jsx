@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, X, MapPin } from 'lucide-react';
+import { Search, X, MapPin, Home } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const SearchBar = ({ onSearch, className }) => {
@@ -7,10 +7,12 @@ const SearchBar = ({ onSearch, className }) => {
   const [recentSearches, setRecentSearches] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  // Popular locations suggestion
+  // Popular locations and transaction types suggestions
   const popularLocations = [
-   'Mumbai','Goa','Jaipur','Ahmedabad'
+    // 'Mumbai','Goa','Jaipur','Ahmedabad'
   ];
+  
+  const transactionTypes = ['Buy', 'Rent', 'Lease'];
 
   useEffect(() => {
     // Load recent searches from localStorage
@@ -57,7 +59,7 @@ const SearchBar = ({ onSearch, className }) => {
       <form onSubmit={handleSubmit} className="relative">
         <input
           type="text"
-          placeholder="Search by location, property type..."
+          placeholder="Search by location, address, city, state, pincode or transaction type (buy/rent/lease)..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onFocus={() => setShowSuggestions(true)}
@@ -128,25 +130,49 @@ const SearchBar = ({ onSearch, className }) => {
               </div>
             )}
 
-            <div className="border-t border-gray-100 p-2">
-              <h3 className="text-xs font-medium text-gray-500 px-3 mb-2">
-                Popular Locations
-              </h3>
-              {popularLocations.map((location, index) => (
-                <button
-                  key={`popular-${index}`}
-                  onClick={() => {
-                    setSearchQuery(location);
-                    handleSearch(location);
-                  }}
-                  className="w-full text-left px-3 py-2 hover:bg-gray-50 
-                    rounded-md flex items-center gap-2 text-gray-700"
-                >
-                  <MapPin className="h-4 w-4 text-gray-400" />
-                  {location}
-                </button>
-              ))}
-            </div>
+            {transactionTypes.length > 0 && (
+              <div className="border-t border-gray-100 p-2">
+                <h3 className="text-xs font-medium text-gray-500 px-3 mb-2">
+                  Transaction Types
+                </h3>
+                {transactionTypes.map((type, index) => (
+                  <button
+                    key={`type-${index}`}
+                    onClick={() => {
+                      setSearchQuery(type);
+                      handleSearch(type);
+                    }}
+                    className="w-full text-left px-3 py-2 hover:bg-gray-50 
+                      rounded-md flex items-center gap-2 text-gray-700"
+                  >
+                    <Home className="h-4 w-4 text-gray-400" />
+                    {type}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {popularLocations.length > 0 && (
+              <div className="border-t border-gray-100 p-2">
+                <h3 className="text-xs font-medium text-gray-500 px-3 mb-2">
+                  Popular Locations
+                </h3>
+                {popularLocations.map((location, index) => (
+                  <button
+                    key={`popular-${index}`}
+                    onClick={() => {
+                      setSearchQuery(location);
+                      handleSearch(location);
+                    }}
+                    className="w-full text-left px-3 py-2 hover:bg-gray-50 
+                      rounded-md flex items-center gap-2 text-gray-700"
+                  >
+                    <MapPin className="h-4 w-4 text-gray-400" />
+                    {location}
+                  </button>
+                ))}
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

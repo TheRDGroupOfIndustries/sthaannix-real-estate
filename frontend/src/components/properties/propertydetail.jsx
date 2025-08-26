@@ -19,7 +19,7 @@ import {
   Building,
   MessageCircle,
 } from "lucide-react";
-import ScheduleViewing from "./ScheduleViewing";
+// import ScheduleViewing from "./ScheduleViewing";
 import {
   getLocalStorage,
   setLocalStorage,
@@ -516,7 +516,7 @@ const PropertyDetails = () => {
               </div>
             </div>
 
-            <button
+            {/* <button
               onClick={() => setShowSchedule(true)}
               className="w-full bg-blue-600 text-white py-3 rounded-lg 
                     hover:bg-blue-700 transition-colors flex items-center 
@@ -524,7 +524,7 @@ const PropertyDetails = () => {
             >
               <Calendar className="w-5 h-5" />
               Schedule Viewing
-            </button>
+            </button> */}
 
             {/* Inquiry Form */}
             <div className="bg-white rounded-lg p-6 shadow">
@@ -696,7 +696,7 @@ const PropertyDetails = () => {
         )}
 
         {/* Viewing Modal */}
-        <AnimatePresence>
+        {/* <AnimatePresence>
           {showSchedule && (
             <ScheduleViewing
               propertyId={property._id}
@@ -706,7 +706,7 @@ const PropertyDetails = () => {
               propertyImage={images[0]}
             />
           )}
-        </AnimatePresence>
+        </AnimatePresence> */}
       </div>
     </motion.div>
   );

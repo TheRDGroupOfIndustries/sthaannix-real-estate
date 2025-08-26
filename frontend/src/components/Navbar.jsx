@@ -89,7 +89,6 @@ const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [notifications] = useState(3); // Example notification count
   const dropdownRef = useRef(null);
   const { isLoggedIn, user, logout } = useAuth();
   const location = useLocation();
@@ -143,14 +142,31 @@ const Navbar = () => {
       .join("")
       .toUpperCase();
   };
+  
   // Profile and inquiry Property navigation
   const handleProfileClick = () => {
     setIsDropdownOpen(false);
     navigate("/user-profile");
+    scrollToTop();
   };
 
   const handleInquiryPropertiesClick = () => {
     navigate("/inquiry-properties");
+    scrollToTop();
+  };
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  };
+
+  // Handle navigation with scroll to top
+  const handleNavigation = (path) => {
+    navigate(path);
+    scrollToTop();
   };
 
   return (
@@ -170,7 +186,11 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Enhanced Logo */}
-          <Link to="/" className="flex items-center space-x-3 group">
+          <Link 
+            to="/" 
+            className="flex items-center space-x-3 group"
+            onClick={scrollToTop}
+          >
             <motion.div
               variants={logoVariants}
               whileHover={{
@@ -206,30 +226,15 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <NavLinks currentPath={location.pathname} />
+            <NavLinks 
+              currentPath={location.pathname} 
+              handleNavigation={handleNavigation} 
+            />
 
             {/* Enhanced Auth Section */}
             <div className="flex items-center space-x-4">
               {isLoggedIn ? (
                 <div className="flex items-center space-x-3">
-                  {/* Notification Bell */}
-                  {/* <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                  >
-                    <Bell className="w-5 h-5 text-gray-600" />
-                    {notifications > 0 && (
-                      <motion.span
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium"
-                      >
-                        {notifications}
-                      </motion.span>
-                    )}
-                  </motion.button> */}
-
                   {/* User Profile Dropdown */}
                   <div className="relative" ref={dropdownRef}>
                     <motion.button
@@ -254,7 +259,6 @@ const Navbar = () => {
                         <span className="text-sm font-semibold text-gray-700">
                           {user?.name}
                         </span>
-                        {/* <span className="text-xs text-gray-500">Premium Member</span> */}
                       </div>
                       <motion.div
                         animate={{ rotate: isDropdownOpen ? 180 : 0 }}
@@ -287,10 +291,6 @@ const Navbar = () => {
                                 <p className="text-xs text-gray-600 truncate">
                                   {user?.email}
                                 </p>
-                                <div className="flex items-center gap-1 mt-1">
-                                  {/* <Crown className="w-3 h-3 text-yellow-500" /> */}
-                                  {/* <span className="text-xs text-yellow-600 font-medium">Premium</span> */}
-                                </div>
                               </div>
                             </div>
                           </div>
@@ -319,13 +319,6 @@ const Navbar = () => {
                               <Calendar className="w-4 h-4" />
                               <span> Properties Inquiry</span>
                             </motion.button>
-                            {/* <motion.button
-                                whileHover={{ x: 4, backgroundColor: "rgb(243 244 246)" }}
-                                className="w-full px-6 py-3 text-left text-sm text-gray-700 hover:text-blue-600 flex items-center space-x-3 transition-colors"
-                              >
-                                <Settings className="w-4 h-4" />
-                                <span>Settings</span>
-                              </motion.button> */}
                             <div className="border-t border-gray-100 my-2" />
                             <motion.button
                               whileHover={{
@@ -353,6 +346,7 @@ const Navbar = () => {
                     <Link
                       to="/login"
                       className="text-gray-700 hover:text-blue-600 font-medium transition-colors px-4 py-2 rounded-lg hover:bg-blue-50"
+                      onClick={scrollToTop}
                     >
                       Sign in
                     </Link>
@@ -364,6 +358,7 @@ const Navbar = () => {
                     <Link
                       to="/signup"
                       className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white px-6 py-2.5 rounded-xl hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl shadow-blue-500/30 font-semibold overflow-hidden"
+                      onClick={scrollToTop}
                     >
                       <span className="relative z-10">Sign up</span>
                       <motion.div
@@ -397,15 +392,6 @@ const Navbar = () => {
                 <Menu className="w-6 h-6 text-gray-700" />
               )}
             </motion.div>
-            {isLoggedIn && notifications > 0 && (
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                // className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium"
-              >
-                {/* {notifications} */}
-              </motion.span>
-            )}
           </motion.button>
         </div>
       </div>
@@ -427,7 +413,7 @@ const Navbar = () => {
                 user={user}
                 handleLogout={handleLogout}
                 currentPath={location.pathname}
-                // notifications={notifications}
+                handleNavigation={handleNavigation}
               />
             </div>
           </motion.div>
@@ -437,7 +423,7 @@ const Navbar = () => {
   );
 };
 
-const NavLinks = ({ currentPath }) => {
+const NavLinks = ({ currentPath, handleNavigation }) => {
   // Enhanced NavLinks with modern styling
   const navLinks = [
     {
@@ -482,8 +468,8 @@ const NavLinks = ({ currentPath }) => {
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Link
-              to={path}
+            <button
+              onClick={() => handleNavigation(path)}
               className={`relative group font-medium transition-all duration-300 flex items-center gap-2 px-4 py-2.5 rounded-xl
                 ${
                   isActive
@@ -517,7 +503,7 @@ const NavLinks = ({ currentPath }) => {
                   initial={false}
                 />
               )}
-            </Link>
+            </button>
           </motion.div>
         );
       })}
@@ -531,7 +517,7 @@ const MobileNavLinks = ({
   user,
   handleLogout,
   currentPath,
-  notifications,
+  handleNavigation,
 }) => {
   // Enhanced navigation links with colors and descriptions
   const navLinks = [
@@ -563,8 +549,13 @@ const MobileNavLinks = ({
       color: "from-orange-500 to-red-500",
       description: "Get in touch"
     }
-   
   ];
+
+  // Scroll to top and close menu
+  const handleNavClick = (path) => {
+    handleNavigation(path);
+    setMobileMenuOpen(false);
+  };
 
   return (
     <motion.div
@@ -591,14 +582,13 @@ const MobileNavLinks = ({
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.1 + index * 0.05 }}
           >
-            <Link
-              to={path}
-              className={`flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-300 group ${
+            <button
+              onClick={() => handleNavClick(path)}
+              className={`flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-300 group w-full text-left ${
                 isActive
                   ? `bg-gradient-to-r ${color} text-white shadow-lg`
                   : "text-gray-700 hover:bg-gray-50 active:scale-95"
               }`}
-              onClick={() => setMobileMenuOpen(false)}
             >
               <div
                 className={`p-2 rounded-lg ${
@@ -638,7 +628,7 @@ const MobileNavLinks = ({
                   className="w-2 h-2 bg-white rounded-full"
                 />
               )}
-            </Link>
+            </button>
           </motion.div>
         );
       })}
@@ -659,14 +649,11 @@ const MobileNavLinks = ({
           >
             {/* Enhanced User Profile Card */}
             <div className="relative p-4 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl border border-indigo-100 overflow-hidden">
-              <Link
-                to="/user-profile"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-4 transition-all duration-300" // Increased gap and simplified class
+              <button
+                onClick={() => handleNavClick("/user-profile")}
+                className="flex items-center gap-4 transition-all duration-300 w-full"
               >
                 <div className="flex items-center space-x-4 relative z-10 w-full">
-                  {" "}
-                  {/* Added w-full */}
                   <div className="relative">
                     <motion.div
                       whileHover={{ scale: 1.05 }}
@@ -677,22 +664,9 @@ const MobileNavLinks = ({
                     <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 border-2 border-white rounded-full flex items-center justify-center">
                       <div className="w-2 h-2 bg-green-600 rounded-full" />
                     </div>
-                    {notifications > 0 && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold"
-                      >
-                        {notifications}
-                      </motion.div>
-                    )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    {" "}
-                    {/* Added flex-1 and min-w-0 */}
                     <p className="text-lg font-bold text-gray-900 truncate">
-                      {" "}
-                      {/* Added truncate */}
                       {user?.name}
                     </p>
                     <p className="text-sm text-gray-600 truncate">
@@ -700,27 +674,22 @@ const MobileNavLinks = ({
                     </p>
                   </div>
                 </div>
-              </Link>
+              </button>
               {/* Background decoration */}
               <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full transform translate-x-6 -translate-y-6" />
             </div>
 
             {/* Quick Actions */}
             <div className="">
-              <Link
-                to="/inquiry-properties"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all"
+              <button
+                onClick={() => handleNavClick("/inquiry-properties")}
+                className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all w-full"
               >
-                <motion.button whileTap={{ scale: 0.95 }}>
-                  {" "}
-                  <Calendar className="w-5 h-5 text-gray-600" />
-                  <span className="text-sm font-medium text-gray-700">
-                    Inquiry
-                  </span>
-                </motion.button>{" "}
-              </Link>
-
+                <Calendar className="w-5 h-5 text-gray-600" />
+                <span className="text-sm font-medium text-gray-700">
+                  Inquiry
+                </span>
+              </button>
             </div>
 
             {/* Logout Button */}
@@ -745,7 +714,10 @@ const MobileNavLinks = ({
             <motion.div whileTap={{ scale: 0.97 }}>
               <Link
                 to="/login"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
                 className="w-full flex items-center justify-center px-6 py-4 border-2 border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all font-semibold"
               >
                 Sign in
@@ -754,7 +726,10 @@ const MobileNavLinks = ({
             <motion.div whileTap={{ scale: 0.97 }}>
               <Link
                 to="/signup"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
                 className="relative w-full flex items-center justify-center px-6 py-4 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 transition-all font-semibold shadow-lg shadow-blue-500/30 overflow-hidden"
               >
                 <span className="relative z-10">Create account</span>
@@ -775,6 +750,7 @@ const MobileNavLinks = ({
 
 NavLinks.propTypes = {
   currentPath: PropTypes.string.isRequired,
+  handleNavigation: PropTypes.func.isRequired,
 };
 
 MobileNavLinks.propTypes = {
@@ -783,7 +759,7 @@ MobileNavLinks.propTypes = {
   user: PropTypes.object,
   handleLogout: PropTypes.func.isRequired,
   currentPath: PropTypes.string.isRequired,
-  notifications: PropTypes.number,
+  handleNavigation: PropTypes.func.isRequired,
 };
 
 export default Navbar;

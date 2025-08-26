@@ -93,8 +93,8 @@ export const submitAdRequest = async (req: Request, res: Response) => {
 export const getAllAdRequests = async (req: Request, res: Response) => {
   try {
     const campaigns = await AdCampaign.find()
-      .populate("user", "name email") // fetch user details
-      .populate("property", "title price") // fetch property details
+      .populate("property") // get full property details
+      .populate("user", "name email phone walletBalance")// fetch property details
       .sort({ createdAt: -1 }); // newest first
 
     return res.status(200).json({
@@ -146,6 +146,87 @@ export const updateAdStatus = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.error("Error updating ad status:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+// Get ads of logged-in user
+export const getUserAdRequests = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id; // from JWT middleware
+
+    const campaigns = await AdCampaign.find({ user: userId })
+      .populate("property") // get full property details
+      .populate("user", "name email phone walletBalance") // fetch specific user fields
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      message: "User's ad requests fetched successfully",
+      campaigns,
+    });
+  } catch (error: any) {
+    console.error("Error fetching user ad requests:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+
+// Delete ad request
+export const deleteAdRequest = async (req: Request, res: Response) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const { id } = req.params; // campaign id
+    const userId = (req as any).user.id; // from JWT middleware
+
+    // Find campaign
+    const campaign = await AdCampaign.findById(id).session(session);
+    if (!campaign) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({ success: false, message: "Ad campaign not found" });
+    }
+
+    // Ensure the logged-in user is the owner (or admin can bypass this)
+    if (campaign.user.toString() !== userId) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(403).json({ success: false, message: "Not authorized to delete this ad" });
+    }
+
+    // Refund wallet if ad is still pending (not yet consumed budget)
+    if (campaign.status === "pending") {
+      const user = await User.findById(userId).session(session);
+      if (user) {
+        user.walletBalance += campaign.budget;
+        await user.save({ session });
+      }
+    }
+
+    await campaign.deleteOne({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return res.status(200).json({
+      success: true,
+      message: "Ad campaign deleted successfully",
+      refunded: campaign.status === "pending" ? campaign.budget : 0,
+    });
+  } catch (error: any) {
+    await session.abortTransaction();
+    session.endSession();
+    console.error("Error deleting ad request:", error);
     return res.status(500).json({
       success: false,
       message: "Server error",

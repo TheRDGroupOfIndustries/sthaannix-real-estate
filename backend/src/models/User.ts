@@ -5,8 +5,7 @@ export type UserRole =
   | "broker"
   | "builder"
   | "owner"
-  | "admin"
-  | "user";
+  | "admin";
 
 export type UserStatus = "pending" | "approved" | "rejected";
 
@@ -29,8 +28,8 @@ const UserSchema = new Schema<IUser>(
     phone: { type: String, required: false },
     role: {
       type: String,
-      enum: ["buyer", "broker", "builder", "owner", "admin", "user"],
-      default: "user", // instead of required: true
+      enum: ["buyer", "broker", "builder", "owner", "admin"],
+      default: "buyer", // instead of required: true
     },
     password: { type: String, required: true },
     isVerified: { type: Boolean, default: false },

@@ -224,7 +224,7 @@ export const requestRoleUpgrade = async (req: Request, res: Response) => {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    if (user.role !== "user") {
+    if (user.role !== "buyer") {
       return res
         .status(400)
         .json({ message: "Only normal users can request upgrade" });
@@ -417,12 +417,10 @@ export const resetPassword = async (req: Request, res: Response) => {
     }
 
     if (newPassword.length < 8) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Password must be at least 8 characters long",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 8 characters long",
+      });
     }
 
     user.password = await bcrypt.hash(newPassword, 10);

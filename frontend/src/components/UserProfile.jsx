@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { User, Camera } from "lucide-react";
 import { fetchUserProfile, updateUserProfile } from "../services/userService";
 import toast from "react-hot-toast";
+import UpgradeRole from "./UpgradeRole";
 
 const UserProfile = () => {
   const [formData, setFormData] = useState({
@@ -188,6 +189,10 @@ const UserProfile = () => {
           )}
         </div>
       </motion.form>
+      <hr className="m-3"/>
+      <div className="card p-2 shadow-md">
+          <UpgradeRole />
+      </div>
     </div>
   );
 };

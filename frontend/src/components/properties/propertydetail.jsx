@@ -17,7 +17,6 @@ import {
   Building,
   MessageCircle,
 } from "lucide-react";
-// import { Backendurl } from "../../App.jsx";
 import ScheduleViewing from "./ScheduleViewing";
 import {
   getLocalStorage,
@@ -168,7 +167,6 @@ const PropertyDetails = () => {
         return Array.isArray(parsed) ? parsed : [parsed];
       } catch (error) {
         console.error("Error parsing amenities:", error);
-        // If parsing fails, split by comma or return as single item array
         return amenities
           .split(",")
           .map((item) => item.trim())
@@ -241,8 +239,8 @@ const PropertyDetails = () => {
 
     try {
       const payload = {
-        propertyId: property._id, // Must include this
-        ownerId: property.owner, // This is likely also required
+        propertyId: property._id, 
+        ownerId: property.owner, 
         name: inquiryData.name,
         email: inquiryData.email,
         phone: inquiryData.phone,
@@ -432,6 +430,19 @@ const PropertyDetails = () => {
           {/* Left column */}
           <div>
             <div className="bg-blue-50 rounded-lg p-6 mb-6 space-y-4">
+              
+          <h3
+            className="text-xl font-semibold text-gray-900 line-clamp-2 
+            group-hover:text-blue-600 transition-colors text-transform: capitalize"
+          >
+            {property.title}
+          </h3>
+          <h5
+            className="text-m font-semibold text-gray-900 line-clamp-2 
+            group-hover:text-blue-600 transition-colors text-transform: capitalize"
+          >
+            - {property.propertyType}
+          </h5>
               <p className="text-3xl font-bold text-blue-600 mb-2">
                 ₹{Number(property.price).toLocaleString("en-IN")}
               </p>

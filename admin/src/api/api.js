@@ -98,11 +98,9 @@ export const adminAPI = {
   approveUser: (id) => api.patch(`/admin/approve-user/${id}`),
   rejectUser: (id) => api.patch(`/admin/reject-user/${id}`),
   deleteProperty: (id) => api.delete(`/admin/property/${id}`),
-  getProperties: (status) =>
-    api.get("/admin/properties", { params: { status } }),
+  getProperties: (status) =>api.get("/admin/properties", { params: { status } }),
   approveProperty: (id) => api.patch(`/admin/approve-property/${id}`),
-  rejectProperty: (id, reason) =>
-    api.patch(`/admin/reject-property/${id}`, { reason }),
+  rejectProperty: (id, reason) =>api.patch(`/admin/reject-property/${id}`, { reason }),
   getUsersData: () => api.get("/admin"),
   getStats: () => api.get("/admin/stats"),
   getTopups: () => api.get("/admin/topups"),

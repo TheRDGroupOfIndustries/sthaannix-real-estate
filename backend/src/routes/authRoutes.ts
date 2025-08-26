@@ -31,7 +31,7 @@ router.get("/get-by-id/:id", authenticate, getUserById);
 
 router.post(
   "/role-upgrade",
-  authenticate,
+  authenticate, 
   upload.single("proof"),
   requestRoleUpgrade
 );

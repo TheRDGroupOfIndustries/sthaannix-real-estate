@@ -1,7 +1,7 @@
 export const Backendurl =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:12000";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import { HelmetProvider } from "react-helmet-async";
@@ -25,6 +25,13 @@ import "react-toastify/dist/ReactToastify.css";
 import { Toaster } from "react-hot-toast";
 
 const App = () => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      window.location.reload();
+    }, 5 * 60 * 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
   return (
     <HelmetProvider>
       <Toaster position="top-right" reverseOrder={false} />

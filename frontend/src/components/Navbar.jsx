@@ -20,33 +20,33 @@ import {
 } from "lucide-react";
 import logo from "../assets/home-regular-24.png";
 import { useAuth } from "../context/AuthContext";
-import PropTypes from "prop-types"; 
+import PropTypes from "prop-types";
 
 // Enhanced Animation Variants
 const navVariants = {
   hidden: { opacity: 0, y: -20 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     transition: {
       duration: 0.6,
       ease: "easeOut",
-      staggerChildren: 0.1
-    }
-  }
+      staggerChildren: 0.1,
+    },
+  },
 };
 
 const logoVariants = {
   hidden: { opacity: 0, scale: 0.8 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     scale: 1,
     transition: {
       type: "spring",
       stiffness: 120,
-      damping: 25
-    }
-  }
+      damping: 25,
+    },
+  },
 };
 
 const floatingAnimation = {
@@ -54,21 +54,21 @@ const floatingAnimation = {
   transition: {
     duration: 4,
     repeat: Infinity,
-    ease: "easeInOut"
-  }
+    ease: "easeInOut",
+  },
 };
 
 const glowAnimation = {
   boxShadow: [
     "0 0 20px rgba(59, 130, 246, 0.2)",
     "0 0 40px rgba(59, 130, 246, 0.4)",
-    "0 0 20px rgba(59, 130, 246, 0.2)"
+    "0 0 20px rgba(59, 130, 246, 0.2)",
   ],
   transition: {
     duration: 3,
     repeat: Infinity,
-    ease: "easeInOut"
-  }
+    ease: "easeInOut",
+  },
 };
 
 const sparkleVariants = {
@@ -79,9 +79,9 @@ const sparkleVariants = {
     transition: {
       duration: 2,
       repeat: Infinity,
-      ease: "easeInOut"
-    }
-  }
+      ease: "easeInOut",
+    },
+  },
 };
 
 const Navbar = () => {
@@ -142,7 +142,7 @@ const Navbar = () => {
       .join("")
       .toUpperCase();
   };
-    // Profile and inquiry Property navigation
+  // Profile and inquiry Property navigation
   const handleProfileClick = () => {
     setIsDropdownOpen(false);
     navigate("/user-profile");
@@ -165,22 +165,26 @@ const Navbar = () => {
     >
       {/* Premium gradient border */}
       <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Enhanced Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
             <motion.div
               variants={logoVariants}
-              whileHover={{ 
+              whileHover={{
                 rotate: [0, -10, 10, -10, 0],
                 scale: 1.1,
-                ...glowAnimation
+                ...glowAnimation,
               }}
               transition={{ duration: 0.5 }}
               className="relative p-2.5 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg group-hover:shadow-blue-500/30"
             >
-              <img src={logo} alt="BuildEstate logo" className="w-6 h-6 brightness-0 invert" />
+              <img
+                src={logo}
+                alt="BuildEstate logo"
+                className="w-6 h-6 brightness-0 invert"
+              />
               {/* Floating sparkles */}
               <motion.div
                 animate={floatingAnimation}
@@ -246,7 +250,9 @@ const Navbar = () => {
                         </div>
                       </div>
                       <div className="hidden lg:flex flex-col items-start">
-                        <span className="text-sm font-semibold text-gray-700">{user?.name}</span>
+                        <span className="text-sm font-semibold text-gray-700">
+                          {user?.name}
+                        </span>
                         {/* <span className="text-xs text-gray-500">Premium Member</span> */}
                       </div>
                       <motion.div
@@ -274,8 +280,12 @@ const Navbar = () => {
                                 {getInitials(user?.name)}
                               </div>
                               <div className="flex-1">
-                                <p className="text-sm font-bold text-gray-900">{user?.name}</p>
-                                <p className="text-xs text-gray-600 truncate">{user?.email}</p>
+                                <p className="text-sm font-bold text-gray-900">
+                                  {user?.name}
+                                </p>
+                                <p className="text-xs text-gray-600 truncate">
+                                  {user?.email}
+                                </p>
                                 <div className="flex items-center gap-1 mt-1">
                                   {/* <Crown className="w-3 h-3 text-yellow-500" /> */}
                                   {/* <span className="text-xs text-yellow-600 font-medium">Premium</span> */}
@@ -287,8 +297,11 @@ const Navbar = () => {
                           {/* Menu Items */}
                           <div className="py-2">
                             <motion.button
-                            onClick={handleProfileClick}
-                              whileHover={{ x: 4, backgroundColor: "rgb(243 244 246)" }}
+                              onClick={handleProfileClick}
+                              whileHover={{
+                                x: 4,
+                                backgroundColor: "rgb(243 244 246)",
+                              }}
                               className="w-full px-6 py-3 text-left text-sm text-gray-700 hover:text-blue-600 flex items-center space-x-3 transition-colors"
                             >
                               <UserCircle className="w-4 h-4" />
@@ -296,13 +309,16 @@ const Navbar = () => {
                             </motion.button>
                             <motion.button
                               onClick={handleInquiryPropertiesClick}
-                              whileHover={{ x: 4, backgroundColor: "rgb(243 244 246)" }}
+                              whileHover={{
+                                x: 4,
+                                backgroundColor: "rgb(243 244 246)",
+                              }}
                               className="w-full px-6 py-3 text-left text-sm text-gray-700 hover:text-blue-600 flex items-center space-x-3 transition-colors"
                             >
                               <Calendar className="w-4 h-4" />
                               <span> Properties Inquiry</span>
                             </motion.button>
-                              {/* <motion.button
+                            {/* <motion.button
                                 whileHover={{ x: 4, backgroundColor: "rgb(243 244 246)" }}
                                 className="w-full px-6 py-3 text-left text-sm text-gray-700 hover:text-blue-600 flex items-center space-x-3 transition-colors"
                               >
@@ -311,7 +327,10 @@ const Navbar = () => {
                               </motion.button> */}
                             <div className="border-t border-gray-100 my-2" />
                             <motion.button
-                              whileHover={{ x: 4, backgroundColor: "rgb(254 242 242)" }}
+                              whileHover={{
+                                x: 4,
+                                backgroundColor: "rgb(254 242 242)",
+                              }}
                               onClick={handleLogout}
                               className="w-full px-6 py-3 text-left text-sm text-red-600 hover:text-red-700 flex items-center space-x-3 transition-colors"
                             >
@@ -420,40 +439,41 @@ const Navbar = () => {
 const NavLinks = ({ currentPath }) => {
   // Enhanced NavLinks with modern styling
   const navLinks = [
-    { 
-      name: "Home", 
-      path: "/", 
-      icon: Home, 
+    {
+      name: "Home",
+      path: "/",
+      icon: Home,
       color: "from-blue-500 to-cyan-500",
-      description: "Welcome home"
+      description: "Welcome home",
     },
-    { 
-      name: "Properties", 
-      path: "/properties", 
-      icon: Search, 
+    {
+      name: "Properties",
+      path: "/properties",
+      icon: Search,
       color: "from-green-500 to-emerald-500",
-      description: "Find your dream"
+      description: "Find your dream",
     },
-    { 
-      name: "About Us", 
-      path: "/about", 
-      icon: Users, 
+    {
+      name: "About Us",
+      path: "/about",
+      icon: Users,
       color: "from-purple-500 to-pink-500",
-      description: "Our story"
+      description: "Our story",
     },
-    { 
-      name: "Contact", 
-      path: "/contact", 
-      icon: MessageCircle, 
+    {
+      name: "Contact",
+      path: "/contact",
+      icon: MessageCircle,
       color: "from-orange-500 to-red-500",
-      description: "Get in touch"
+      description: "Get in touch",
     },
   ];
 
   return (
     <div className="flex space-x-2 items-center">
       {navLinks.map(({ name, path, icon: Icon, color, description }) => {
-        const isActive = path === "/" ? currentPath === path : currentPath.startsWith(path);
+        const isActive =
+          path === "/" ? currentPath === path : currentPath.startsWith(path);
 
         return (
           <motion.div
@@ -464,15 +484,22 @@ const NavLinks = ({ currentPath }) => {
             <Link
               to={path}
               className={`relative group font-medium transition-all duration-300 flex items-center gap-2 px-4 py-2.5 rounded-xl
-                ${isActive
-                  ? `text-white bg-gradient-to-r ${color} shadow-lg shadow-blue-500/30`
-                  : "text-gray-700 hover:text-blue-600 hover:bg-blue-50/80"
+                ${
+                  isActive
+                    ? `text-white bg-gradient-to-r ${color} shadow-lg shadow-blue-500/30`
+                    : "text-gray-700 hover:text-blue-600 hover:bg-blue-50/80"
                 }
               `}
             >
-              <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-gray-600 group-hover:text-blue-600'}`} />
+              <Icon
+                className={`w-4 h-4 ${
+                  isActive
+                    ? "text-white"
+                    : "text-gray-600 group-hover:text-blue-600"
+                }`}
+              />
               <span className="font-semibold">{name}</span>
-              
+
               {/* Tooltip */}
               <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
                 <div className="bg-gray-900 text-white text-xs px-2 py-1 rounded-lg whitespace-nowrap">
@@ -507,38 +534,38 @@ const MobileNavLinks = ({
 }) => {
   // Enhanced navigation links with colors and descriptions
   const navLinks = [
-    { 
-      name: "Home", 
-      path: "/", 
-      icon: Home, 
+    {
+      name: "Home",
+      path: "/",
+      icon: Home,
       color: "from-blue-500 to-cyan-500",
-      description: "Welcome home"
+      description: "Welcome home",
     },
-    { 
-      name: "Properties", 
-      path: "/properties", 
-      icon: Search, 
+    {
+      name: "Properties",
+      path: "/properties",
+      icon: Search,
       color: "from-green-500 to-emerald-500",
-      description: "Find your dream"
+      description: "Find your dream",
     },
-    { 
-      name: "About Us", 
-      path: "/about", 
-      icon: Users, 
+    {
+      name: "About Us",
+      path: "/about",
+      icon: Users,
       color: "from-purple-500 to-pink-500",
-      description: "Our story"
+      description: "Our story",
     },
-    { 
-      name: "Contact", 
-      path: "/contact", 
-      icon: MessageCircle, 
+    {
+      name: "Contact",
+      path: "/contact",
+      icon: MessageCircle,
       color: "from-orange-500 to-red-500",
-      description: "Get in touch"
+      description: "Get in touch",
     },
   ];
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="flex flex-col space-y-3"
@@ -552,14 +579,15 @@ const MobileNavLinks = ({
 
       {/* Enhanced Navigation Links */}
       {navLinks.map(({ name, path, icon: Icon, color, description }, index) => {
-        const isActive = path === "/" ? currentPath === path : currentPath.startsWith(path);
+        const isActive =
+          path === "/" ? currentPath === path : currentPath.startsWith(path);
 
         return (
-          <motion.div 
+          <motion.div
             key={name}
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.1 + (index * 0.05) }}
+            transition={{ delay: 0.1 + index * 0.05 }}
           >
             <Link
               to={path}
@@ -570,14 +598,34 @@ const MobileNavLinks = ({
               }`}
               onClick={() => setMobileMenuOpen(false)}
             >
-              <div className={`p-2 rounded-lg ${isActive ? 'bg-white/20' : 'bg-gray-100 group-hover:bg-blue-100'}`}>
-                <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-gray-600 group-hover:text-blue-600'}`} />
+              <div
+                className={`p-2 rounded-lg ${
+                  isActive
+                    ? "bg-white/20"
+                    : "bg-gray-100 group-hover:bg-blue-100"
+                }`}
+              >
+                <Icon
+                  className={`w-5 h-5 ${
+                    isActive
+                      ? "text-white"
+                      : "text-gray-600 group-hover:text-blue-600"
+                  }`}
+                />
               </div>
               <div className="flex-1">
-                <div className={`font-semibold ${isActive ? 'text-white' : 'text-gray-900'}`}>
+                <div
+                  className={`font-semibold ${
+                    isActive ? "text-white" : "text-gray-900"
+                  }`}
+                >
                   {name}
                 </div>
-                <div className={`text-sm ${isActive ? 'text-white/80' : 'text-gray-500'}`}>
+                <div
+                  className={`text-sm ${
+                    isActive ? "text-white/80" : "text-gray-500"
+                  }`}
+                >
                   {description}
                 </div>
               </div>
@@ -602,60 +650,75 @@ const MobileNavLinks = ({
         </div>
 
         {isLoggedIn ? (
-          <motion.div 
+          <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             className="space-y-4 px-2"
           >
             {/* Enhanced User Profile Card */}
             <div className="relative p-4 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl border border-indigo-100 overflow-hidden">
-              <div className="flex items-center space-x-4 relative z-10">
-                <div className="relative">
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg shadow-lg"
-                  >
-                    {user?.name ? user.name[0].toUpperCase() : "U"}
-                  </motion.div>
-                  <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 border-2 border-white rounded-full flex items-center justify-center">
-                    <div className="w-2 h-2 bg-green-600 rounded-full" />
-                  </div>
-                  {notifications > 0 && (
+              <Link
+                to="/user-profile"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-4 transition-all duration-300" // Increased gap and simplified class
+              >
+                <div className="flex items-center space-x-4 relative z-10 w-full">
+                  {" "}
+                  {/* Added w-full */}
+                  <div className="relative">
                     <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold"
+                      whileHover={{ scale: 1.05 }}
+                      className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg shadow-lg"
                     >
-                      {notifications}
+                      {user?.name ? user.name[0].toUpperCase() : "U"}
                     </motion.div>
-                  )}
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 border-2 border-white rounded-full flex items-center justify-center">
+                      <div className="w-2 h-2 bg-green-600 rounded-full" />
+                    </div>
+                    {notifications > 0 && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold"
+                      >
+                        {notifications}
+                      </motion.div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    {" "}
+                    {/* Added flex-1 and min-w-0 */}
+                    <p className="text-lg font-bold text-gray-900 truncate">
+                      {" "}
+                      {/* Added truncate */}
+                      {user?.name}
+                    </p>
+                    <p className="text-sm text-gray-600 truncate">
+                      {user?.email}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <p className="text-lg font-bold text-gray-900">{user?.name}</p>
-                  <p className="text-sm text-gray-600 truncate">{user?.email}</p>
-                  
-                </div>
-              </div>
+              </Link>
               {/* Background decoration */}
               <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full transform translate-x-6 -translate-y-6" />
             </div>
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-2 gap-3">
-              <motion.button
-                whileTap={{ scale: 0.95 }}
+            <div className="">
+              <Link
+                to="/inquiry-properties"
+                onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all"
               >
-                <Calendar className="w-5 h-5 text-gray-600" />
-                <span className="text-sm font-medium text-gray-700">Inquiry</span>
-              </motion.button>
-              {/* <motion.button
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all"
-              >
-                <Settings className="w-5 h-5 text-gray-600" />
-                <span className="text-sm font-medium text-gray-700">Settings</span>
-              </motion.button> */}
+                <motion.button whileTap={{ scale: 0.95 }}>
+                  {" "}
+                  <Calendar className="w-5 h-5 text-gray-600" />
+                  <span className="text-sm font-medium text-gray-700">
+                    Inquiry
+                  </span>
+                </motion.button>{" "}
+              </Link>
+
             </div>
 
             {/* Logout Button */}
@@ -672,7 +735,7 @@ const MobileNavLinks = ({
             </motion.button>
           </motion.div>
         ) : (
-          <motion.div 
+          <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             className="flex flex-col space-y-3 px-2"

@@ -127,9 +127,9 @@ export const paymentsAPI = {
   getAll: () => api.get('/payment/admin/all'),
   approve: (id) => api.patch(`/payment/admin/approve/${id}`),
   reject: (id, reason) => api.patch(`/payment/admin/reject/${id}`, { reason }),
-  walletReject:(id,reason)=>api.patch(`/wallet/topups/${id}`,{status:'rejected',reason}),
+  walletReject:(id,reason)=>api.patch(`/wallet/topups/${id}`,{action:'rejected',reason}),
   walletApprove: (id, utrNumber, paymentMethod) => api.patch(`/wallet/topups/${id}`, {
-    status: "approved",
+    action: "approved",
     utrNumber,
     paymentMethod,
   }),

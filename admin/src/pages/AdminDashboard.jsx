@@ -220,7 +220,8 @@ const AdminDashboard = () => {
     try {
       // Call backend reject API with reason
       const res = await paymentsAPI.walletReject(id, reason);
-
+      console.log("cancelWalletPayment: ",res);
+      
       if (res.status === 200) {
         const updatedRes = await paymentsAPI.getAll();
         setPayments(updatedRes.data.data);

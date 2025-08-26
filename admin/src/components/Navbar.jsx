@@ -12,6 +12,7 @@ import {
   LayoutDashboard, 
   Settings,
   Bell,
+  HandCoins,
   User,
   ChevronDown,
   ChartCandlestick
@@ -20,6 +21,7 @@ import {
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [balance, setBalance] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -91,19 +93,19 @@ const Navbar = () => {
     ],
     broker: [
       { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-      { path: '/leads', label: 'My Leads', icon: Calendar },
+      // { path: '/leads', label: 'My Leads', icon: Calendar },
       { path: '/add', label: 'Add Property', icon: PlusSquare },
        { path: '/appointments', label: 'Leads', icon: Calendar },
     ],
     builder: [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-      { path: '/leads', label: 'My Leads', icon: Calendar },
+      // { path: '/leads', label: 'My Leads', icon: Calendar },
       { path: '/add', label: 'Add Property', icon: PlusSquare },
        { path: '/appointments', label: 'Leads', icon: Calendar },
     ],
     owner: [
    { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-      { path: '/leads', label: 'My Leads', icon: Calendar },
+      // { path: '/leads', label: 'My Leads', icon: Calendar },
       { path: '/add', label: 'Add Property', icon: PlusSquare },
        { path: '/appointments', label: 'Leads', icon: Calendar },
     ],
@@ -111,7 +113,14 @@ const Navbar = () => {
 
   const navItems = navConfig[role] || [];
 
-  
+  useEffect(() => {
+    // ✅ Read user from localStorage
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      const parsedUser = JSON.parse(userData);
+      setBalance(parsedUser.walletBalance || 0); // if null, default 0
+    }
+  }, []);
 
   return (
     <motion.header 
@@ -219,11 +228,9 @@ const Navbar = () => {
                       <div className="text-sm font-medium text-gray-900">Admin Panel</div>
                       <div className="text-xs text-gray-500">Manage your properties</div>
                     </div>
-                    <button
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center"
-                    >
-                      <Settings className="h-4 w-4 mr-2" />
-                      Settings
+                    <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center">
+                    <HandCoins className="h-4 w-4 mr-2" />
+                    Balance: {balance === 0 ? "0" : balance}
                     </button>
                     <button
                       onClick={handleLogout}
@@ -306,8 +313,8 @@ const Navbar = () => {
                 <button
                   className="w-full text-left px-4 py-3 rounded-xl text-sm text-gray-700 hover:bg-gray-50 flex items-center mb-2"
                 >
-                  <Settings className="h-4 w-4 mr-3" />
-                  Settings
+                 <HandCoins className="h-4 w-4 mr-3" />
+                    Balance: {balance === 0 ? "0" : balance}
                 </button>
                 
                 <button

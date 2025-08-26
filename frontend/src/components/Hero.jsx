@@ -5,13 +5,7 @@ import { useNavigate } from "react-router-dom";
 import heroimage from "../assets/images/heroimage.png";
 import { RadialGradient } from "react-text-gradients";
 
-const popularLocations = [
-  "Mumbai",
-  "Delhi", 
-  "Bangalore",
-  "Hyderabad",
-  "Chennai"
-];
+const popularLocations = [];
 
 const quickFilters = [
   { label: "Apartments", icon: Home, count: "2.5k+" },
@@ -297,11 +291,11 @@ const Hero = () => {
                       >
                         <div className="p-6">
                           <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                            {/* <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                               <TrendingUp className="w-5 h-5 text-orange-500" />
                               Popular Locations
                             </h3>
-                            <span className="text-sm text-gray-500">Choose from trending areas</span>
+                            <span className="text-sm text-gray-500">Choose from trending areas</span> */}
                           </div>
                           
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

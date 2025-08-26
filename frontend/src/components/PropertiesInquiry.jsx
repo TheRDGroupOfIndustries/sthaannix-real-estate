@@ -32,9 +32,9 @@ export default function PropertiesInquiry() {
       const response = await fetchInquiryys();
 
       if (response) {
-        const validInquiries = response.data || response.inquiries || [];
+        const validInquiries = response;
         setInquiries(validInquiries);
-        console.log("Fetched inquiries:", response);
+        console.log("Fetched inquiries:", inquiries);
       } else {
         toast.error(response.message || "Failed to fetch inquiries");
       }
@@ -156,7 +156,7 @@ export default function PropertiesInquiry() {
               </select>
             </div>
           </div>
-        </div>
+        </div> 
 
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="overflow-x-auto">
@@ -166,12 +166,12 @@ export default function PropertiesInquiry() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Property
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Client
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Contact Info
-                  </th>
+                  </th> */}
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Date & Time
                   </th>
@@ -181,9 +181,9 @@ export default function PropertiesInquiry() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
-                  </th>
+                  </th> */}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -210,37 +210,37 @@ export default function PropertiesInquiry() {
                     </td>
 
                     {/* Client Details */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center">
-                        <User className="w-5 h-5 text-gray-400 mr-2" />
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            {inquiry.buyer?.name || "Unknown Buyer"}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            Inquiry for: {inquiry.propertyTitle}
-                          </p>
+                    {/* <td className="px-6 py-4">
+                      <div className="flex items-center"> */}
+                        {/* <User className="w-5 h-5 text-gray-400 mr-2" /> */}
+                        {/* <div> */}
+                          {/* <p className="font-medium text-gray-900"> */}
+                            {/* {inquiry.buyer?.name || "Unknown Buyer"} */}
+                          {/* </p>
+                          <p className="text-sm text-gray-500"> */}
+                            {/* Inquiry for: {inquiry.property.title} */}
+                          {/* </p>
                         </div>
                       </div>
-                    </td>
+                    </td> */}
 
                     {/* Contact Info */}
-                    <td className="px-6 py-4">
+                    {/* <td className="px-6 py-4">
                       <div className="space-y-1">
-                        <div className="flex items-center text-sm">
-                          <Mail className="w-4 h-4 text-gray-400 mr-2" />
-                          <span className="text-gray-600">
+                        <div className="flex items-center text-sm"> */}
+                          {/* <Mail className="w-4 h-4 text-gray-400 mr-2" /> */}
+                          {/* <span className="text-gray-600">
                             {inquiry.buyer?.email || inquiry.email}
-                          </span>
-                        </div>
-                        <div className="flex items-center text-sm">
-                          <Phone className="w-4 h-4 text-gray-400 mr-2" />
-                          <span className="text-gray-600">
+                          </span> */}
+                        {/* </div>
+                        <div className="flex items-center text-sm"> */}
+                          {/* <Phone className="w-4 h-4 text-gray-400 mr-2" /> */}
+                          {/* <span className="text-gray-600">
                             {inquiry.buyer?.phone || inquiry.phone}
-                          </span>
-                        </div>
+                          </span> */}
+                        {/* </div>
                       </div>
-                    </td>
+                    </td> */}
 
                     {/* Date & Time */}
                     <td className="px-6 py-4">
@@ -288,7 +288,7 @@ export default function PropertiesInquiry() {
                     </td>
 
                     {/* Actions */}
-                    <td className="px-6 py-4">
+                    {/* <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() =>
@@ -335,7 +335,7 @@ export default function PropertiesInquiry() {
                           )}
                         </button>
                       </div>
-                    </td>
+                    </td> */}
                   </motion.tr>
                 ))}
               </tbody>

@@ -92,9 +92,17 @@ const PropertiesPage = () => {
       .filter((property) => {
         const searchMatch =
           !filters.searchQuery ||
-          [property.title, property.description, property.location].some(
+           [
+            property.title, 
+            property.description, 
+            property.transactionType,
+            property.location?.address,
+            property.location?.city,
+            property.location?.state,
+            property.location?.pincode?.toString()
+          ].some(
             (field) =>
-              field?.toLowerCase().includes(filters.searchQuery.toLowerCase())
+              field && field.toLowerCase().includes(filters.searchQuery.toLowerCase())
           );
 
         // const typeMatch =

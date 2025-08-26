@@ -6,25 +6,26 @@ import axios from "axios";
 import api from "../api/api";
 import { paymentsAPI } from '../api/api';
 
-const BrokerDashboard = () => {
-  const navigate = useNavigate();
+
+const PropertyOwnerDashboard = () => {
+   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("properties");
   const [properties, setProperties] = useState([]);
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [ads, setAds] = useState([]);
 
-  useEffect(() => {
+useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    console.log("BrokerDashboard: ",user);
+    console.log("PropertyOwnerDashboard: ",user);
     
-    if (!user || user.role !== "broker") {
-      toast.error("Unauthorized. Please login as Broker.");
+    if (!user || user.role !== "owner") {
+      toast.error("Unauthorized. Please login as Owner.");
       navigate("/login");
       return;
     }
 
-   if (activeTab === "properties") fetchProperties();
+     if (activeTab === "properties") fetchProperties();
     else if (activeTab === "payments") loadPayments(user.email);
     else if (activeTab === "ads") loadAds(user.id);
 
@@ -129,7 +130,6 @@ const handleDeletePayment = async (id, type) => {
     toast.error("Failed to delete transaction ❌");
   }
 };
-
 
     //  Handle delete ad
   const handleDeleteAds = async (id) => {
@@ -354,7 +354,7 @@ const handleDeletePayment = async (id, type) => {
             No Image
           </div>
         )}
-        <span className="font-medium">{ad.property?.title || "-"}</span>
+
       </td>
 
               <td className="px-6 py-4">{ad.property?.title || "-"}</td>
@@ -381,4 +381,4 @@ const handleDeletePayment = async (id, type) => {
   );
 };
 
-export default BrokerDashboard;
+export default PropertyOwnerDashboard;

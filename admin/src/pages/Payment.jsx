@@ -63,6 +63,7 @@ const Payment = () => {
     setShowUpiDetails(false);
   };
 
+  
   const handlePaymentSubmit = async (e) => {
     e.preventDefault();
 
@@ -101,8 +102,8 @@ const Payment = () => {
 
       // append multiple images
       images.forEach((file) => {
-        formDataToSend.append("screenshot", file); // backend will get it
-      });
+  formDataToSend.append("proof", file); // ✅ match backend
+  });
 
       const response = await paymentsAPI.submitProof(formDataToSend, token);
 
@@ -110,7 +111,7 @@ const Payment = () => {
         toast.success(
           "Payment submitted successfully! Your account will be activated after verification."
         );
-        navigate("/register");
+        navigate("/login");
       } else {
         toast.error(response?.data?.message || "Payment submission failed");
       }

@@ -52,6 +52,7 @@ import mongoose from "mongoose";
 export const approvePayment = async (req: Request, res: Response) => {
   const session = await mongoose.startSession();
   session.startTransaction();
+
   try {
     if (!req.user || req.user.role !== "admin") {
       return res.status(403).json({ message: "Admin access required" });
@@ -76,13 +77,16 @@ export const approvePayment = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Update payment status
     payment.status = "approved";
     payment.approvedBy = new mongoose.Types.ObjectId(req.user.id);
-    payment.reviewedAt = new Date(); //  track review date
+    payment.reviewedAt = new Date();
     await payment.save({ session });
 
+    // Handle different purposes
     if (payment.purpose === "registration") {
-      user.role = "broker";
+      // Assign requested role if exists, else default to 'broker'
+      user.status = "approved"; // set user status to approved
       await user.save({ session });
     }
 
@@ -102,6 +106,15 @@ export const approvePayment = async (req: Request, res: Response) => {
         ],
         { session }
       );
+    }
+
+    if (payment.purpose === "role-upgrade") {
+      if (!payment.meta?.requestedRole) {
+        await session.abortTransaction();
+        return res.status(400).json({ message: "Requested role missing" });
+      }
+      user.role = payment.meta.requestedRole;
+      await user.save({ session });
     }
 
     await session.commitTransaction();

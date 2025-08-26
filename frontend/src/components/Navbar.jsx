@@ -20,7 +20,8 @@ import {
 } from "lucide-react";
 import logo from "../assets/home-regular-24.png";
 import { useAuth } from "../context/AuthContext";
-import PropTypes from "prop-types";
+import PropTypes from "prop-types"; 
+import path from "path";
 
 // Enhanced Animation Variants
 const navVariants = {
@@ -400,9 +401,9 @@ const Navbar = () => {
               <motion.span
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium"
+                // className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium"
               >
-                {notifications}
+                {/* {notifications} */}
               </motion.span>
             )}
           </motion.button>
@@ -426,7 +427,7 @@ const Navbar = () => {
                 user={user}
                 handleLogout={handleLogout}
                 currentPath={location.pathname}
-                notifications={notifications}
+                // notifications={notifications}
               />
             </div>
           </motion.div>
@@ -560,8 +561,9 @@ const MobileNavLinks = ({
       path: "/contact",
       icon: MessageCircle,
       color: "from-orange-500 to-red-500",
-      description: "Get in touch",
-    },
+      description: "Get in touch"
+    }
+   
   ];
 
   return (

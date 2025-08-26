@@ -356,6 +356,7 @@ const handleDeletePayment = async (id, type) => {
         )}
         <span className="font-medium">{ad.property?.title || "-"}</span>
       </td>
+
               <td className="px-6 py-4">{ad.property?.title || "-"}</td>
               <td className="px-6 py-4">₹{ad.budget.toLocaleString()}</td>
               <td className="px-6 py-4">{ad.platform.join(", ")}</td>

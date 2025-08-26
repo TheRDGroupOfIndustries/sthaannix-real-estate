@@ -6,9 +6,8 @@ import axios from "axios";
 import api from "../api/api";
 import { paymentsAPI } from '../api/api';
 
-
-const BuilderDashboard = () => {
-const navigate = useNavigate();
+const BrokerDashboard = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("properties");
   const [properties, setProperties] = useState([]);
   const [payments, setPayments] = useState([]);
@@ -17,15 +16,15 @@ const navigate = useNavigate();
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    console.log("BuilderDashboard: ",user);
+    console.log("BrokerDashboard: ",user);
     
-    if (!user || user.role !== "builder") {
-      toast.error("Unauthorized. Please login as Builder.");
+    if (!user || user.role !== "broker") {
+      toast.error("Unauthorized. Please login as Broker.");
       navigate("/login");
       return;
     }
 
- if (activeTab === "properties") fetchProperties();
+   if (activeTab === "properties") fetchProperties();
     else if (activeTab === "payments") loadPayments(user.email);
     else if (activeTab === "ads") loadAds(user.id);
 
@@ -131,6 +130,7 @@ const handleDeletePayment = async (id, type) => {
   }
 };
 
+
     //  Handle delete ad
   const handleDeleteAds = async (id) => {
     if (!window.confirm("Are you sure you want to delete this ad?")) return;
@@ -155,7 +155,7 @@ const handleDeletePayment = async (id, type) => {
     loadAds();
   }, []);
 
-   return (
+  return (
     <div className="min-h-screen pt-16 px-6 bg-gray-50 max-w-7xl mx-auto">
        <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Broker Dashboard</h1>
@@ -356,6 +356,7 @@ const handleDeletePayment = async (id, type) => {
         )}
         <span className="font-medium">{ad.property?.title || "-"}</span>
       </td>
+
               <td className="px-6 py-4">{ad.property?.title || "-"}</td>
               <td className="px-6 py-4">₹{ad.budget.toLocaleString()}</td>
               <td className="px-6 py-4">{ad.platform.join(", ")}</td>
@@ -380,4 +381,4 @@ const handleDeletePayment = async (id, type) => {
   );
 };
 
-export default BuilderDashboard;
+export default BrokerDashboard;

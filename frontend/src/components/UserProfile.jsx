@@ -22,10 +22,10 @@ const UserProfile = () => {
   // Load user profile from backend
   useEffect(() => {
     async function loadProfile() {
-    try {
-    const profile = await fetchUserProfile();   
-    //  if (storedProfile) {
-    //   try {
+      try {
+        const profile = await fetchUserProfile();
+        //  if (storedProfile) {
+        //   try {
         // const profile = JSON.parse(storedProfile);
         setFormData({
           name: profile.name || "",
@@ -69,7 +69,7 @@ const UserProfile = () => {
     try {
       const updatedProfile = { ...formData };
       await updateUserProfile(updatedProfile);
-        toast.success("Profile updated successfully!");
+      toast.success("Profile updated successfully!");
       setEditMode(false);
     } catch (error) {
       toast.error("Failed to update profile");
@@ -189,10 +189,8 @@ const UserProfile = () => {
           )}
         </div>
       </motion.form>
-      <hr className="m-3"/>
-      <div className="card p-2 shadow-md">
-          <UpgradeRole />
-      </div>
+      <hr className="m-3" />
+      <UpgradeRole />
     </div>
   );
 };

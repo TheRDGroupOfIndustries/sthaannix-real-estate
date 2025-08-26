@@ -45,12 +45,7 @@ export const fetchInquiryys = async () => {
   try {
     const token = localStorage.getItem("token");
 
-    const response = await axios.get(`${Backendurl}/leads/my`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await http.get("/leads/my")
 
     return response.data;
   } catch (error) {

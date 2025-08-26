@@ -32,9 +32,9 @@ export default function PropertiesInquiry() {
       const response = await fetchInquiryys();
 
       if (response) {
-        const validInquiries = response.data || response.inquiries || [];
+        const validInquiries = response;
         setInquiries(validInquiries);
-        console.log("Fetched inquiries:", response);
+        console.log("Fetched inquiries:", inquiries);
       } else {
         toast.error(response.message || "Failed to fetch inquiries");
       }
@@ -156,7 +156,7 @@ export default function PropertiesInquiry() {
               </select>
             </div>
           </div>
-        </div>
+        </div> 
 
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="overflow-x-auto">
@@ -181,9 +181,9 @@ export default function PropertiesInquiry() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
-                  </th>
+                  </th> */}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -288,7 +288,7 @@ export default function PropertiesInquiry() {
                     </td>
 
                     {/* Actions */}
-                    <td className="px-6 py-4">
+                    {/* <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() =>
@@ -335,7 +335,7 @@ export default function PropertiesInquiry() {
                           )}
                         </button>
                       </div>
-                    </td>
+                    </td> */}
                   </motion.tr>
                 ))}
               </tbody>

@@ -164,17 +164,17 @@ const PropertyCard = ({ property, viewType }) => {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="bg-gradient-to-r from-blue-600 to-blue-500 text-white 
-              px-3 py-1 rounded-full text-sm font-medium shadow-lg"
+              px-3 py-1 rounded-full text-sm font-medium shadow-lg text-transform: capitalize"
           >
-            {property.type}
+            {property.propertyType}
           </motion.span>
           <motion.span
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="bg-gradient-to-r from-green-600 to-green-500 text-white 
-              px-3 py-1 rounded-full text-sm font-medium shadow-lg"
+              px-3 py-1 rounded-full text-sm font-medium shadow-lg text-transform: capitalize"
           >
-            {property.availability}
+            {property.transactionType}
           </motion.span>
         </div>
       </div>
@@ -199,7 +199,7 @@ const PropertyCard = ({ property, viewType }) => {
 
           <h3
             className="text-xl font-semibold text-gray-900 line-clamp-2 
-            group-hover:text-blue-600 transition-colors"
+            group-hover:text-blue-600 transition-colors text-transform: capitalize"
           >
             {property.title}
           </h3>

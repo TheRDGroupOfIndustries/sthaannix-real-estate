@@ -166,12 +166,12 @@ export default function PropertiesInquiry() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Property
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Client
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Contact Info
-                  </th>
+                  </th> */}
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Date & Time
                   </th>
@@ -210,37 +210,37 @@ export default function PropertiesInquiry() {
                     </td>
 
                     {/* Client Details */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center">
-                        <User className="w-5 h-5 text-gray-400 mr-2" />
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            {inquiry.buyer?.name || "Unknown Buyer"}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            Inquiry for: {inquiry.propertyTitle}
-                          </p>
+                    {/* <td className="px-6 py-4">
+                      <div className="flex items-center"> */}
+                        {/* <User className="w-5 h-5 text-gray-400 mr-2" /> */}
+                        {/* <div> */}
+                          {/* <p className="font-medium text-gray-900"> */}
+                            {/* {inquiry.buyer?.name || "Unknown Buyer"} */}
+                          {/* </p>
+                          <p className="text-sm text-gray-500"> */}
+                            {/* Inquiry for: {inquiry.property.title} */}
+                          {/* </p>
                         </div>
                       </div>
-                    </td>
+                    </td> */}
 
                     {/* Contact Info */}
-                    <td className="px-6 py-4">
+                    {/* <td className="px-6 py-4">
                       <div className="space-y-1">
-                        <div className="flex items-center text-sm">
-                          <Mail className="w-4 h-4 text-gray-400 mr-2" />
-                          <span className="text-gray-600">
+                        <div className="flex items-center text-sm"> */}
+                          {/* <Mail className="w-4 h-4 text-gray-400 mr-2" /> */}
+                          {/* <span className="text-gray-600">
                             {inquiry.buyer?.email || inquiry.email}
-                          </span>
-                        </div>
-                        <div className="flex items-center text-sm">
-                          <Phone className="w-4 h-4 text-gray-400 mr-2" />
-                          <span className="text-gray-600">
+                          </span> */}
+                        {/* </div>
+                        <div className="flex items-center text-sm"> */}
+                          {/* <Phone className="w-4 h-4 text-gray-400 mr-2" /> */}
+                          {/* <span className="text-gray-600">
                             {inquiry.buyer?.phone || inquiry.phone}
-                          </span>
-                        </div>
+                          </span> */}
+                        {/* </div>
                       </div>
-                    </td>
+                    </td> */}
 
                     {/* Date & Time */}
                     <td className="px-6 py-4">

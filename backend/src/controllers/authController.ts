@@ -210,8 +210,9 @@ export const requestRoleUpgrade = async (req: Request, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
-    const { newRole, amount, utrNumber, proof } = req.body;
+    const { newRole, amount, utrNumber, proof, paymentMethod } = req.body; // added paymentMethod
     const validRoles = ["broker", "builder", "owner"];
+    const validMethods = ["upi", "account", "whatsapp"]; // validate method
 
     if (!validRoles.includes(newRole.toLowerCase())) {
       return res.status(400).json({ message: "Invalid role selected" });
@@ -219,6 +220,10 @@ export const requestRoleUpgrade = async (req: Request, res: Response) => {
 
     if (amount < 1500) {
       return res.status(400).json({ message: "Role upgrade fee is ₹1500" });
+    }
+
+    if (!validMethods.includes(paymentMethod)) {
+      return res.status(400).json({ message: "Invalid payment method" });
     }
 
     const user = await User.findById(req.user.id);
@@ -246,6 +251,7 @@ export const requestRoleUpgrade = async (req: Request, res: Response) => {
       purpose: "role-upgrade",
       utrNumber,
       screenshot,
+      paymentMethod, // save payment method
       status: "pending",
       meta: { requestedRole: newRole.toLowerCase() },
     });
@@ -260,6 +266,7 @@ export const requestRoleUpgrade = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
+
 
 //UPDATE NAME,EMAIL,PASS
 export const updateUserProfile = async (req: Request, res: Response) => {

@@ -93,6 +93,8 @@ const loadAds = async () => {
   }
 };
 
+
+
   const handleDeleteProperty = async (id) => {
     if (window.confirm("Are you sure you want to delete this property?")) {
       try {
@@ -117,18 +119,18 @@ const handleDeletePayment = async (id, type) => {
   try {
     const token = localStorage.getItem("token");
 
-    await api.delete(`/payment/history/${type}/${id}`, {
+    await axios.delete(`/payment/history/${type}/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    toast.success("Transaction deleted successfully ✅");
-
-    loadPayments(); 
+    // Remove from UI
+    setPayments(payments.filter((p) => p.id !== id));
   } catch (err) {
     console.error("Error deleting transaction", err);
-    toast.error("Failed to delete transaction ❌");
+    alert("Failed to delete transaction");
   }
 };
+
 
 
     //  Handle delete ad
@@ -307,7 +309,7 @@ const handleDeletePayment = async (id, type) => {
               <td className="px-6 py-4 whitespace-nowrap">{payment.purpose || "Wallet Top-up"}</td>
               <td className="px-6 py-4 whitespace-nowrap text-center">
                 <button
-                  onClick={() => handleDeletePayment(payment._id,payment.type)}
+                  onClick={() => handleDeletePayment(payment.id,payment.type)}
                   className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-red-600 text-white hover:bg-red-700 transition"
                 >
                   <Trash2 className="w-4 h-4" /> Delete

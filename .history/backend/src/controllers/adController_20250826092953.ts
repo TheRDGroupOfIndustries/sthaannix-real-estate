@@ -179,7 +179,6 @@ export const getUserAdRequests = async (req: Request, res: Response) => {
 };
 
 
-
 // Delete ad request
 export const deleteAdRequest = async (req: Request, res: Response) => {
   const session = await mongoose.startSession();

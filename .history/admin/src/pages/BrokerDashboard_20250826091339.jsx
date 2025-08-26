@@ -12,7 +12,6 @@ const BrokerDashboard = () => {
   const [properties, setProperties] = useState([]);
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [ads, setAds] = useState([]);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -74,24 +73,28 @@ const loadPayments = async (email) => {
   }
 };
 
+// Fetch ads
+  const loadAds = async (userId) => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await api.get("/ad/get", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-// Fetch only ads of logged-in user
-const loadAds = async () => {
-  setLoading(true);
-  try {
-    const token = localStorage.getItem("token");
-    const res = await api.get("/ad/my-ads", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+      // Filter ads created by this broker
+      const userAds = res.data.campaigns.filter(
+        (ad) => ad.user?._id === userId
+      );
+      setAds(userAds);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to load advertisement details");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    setAds(res.data.campaigns); // already filtered by backend
-  } catch (error) {
-    console.error(error);
-    toast.error("Failed to load advertisement details");
-  } finally {
-    setLoading(false);
-  }
-};
 
   const handleDeleteProperty = async (id) => {
     if (window.confirm("Are you sure you want to delete this property?")) {
@@ -111,49 +114,16 @@ const loadAds = async () => {
     }
   };
 
-const handleDeletePayment = async (id, type) => {
-  if (!window.confirm("Are you sure you want to delete this transaction?")) return;
 
-  try {
-    const token = localStorage.getItem("token");
-
-    await api.delete(`/payment/history/${type}/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    toast.success("Transaction deleted successfully ✅");
-
-    loadPayments(); 
-  } catch (err) {
-    console.error("Error deleting transaction", err);
-    toast.error("Failed to delete transaction ❌");
-  }
-};
-
-
-    //  Handle delete ad
-  const handleDeleteAds = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this ad?")) return;
-
-    try {
-      const token = localStorage.getItem("token");
-      const res = await api.delete(`/ad/delete/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      toast.success(res.data.message);
-
-      // Refresh ads after deletion
-      setAds((prevAds) => prevAds.filter((ad) => ad._id !== id));
-    } catch (error) {
-      console.error(error);
-      toast.error(error.response?.data?.message || "Failed to delete ad");
+  const handleDeletePayment = (id) => {
+    if (window.confirm("Are you sure you want to delete this payment record?")) {
+      const allPayments = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
+      const updatedPayments = allPayments.filter(p => p.id !== id);
+      localStorage.setItem("paymentRecords", JSON.stringify(updatedPayments));
+      setPayments(updatedPayments.filter(p => p.user.email === (JSON.parse(localStorage.getItem("user") || "{}")).email));
+      toast.success("Payment record deleted");
     }
   };
-
-  useEffect(() => {
-    loadAds();
-  }, []);
 
   return (
     <div className="min-h-screen pt-16 px-6 bg-gray-50 max-w-7xl mx-auto">
@@ -217,8 +187,138 @@ const handleDeletePayment = async (id, type) => {
       </div>
 
       {/* Tab Content */}
- 
- {loading ? (
+      
+      {loading ? (
+        <div className="text-center py-20 text-lg">Loading...</div>
+      ) : activeTab === "properties" ? (
+        properties.length === 0 ? (
+          <div className="text-center py-20 text-lg">No properties found.</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {properties.map((property) => (
+              <div
+                key={property._id}
+                className="bg-white p-4 rounded-lg shadow group hover:shadow-lg transition relative"
+              >
+             <img
+            src={
+              property.images && property.images.length > 0
+                ? property.images[0]
+                : "/placeholder.jpg"
+            }
+            alt={property.title}
+            className="w-full h-48 object-cover rounded-lg mb-4"
+          />
+
+            <h2 className="font-semibold text-lg mb-1">{property.title}</h2>
+              <p className="text-gray-600 mb-1">{property.location?.address}</p>
+              <p className="text-blue-600 font-bold mb-2">
+                ₹{property.price.toLocaleString()}
+              </p>
+              <div className="flex justify-between text-sm text-gray-500 mb-3">
+                <span>{property.bhk} BHK</span>
+                {/* <span>{property.bathroom} Baths</span> */}
+                <span>{property.size} Sq Ft</span>
+              </div>
+
+                <div className="flex space-x-2 mb-3 flex-wrap">
+                 {property.amenities && property.amenities.length > 0 && (
+                  <div className="flex space-x-2 mb-3 flex-wrap">
+                    {property.amenities.slice(0, 4).map((a, idx) => (
+                      <span
+                        key={idx}
+                        className="bg-blue-100 text-blue-700 px-2 rounded-full text-xs"
+                      >
+                        {a}
+                      </span>
+                    ))}
+                    {property.amenities.length > 4 && (
+                      <span className="text-gray-400 text-xs">{`+${property.amenities.length - 4} more`}</span>
+                    )}
+                  </div>
+                )}
+
+                </div>
+                <div className="flex justify-end space-x-2 opacity-0 group-hover:opacity-100 transition">
+                  <button
+                    onClick={() => navigate(`/update/${property._id}`)}
+                    className="p-2 bg-yellow-400 rounded hover:bg-yellow-500"
+                    aria-label="Edit property"
+                  >
+                  <Edit3 size={18} />
+                  </button>
+
+                  <button
+                    onClick={() => handleDeleteProperty(property._id)}
+                    className="p-2 bg-red-500 rounded hover:bg-red-600"
+                    aria-label="Delete property"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+
+                  <button
+                    onClick={() => navigate(`/ads/${property._id}`)}
+                    className="p-2 bg-yellow-400 rounded hover:bg-yellow-500"
+                    aria-label="Edit property"
+                  >
+                  <TvMinimalPlay size={18} />
+                  </button>
+
+                </div>
+              </div>
+            ))}
+          </div>
+        )
+      ) : payments.length === 0 ? (
+        <div className="text-center py-20 text-lg text-gray-500">
+          No payment records found.
+        </div>
+      ) : (
+        <div className="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unique Transaction Reference</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {payments.map((payment, idx) => (
+                <tr key={payment.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">{idx + 1}</td>
+                  <td className="px-6 py-4 font-mono text-sm whitespace-nowrap">
+                        {payment.utrNumber || "-"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {new Date(payment.createdAt).toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {payment.purpose || "Wallet Top-up"}
+                      </td>
+
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <button
+                      onClick={() => handleDeletePayment(payment.id)}
+                      className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-red-600 text-white hover:bg-red-700 transition"
+                      title="Delete Payment"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) 
+    }
+
+
+    {loading ? (
   <div className="text-center py-20 text-lg">Loading...</div>
 ) : activeTab === "properties" ? (
   properties.length === 0 ? (
@@ -272,7 +372,7 @@ const handleDeletePayment = async (id, type) => {
             </button>
             <button
               onClick={() => navigate(`/ads/${property._id}`)}
-              className="p-2 bg-green-400 rounded hover:bg-green-500"
+              className="p-2 bg-yellow-400 rounded hover:bg-yellow-500"
             >
               <TvMinimalPlay size={18} />
             </button>
@@ -307,7 +407,7 @@ const handleDeletePayment = async (id, type) => {
               <td className="px-6 py-4 whitespace-nowrap">{payment.purpose || "Wallet Top-up"}</td>
               <td className="px-6 py-4 whitespace-nowrap text-center">
                 <button
-                  onClick={() => handleDeletePayment(payment._id,payment.type)}
+                  onClick={() => handleDeletePayment(payment.id)}
                   className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-red-600 text-white hover:bg-red-700 transition"
                 >
                   <Trash2 className="w-4 h-4" /> Delete
@@ -333,7 +433,6 @@ const handleDeletePayment = async (id, type) => {
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Platform</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Delete</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">
@@ -345,21 +444,16 @@ const handleDeletePayment = async (id, type) => {
               <td className="px-6 py-4">{ad.platform.join(", ")}</td>
               <td className="px-6 py-4">{new Date(ad.startDate).toLocaleDateString()}</td>
               <td className="px-6 py-4 capitalize">{ad.status}</td>
-               <td className="px-6 py-4 whitespace-nowrap text-center">
-                <button
-                  onClick={() => handleDeleteAds(ad._id)}
-                  className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-red-600 text-white hover:bg-red-700 transition"
-                >
-                  <Trash2 className="w-4 h-4" /> Delete
-                </button>
-              </td>
             </tr>
           ))}
         </tbody>
       </table>
     </div>
 )) : null}
-   
+
+
+
+      
     </div>
   );
 };

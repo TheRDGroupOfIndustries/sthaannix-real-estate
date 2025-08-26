@@ -1,6 +1,5 @@
 import { Router } from "express";
-import { getAllAdRequests, submitAdRequest,getUserAdRequests, updateAdStatus ,deleteAdRequest} from "../controllers/adController";
-import { authenticate } from "../middlewares/authenticate";
+import { getAllAdRequests, submitAdRequest,getUserAdRequests, updateAdStatus } from "../controllers/adController";
 
 const router = Router();
 
@@ -14,8 +13,6 @@ router.put("/:id/status", updateAdStatus);
 router.get("/get",getAllAdRequests);
 
 //only user ad
-router.get("/my-ads", authenticate,getUserAdRequests);
-
-router.delete("/delete/:id", authenticate, deleteAdRequest);
+router.get("/my-ads",getUserAdRequests);
 
 export default router;

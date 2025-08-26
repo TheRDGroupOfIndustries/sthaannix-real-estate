@@ -93,6 +93,8 @@ const loadAds = async () => {
   }
 };
 
+
+
   const handleDeleteProperty = async (id) => {
     if (window.confirm("Are you sure you want to delete this property?")) {
       try {

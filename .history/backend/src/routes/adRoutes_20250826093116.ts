@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getAllAdRequests, submitAdRequest,getUserAdRequests, updateAdStatus ,deleteAdRequest} from "../controllers/adController";
+import { getAllAdRequests, submitAdRequest,getUserAdRequests, updateAdStatus ,de} from "../controllers/adController";
 import { authenticate } from "../middlewares/authenticate";
 
 const router = Router();

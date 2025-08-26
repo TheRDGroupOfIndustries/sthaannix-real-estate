@@ -7,7 +7,6 @@ import {
   approvePayment,
   rejectPayment,
   getAllPayments,
-  deletePaymentHistory
 } from "../controllers/paymentController";
 import { upload } from "../middlewares/multer";
 import multer from "multer";
@@ -19,7 +18,7 @@ router.post(
   "/submit-proof",
   authenticate,
   (req, res, next) => {
-    upload.array("proof", 5)(req, res, (err) => { // allow up to 5 files
+    upload.array("proof", 5)(req, res, (err) => { // 👈 allow up to 5 files
       if (err instanceof multer.MulterError) {
         return res.status(400).json({ message: err.message });
       } else if (err) {
@@ -36,7 +35,6 @@ router.post(
 // route for person who paid to see their payment
 router.get("/my-payments", authenticate, getMyPayments);
 
-router.delete("/history/:type/:id", authenticate, deletePaymentHistory);
 
 
 // Admin routes

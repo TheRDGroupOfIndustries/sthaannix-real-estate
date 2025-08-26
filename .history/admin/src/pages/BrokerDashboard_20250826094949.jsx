@@ -93,6 +93,8 @@ const loadAds = async () => {
   }
 };
 
+
+
   const handleDeleteProperty = async (id) => {
     if (window.confirm("Are you sure you want to delete this property?")) {
       try {
@@ -123,12 +125,14 @@ const handleDeletePayment = async (id, type) => {
 
     toast.success("Transaction deleted successfully ✅");
 
-    loadPayments(); 
+    // Instead of filtering, fetch fresh data
+    fePayments(); // call your API fetch function again
   } catch (err) {
     console.error("Error deleting transaction", err);
     toast.error("Failed to delete transaction ❌");
   }
 };
+
 
 
     //  Handle delete ad

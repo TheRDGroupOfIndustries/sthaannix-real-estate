@@ -74,24 +74,28 @@ const loadPayments = async (email) => {
   }
 };
 
+// Fetch ads
+  const loadAds = async (userId) => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await api.get("/ad/get", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-// Fetch only ads of logged-in user
-const loadAds = async () => {
-  setLoading(true);
-  try {
-    const token = localStorage.getItem("token");
-    const res = await api.get("/ad/my-ads", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+      // Filter ads created by this broker
+      const userAds = res.data.campaigns.filter(
+        (ad) => ad.user?._id === userId
+      );
+      setAds(userAds);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to load advertisement details");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    setAds(res.data.campaigns); // already filtered by backend
-  } catch (error) {
-    console.error(error);
-    toast.error("Failed to load advertisement details");
-  } finally {
-    setLoading(false);
-  }
-};
 
   const handleDeleteProperty = async (id) => {
     if (window.confirm("Are you sure you want to delete this property?")) {
@@ -111,49 +115,20 @@ const loadAds = async () => {
     }
   };
 
-const handleDeletePayment = async (id, type) => {
-  if (!window.confirm("Are you sure you want to delete this transaction?")) return;
 
-  try {
-    const token = localStorage.getItem("token");
-
-    await api.delete(`/payment/history/${type}/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    toast.success("Transaction deleted successfully ✅");
-
-    loadPayments(); 
-  } catch (err) {
-    console.error("Error deleting transaction", err);
-    toast.error("Failed to delete transaction ❌");
-  }
-};
-
-
-    //  Handle delete ad
-  const handleDeleteAds = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this ad?")) return;
-
-    try {
-      const token = localStorage.getItem("token");
-      const res = await api.delete(`/ad/delete/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      toast.success(res.data.message);
-
-      // Refresh ads after deletion
-      setAds((prevAds) => prevAds.filter((ad) => ad._id !== id));
-    } catch (error) {
-      console.error(error);
-      toast.error(error.response?.data?.message || "Failed to delete ad");
+  const handleDeletePayment = (id) => {
+    if (window.confirm("Are you sure you want to delete this payment record?")) {
+      const allPayments = JSON.parse(localStorage.getItem("paymentRecords") || "[]");
+      const updatedPayments = allPayments.filter(p => p.id !== id);
+      localStorage.setItem("paymentRecords", JSON.stringify(updatedPayments));
+      setPayments(updatedPayments.filter(p => p.user.email === (JSON.parse(localStorage.getItem("user") || "{}")).email));
+      toast.success("Payment record deleted");
     }
   };
 
-  useEffect(() => {
-    loadAds();
-  }, []);
+  const handleDeleteAds = (id)=>{
+
+  }
 
   return (
     <div className="min-h-screen pt-16 px-6 bg-gray-50 max-w-7xl mx-auto">
@@ -272,7 +247,7 @@ const handleDeletePayment = async (id, type) => {
             </button>
             <button
               onClick={() => navigate(`/ads/${property._id}`)}
-              className="p-2 bg-green-400 rounded hover:bg-green-500"
+              className="p-2 bg-y-400 rounded hover:bg-yellow-500"
             >
               <TvMinimalPlay size={18} />
             </button>
@@ -307,7 +282,7 @@ const handleDeletePayment = async (id, type) => {
               <td className="px-6 py-4 whitespace-nowrap">{payment.purpose || "Wallet Top-up"}</td>
               <td className="px-6 py-4 whitespace-nowrap text-center">
                 <button
-                  onClick={() => handleDeletePayment(payment._id,payment.type)}
+                  onClick={() => handleDeletePayment(payment.id)}
                   className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-red-600 text-white hover:bg-red-700 transition"
                 >
                   <Trash2 className="w-4 h-4" /> Delete
@@ -347,7 +322,7 @@ const handleDeletePayment = async (id, type) => {
               <td className="px-6 py-4 capitalize">{ad.status}</td>
                <td className="px-6 py-4 whitespace-nowrap text-center">
                 <button
-                  onClick={() => handleDeleteAds(ad._id)}
+                  onClick={() => handleDeleteAds(ad.id)}
                   className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-red-600 text-white hover:bg-red-700 transition"
                 >
                   <Trash2 className="w-4 h-4" /> Delete

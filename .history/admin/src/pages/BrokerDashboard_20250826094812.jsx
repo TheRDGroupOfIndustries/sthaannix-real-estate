@@ -93,6 +93,8 @@ const loadAds = async () => {
   }
 };
 
+
+
   const handleDeleteProperty = async (id) => {
     if (window.confirm("Are you sure you want to delete this property?")) {
       try {
@@ -121,14 +123,14 @@ const handleDeletePayment = async (id, type) => {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    toast.success("Transaction deleted successfully ✅");
-
-    loadPayments(); 
+    // Remove from UI
+    setPayments(payments.filter((p) => p.id !== id));
   } catch (err) {
     console.error("Error deleting transaction", err);
-    toast.error("Failed to delete transaction ❌");
+    alert("Failed to delete transaction");
   }
 };
+
 
 
     //  Handle delete ad

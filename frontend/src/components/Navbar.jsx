@@ -21,6 +21,7 @@ import {
 import logo from "../assets/home-regular-24.png";
 import { useAuth } from "../context/AuthContext";
 import PropTypes from "prop-types"; 
+import path from "path";
 
 // Enhanced Animation Variants
 const navVariants = {
@@ -381,9 +382,9 @@ const Navbar = () => {
               <motion.span
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium"
+                // className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium"
               >
-                {notifications}
+                {/* {notifications} */}
               </motion.span>
             )}
           </motion.button>
@@ -407,7 +408,7 @@ const Navbar = () => {
                 user={user}
                 handleLogout={handleLogout}
                 currentPath={location.pathname}
-                notifications={notifications}
+                // notifications={notifications}
               />
             </div>
           </motion.div>
@@ -534,7 +535,8 @@ const MobileNavLinks = ({
       icon: MessageCircle, 
       color: "from-orange-500 to-red-500",
       description: "Get in touch"
-    },
+    }
+   
   ];
 
   return (
@@ -642,20 +644,22 @@ const MobileNavLinks = ({
 
             {/* Quick Actions */}
             <div className="grid grid-cols-2 gap-3">
+               <motion.button
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all"
+              >
+                <UserCircle className="w-4 h-4" />
+                 <span className="text-sm font-medium text-gray-700">My Profile</span>
+              </motion.button>
               <motion.button
+              
                 whileTap={{ scale: 0.95 }}
                 className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all"
               >
                 <Calendar className="w-5 h-5 text-gray-600" />
                 <span className="text-sm font-medium text-gray-700">Inquiry</span>
               </motion.button>
-              {/* <motion.button
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all"
-              >
-                <Settings className="w-5 h-5 text-gray-600" />
-                <span className="text-sm font-medium text-gray-700">Settings</span>
-              </motion.button> */}
+             
             </div>
 
             {/* Logout Button */}

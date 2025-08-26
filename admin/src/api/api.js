@@ -56,7 +56,7 @@ export const propertiesAPI = {
         "Content-Type": "multipart/form-data",
       },
     });
-  }, 
+  },
 
   get: (filters = {}) => api.get("/properties/get", { params: filters }),
   getById: (id) => api.get(`/properties/get-by-id/${id}`),
@@ -103,39 +103,35 @@ export const adminAPI = {
   approveProperty: (id) => api.patch(`/admin/approve-property/${id}`),
   rejectProperty: (id, reason) =>
     api.patch(`/admin/reject-property/${id}`, { reason }),
-  getUsersData:()=>api.get("/admin"),
+  getUsersData: () => api.get("/admin"),
   getStats: () => api.get("/admin/stats"),
   getTopups: () => api.get("/admin/topups"),
   reviewTopup: (id, action) => api.patch(`/admin/topups/${id}`, { action }),
   getAllAdRequests: () => api.get("/ad/get"),
-  updateAdStatus:(id,status)=>api.put(`/ad/${id}/status`,{status})
-
+  updateAdStatus: (id, status) => api.put(`/ad/${id}/status`, { status }),
 };
-
-
 
 // Payments API calls
 export const paymentsAPI = {
   // User actions
   submitProof: (formData) =>
-    api.post('/payment/submit-proof', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+    api.post("/payment/submit-proof", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
     }),
-  myPayments: () => api.get('/payment/my-payments'),
+  myPayments: () => api.get("/payment/my-payments"),
 
   // Admin actions
-  getAll: () => api.get('/payment/admin/all'),
+  getAll: () => api.get("/payment/admin/all"),
   approve: (id) => api.patch(`/payment/admin/approve/${id}`),
   reject: (id, reason) => api.patch(`/payment/admin/reject/${id}`, { reason }),
-  walletReject:(id,reason)=>api.patch(`/wallet/topups/${id}`,{action:'rejected',reason}),
-  walletApprove: (id, utrNumber, paymentMethod) => api.patch(`/wallet/topups/${id}`, {
-    action: "approved",
-    utrNumber,
-    paymentMethod,
-  }),
-
+  walletReject: (id, reason) =>
+    api.patch(`/wallet/topups/${id}`, { action: "rejected", reason }),
+  walletApprove: (id, utrNumber, paymentMethod) =>
+    api.patch(`/wallet/topups/${id}`, {
+      action: "approved",
+      utrNumber,
+      paymentMethod,
+    }),
 };
- 
 
 export default api;
-

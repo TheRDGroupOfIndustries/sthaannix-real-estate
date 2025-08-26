@@ -228,10 +228,13 @@ const Navbar = () => {
                       <div className="text-sm font-medium text-gray-900">Admin Panel</div>
                       <div className="text-xs text-gray-500">Manage your properties</div>
                     </div>
+                    
+                    {role !== "admin" && (
                     <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center">
-                    <HandCoins className="h-4 w-4 mr-2" />
-                    Balance: {balance === 0 ? "0" : balance}
+                      <HandCoins className="h-4 w-4 mr-2" />
+                      Balance: {balance === 0 ? "0" : balance}
                     </button>
+                  )}
                     <button
                       onClick={handleLogout}
                       className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center"
@@ -310,13 +313,12 @@ const Navbar = () => {
                   </div>
                 </div>
                 
-                <button
-                  className="w-full text-left px-4 py-3 rounded-xl text-sm text-gray-700 hover:bg-gray-50 flex items-center mb-2"
-                >
-                 <HandCoins className="h-4 w-4 mr-3" />
-                    Balance: {balance === 0 ? "0" : balance}
-                </button>
-                
+                {role !== "admin" && (
+                    <button  className="w-full text-left px-4 py-3 rounded-xl text-sm text-gray-700 hover:bg-gray-50 flex items-center mb-2">
+                      <HandCoins className="h-4 w-4 mr-3" />
+                      Balance: {balance === 0 ? "0" : balance}
+                    </button>
+                  )}
                 <button
                   onClick={handleLogout}
                   className="w-full text-left px-4 py-3 rounded-xl text-sm text-red-600 hover:bg-red-50 flex items-center"

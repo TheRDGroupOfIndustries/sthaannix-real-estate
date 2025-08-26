@@ -1,7 +1,18 @@
 import { useState } from "react";
-import { Search, MapPin, ArrowRight, Star, Users, Home, Shield, Sparkles, TrendingUp, Filter } from "lucide-react";
+import {
+  Search,
+  MapPin,
+  ArrowRight,
+  Star,
+  Users,
+  Home,
+  Shield,
+  Sparkles,
+  TrendingUp,
+  Filter,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import heroimage from "../assets/images/heroimage.png";
 import { RadialGradient } from "react-text-gradients";
 
@@ -11,20 +22,40 @@ const quickFilters = [
   { label: "Apartments", icon: Home, count: "2.5k+" },
   { label: "Houses", icon: Home, count: "1.8k+" },
   { label: "Villas", icon: Home, count: "750+" },
-  { label: "Studios", icon: Home, count: "1.2k+" }
+  { label: "Studios", icon: Home, count: "1.2k+" },
 ];
 
 const transactionTypes = [
   { label: "Buy", icon: Home, value: "buy" },
   { label: "Rent", icon: Home, value: "rent" },
-  { label: "Lease", icon: Home, value: "lease" }
+  { label: "Lease", icon: Home, value: "lease" },
 ];
 
 const stats = [
-  { icon: Users, value: "50K+", label: "Happy Customers", color: "from-blue-500 to-cyan-500" },
-  { icon: Home, value: "25K+", label: "Properties Listed", color: "from-green-500 to-emerald-500" },
-  { icon: Star, value: "4.9", label: "Average Rating", color: "from-yellow-500 to-orange-500" },
-  { icon: Shield, value: "100%", label: "Verified Properties", color: "from-purple-500 to-pink-500" }
+  {
+    icon: Users,
+    value: "50K+",
+    label: "Happy Customers",
+    color: "from-blue-500 to-cyan-500",
+  },
+  {
+    icon: Home,
+    value: "25K+",
+    label: "Properties Listed",
+    color: "from-green-500 to-emerald-500",
+  },
+  {
+    icon: Star,
+    value: "4.9",
+    label: "Average Rating",
+    color: "from-yellow-500 to-orange-500",
+  },
+  {
+    icon: Shield,
+    value: "100%",
+    label: "Verified Properties",
+    color: "from-purple-500 to-pink-500",
+  },
 ];
 
 // Enhanced animation variants
@@ -34,24 +65,24 @@ const containerVariants = {
     opacity: 1,
     transition: {
       delayChildren: 0.2,
-      staggerChildren: 0.1
-    }
-  }
+      staggerChildren: 0.1,
+    },
+  },
 };
 
 const itemVariants = {
   hidden: { opacity: 0, y: 30, scale: 0.95 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     scale: 1,
     transition: {
       type: "spring",
       stiffness: 100,
       damping: 20,
-      duration: 0.6
-    }
-  }
+      duration: 0.6,
+    },
+  },
 };
 
 const floatingAnimation = {
@@ -59,8 +90,8 @@ const floatingAnimation = {
   transition: {
     duration: 6,
     repeat: Infinity,
-    ease: "easeInOut"
-  }
+    ease: "easeInOut",
+  },
 };
 
 const sparkleAnimation = {
@@ -69,8 +100,8 @@ const sparkleAnimation = {
   transition: {
     duration: 3,
     repeat: Infinity,
-    ease: "easeInOut"
-  }
+    ease: "easeInOut",
+  },
 };
 
 const Hero = () => {
@@ -86,7 +117,7 @@ const Hero = () => {
       const queryParams = new URLSearchParams({
         location: encodeURIComponent(location),
         type: propertyType,
-        transaction: transactionType
+        transaction: transactionType,
       });
       navigate(`/properties?${queryParams.toString()}`);
     }
@@ -104,7 +135,7 @@ const Hero = () => {
       <div className="absolute inset-0">
         {/* Base gradient background */}
         <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50"></div>
-        
+
         {/* Hero image with overlay */}
         <motion.div
           initial={{ opacity: 0, scale: 1.1 }}
@@ -130,7 +161,7 @@ const Hero = () => {
           <motion.div
             animate={{
               y: [10, -10, 10],
-              transition: { duration: 8, repeat: Infinity, ease: "easeInOut" }
+              transition: { duration: 8, repeat: Infinity, ease: "easeInOut" },
             }}
             className="absolute top-40 right-20 w-96 h-96 bg-gradient-to-br from-purple-400/15 to-pink-400/15 rounded-full blur-3xl"
           />
@@ -138,7 +169,7 @@ const Hero = () => {
             animate={{
               y: [-15, 15, -15],
               x: [-10, 10, -10],
-              transition: { duration: 10, repeat: Infinity, ease: "easeInOut" }
+              transition: { duration: 10, repeat: Infinity, ease: "easeInOut" },
             }}
             className="absolute bottom-20 left-1/3 w-80 h-80 bg-gradient-to-br from-green-400/10 to-emerald-400/10 rounded-full blur-3xl"
           />
@@ -152,9 +183,9 @@ const Hero = () => {
               animate={sparkleAnimation}
               transition={{ delay: i * 0.5 }}
               className={`absolute w-6 h-6 text-yellow-400/60 ${
-                i % 2 === 0 ? 'top-1/4' : 'top-3/4'
+                i % 2 === 0 ? "top-1/4" : "top-3/4"
               } ${
-                i % 3 === 0 ? 'left-1/4' : i % 3 === 1 ? 'left-1/2' : 'left-3/4'
+                i % 3 === 0 ? "left-1/4" : i % 3 === 1 ? "left-1/2" : "left-3/4"
               }`}
             >
               <Sparkles className="w-full h-full" />
@@ -167,7 +198,7 @@ const Hero = () => {
       <div className="relative z-10 min-h-screen flex flex-col">
         {/* Top spacing */}
         <div className="pt-24 lg:pt-32"></div>
-        
+
         {/* Hero Content */}
         <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto w-full">
@@ -178,7 +209,7 @@ const Hero = () => {
               className="text-center"
             >
               {/* Trust Badge */}
-              <motion.div 
+              <motion.div
                 variants={itemVariants}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-white/90 backdrop-blur-md text-blue-700 rounded-full text-sm font-semibold mb-8 shadow-lg border border-blue-100"
               >
@@ -186,7 +217,10 @@ const Hero = () => {
                 <span>Trusted by 50,000+ families</span>
                 <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                    <Star
+                      key={i}
+                      className="w-3 h-3 fill-yellow-400 text-yellow-400"
+                    />
                   ))}
                 </div>
               </motion.div>
@@ -195,7 +229,9 @@ const Hero = () => {
               <motion.div variants={itemVariants} className="mb-8">
                 <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold mb-6 leading-[0.9]">
                   <RadialGradient
-                    gradient={["circle, rgba(63,94,251,1) 0%, rgba(252,70,107,1) 100%"]}
+                    gradient={[
+                      "circle, rgba(63,94,251,1) 0%, rgba(252,70,107,1) 100%",
+                    ]}
                   >
                     Find Your Perfect
                   </RadialGradient>
@@ -205,12 +241,15 @@ const Hero = () => {
                   </span>
                 </h1>
 
-                <motion.p 
+                <motion.p
                   variants={itemVariants}
                   className="text-gray-700 text-xl sm:text-2xl mb-12 max-w-3xl mx-auto leading-relaxed font-medium"
                 >
-                  Discover exceptional properties in prime locations with our 
-                  <span className="text-purple-600 font-semibold"> expert guidance</span>
+                  Discover exceptional properties in prime locations with our
+                  <span className="text-purple-600 font-semibold">
+                    {" "}
+                    expert guidance
+                  </span>
                 </motion.p>
               </motion.div>
 
@@ -219,9 +258,8 @@ const Hero = () => {
                 variants={itemVariants}
                 className="relative max-w-4xl mx-auto mb-16"
               >
-                <div className="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-2xl border border-white/50">
                   {/* Property Type Filters */}
-                  <div className="flex flex-wrap justify-center gap-3 mb-6">
+                  {/* <div className="flex flex-wrap justify-center gap-3 mb-6">
                     {quickFilters.map((filter) => (
                       <motion.button
                         key={filter.label}
@@ -239,10 +277,10 @@ const Hero = () => {
                         <span className="text-xs opacity-75">({filter.count})</span>
                       </motion.button>
                     ))}
-                  </div>
+                  </div> */}
 
                   {/* Transaction Type Filters */}
-                  <div className="flex flex-wrap justify-center gap-3 mb-6">
+                  {/* <div className="flex flex-wrap justify-center gap-3 mb-6">
                     {transactionTypes.map((type) => (
                       <motion.button
                         key={type.value}
@@ -259,55 +297,29 @@ const Hero = () => {
                         <span>{type.label}</span>
                       </motion.button>
                     ))}
-                  </div>
+                  </div> */}
 
                   {/* Search Input */}
-                  <div className="flex flex-col lg:flex-row gap-4">
-                    <div className="relative flex-1">
-                      <MapPin className={`absolute left-4 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${
-                        isSearchFocused ? 'text-blue-500' : 'text-gray-400'
-                      }`} />
-                      <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        onFocus={() => {
-                          setShowSuggestions(true);
-                          setIsSearchFocused(true);
-                        }}
-                        onBlur={() => setIsSearchFocused(false)}
-                        placeholder="Search by address, city, state, pincode or transaction type..."
-                        className="w-full pl-12 pr-6 py-4 rounded-2xl border-2 border-gray-200 bg-white/90 
-                          focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 
-                          text-lg placeholder-gray-500 font-medium"
-                      />
-                    </div>
-                    
-                    <div className="flex gap-3">
-                      <motion.button
+                  <div className="flex flex-col lg:flex-row gap-4 ">
+                    <div className="relative flex-1"></div>
+
+                    <div className="flex justify-center items-center">
+                      <motion.div
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        className="px-6 py-4 bg-gray-100 text-gray-700 rounded-2xl hover:bg-gray-200 
-                          transition-all flex items-center gap-2 font-medium"
                       >
-                        <Filter className="w-5 h-5" />
-                        <span className="hidden sm:inline">Filters</span>
-                      </motion.button>
-                      
-                      <motion.button
-                        onClick={() => handleSubmit()}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className="px-8 py-4 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 
-                          text-white rounded-2xl hover:shadow-2xl transition-all flex items-center gap-3 
-                          font-bold text-lg shadow-xl"
-                      >
-                        <Search className="w-5 h-5" />
-                        <span>Search Properties</span>
-                        <ArrowRight className="w-5 h-5" />
-                      </motion.button>
+                        <Link
+                          to="/properties" // ✅ change this path as needed
+                          className="px-8 py-4 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 
+        text-white rounded-2xl hover:shadow-2xl transition-all flex items-center gap-3 
+        font-bold text-lg shadow-xl"
+                        >
+                          <Search className="w-5 h-5" />
+                          <span>Search Properties</span>
+                          <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      </motion.div>
                     </div>
-                  </div>
 
                   {/* Enhanced Location Suggestions */}
                   {/* <AnimatePresence>
@@ -381,12 +393,18 @@ const Hero = () => {
                     className="bg-white/90 backdrop-blur-md rounded-2xl p-6 text-center shadow-xl 
                       border border-white/50 hover:shadow-2xl transition-all duration-300"
                   >
-                    <div className={`w-14 h-14 mx-auto mb-4 bg-gradient-to-br ${stat.color} 
-                      rounded-2xl flex items-center justify-center shadow-lg`}>
+                    <div
+                      className={`w-14 h-14 mx-auto mb-4 bg-gradient-to-br ${stat.color} 
+                      rounded-2xl flex items-center justify-center shadow-lg`}
+                    >
                       <stat.icon className="w-7 h-7 text-white" />
                     </div>
-                    <div className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
-                    <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
+                    <div className="text-3xl font-bold text-gray-900 mb-1">
+                      {stat.value}
+                    </div>
+                    <div className="text-sm text-gray-600 font-medium">
+                      {stat.label}
+                    </div>
                   </motion.div>
                 ))}
               </motion.div>

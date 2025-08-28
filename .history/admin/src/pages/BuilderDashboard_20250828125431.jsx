@@ -6,8 +6,9 @@ import axios from "axios";
 import api from "../api/api";
 import { paymentsAPI } from '../api/api';
 
-const BrokerDashboard = () => {
-  const navigate = useNavigate();
+
+const BuilderDashboard = () => {
+const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("properties");
   const [properties, setProperties] = useState([]);
   const [payments, setPayments] = useState([]);
@@ -16,15 +17,15 @@ const BrokerDashboard = () => {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    // console.log("BrokerDashboard: ",user);
+    // console.log("BuilderDashboard: ",user);
     
-    if (!user || user.role !== "broker") {
-      toast.error("Unauthorized. Please login as Broker.");
+    if (!user || user.role !== "builder") {
+      toast.error("Unauthorized. Please login as Builder.");
       navigate("/login");
       return;
     }
 
-   if (activeTab === "properties") fetchProperties();
+ if (activeTab === "properties") fetchProperties();
     else if (activeTab === "payments") loadPayments(user.email);
     else if (activeTab === "ads") loadAds(user.id);
 
@@ -41,11 +42,12 @@ const BrokerDashboard = () => {
       },
     });
 
-    if (response.status === 200) {
-      setProperties(Array.isArray(response.data) ? response.data : response.data.properties || []);
-    } else {
-      toast.error("Failed to fetch properties");
-    }
+if (response.status === 200) {
+  setProperties(Array.isArray(response.data) ? response.data : response.data.properties || []);
+} else {
+  toast.error("Failed to fetch properties");
+}
+
   } catch (error) {
     console.error("Fetch properties error:", error);
     toast.error("Failed to fetch properties");
@@ -154,7 +156,7 @@ const handleDeletePayment = async (id, type) => {
     loadAds();
   }, []);
 
-  return (
+   return (
     <div className="min-h-screen pt-16 px-6 bg-gray-50 max-w-7xl mx-auto">
        <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Broker Dashboard</h1>
@@ -358,7 +360,6 @@ const handleDeletePayment = async (id, type) => {
           </div>
         )}
       </td>
-
               <td className="px-6 py-4">{ad.property?.title || "-"}</td>
               <td className="px-6 py-4">₹{ad.budget.toLocaleString()}</td>
               <td className="px-6 py-4">{ad.platform.join(", ")}</td>
@@ -383,4 +384,4 @@ const handleDeletePayment = async (id, type) => {
   );
 };
 
-export default BrokerDashboard;
+export default BuilderDashboard;

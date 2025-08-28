@@ -41,11 +41,12 @@ const BrokerDashboard = () => {
       },
     });
 
-    if (response.status === 200) {
-      setProperties(Array.isArray(response.data) ? response.data : response.data.properties || []);
-    } else {
-      toast.error("Failed to fetch properties");
-    }
+if (response.status === 200) {
+  setProperties(Array.isArray(response.data) ? response.data : response.data.properties || []);
+} else {
+  toast.error("Failed to fetch properties");
+}
+
   } catch (error) {
     console.error("Fetch properties error:", error);
     toast.error("Failed to fetch properties");

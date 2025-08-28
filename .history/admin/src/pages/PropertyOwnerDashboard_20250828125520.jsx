@@ -6,25 +6,26 @@ import axios from "axios";
 import api from "../api/api";
 import { paymentsAPI } from '../api/api';
 
-const BrokerDashboard = () => {
-  const navigate = useNavigate();
+
+const PropertyOwnerDashboard = () => {
+   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("properties");
   const [properties, setProperties] = useState([]);
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [ads, setAds] = useState([]);
 
-  useEffect(() => {
+useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    // console.log("BrokerDashboard: ",user);
+    // console.log("PropertyOwnerDashboard: ",user);
     
-    if (!user || user.role !== "broker") {
-      toast.error("Unauthorized. Please login as Broker.");
+    if (!user || user.role !== "owner") {
+      toast.error("Unauthorized. Please login as Owner.");
       navigate("/login");
       return;
     }
 
-   if (activeTab === "properties") fetchProperties();
+    if (activeTab === "properties") fetchProperties();
     else if (activeTab === "payments") loadPayments(user.email);
     else if (activeTab === "ads") loadAds(user.id);
 
@@ -41,11 +42,11 @@ const BrokerDashboard = () => {
       },
     });
 
-    if (response.status === 200) {
-      setProperties(Array.isArray(response.data) ? response.data : response.data.properties || []);
-    } else {
-      toast.error("Failed to fetch properties");
-    }
+      if (response.status === 200) {
+        setProperties(Array.isArray(response.data) ? response.data : response.data.properties || []);
+      } else {
+        toast.error("Failed to fetch properties");
+      }
   } catch (error) {
     console.error("Fetch properties error:", error);
     toast.error("Failed to fetch properties");
@@ -60,7 +61,7 @@ const loadPayments = async (email) => {
     const res = await paymentsAPI.myPayments();
 
     if (res.data?.success) {
-      setPayments(res.data.transactions); // <-- use transactions, not payments
+      setPayments(res.data.transactions); 
     } else {
       toast.error("Failed to load payments");
       setPayments([]);
@@ -287,7 +288,7 @@ const handleDeletePayment = async (id, type) => {
     </div>
   ) : (
     <div className="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
-            <table className="min-w-full divide-y divide-gray-200">
+           <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
@@ -383,4 +384,4 @@ const handleDeletePayment = async (id, type) => {
   );
 };
 
-export default BrokerDashboard;
+export default PropertyOwnerDashboard;

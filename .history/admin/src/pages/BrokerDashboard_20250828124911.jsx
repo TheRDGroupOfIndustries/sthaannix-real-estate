@@ -42,7 +42,7 @@ const BrokerDashboard = () => {
     });
 
     if (response.status === 200) {
-      setProperties(Array.isArray(response.data) ? response.data : response.data.properties || []);
+      setProperties(response.data); // backend returns array of properties
     } else {
       toast.error("Failed to fetch properties");
     }

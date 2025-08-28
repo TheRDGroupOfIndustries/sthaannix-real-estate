@@ -37,9 +37,9 @@ const Appointments = () => {
         // Filter out appointments with missing user data
         const validAppointments = response.data.filter(
           (apt) => apt?.buyer?._id && apt?.property?._id
+        )
 
-
-        setAppointments(validAppointments);
+        setAppointments(validAppointments)
       } else {
         toast.error(response.data.message);
       }

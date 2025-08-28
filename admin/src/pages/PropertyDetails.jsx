@@ -14,7 +14,7 @@ const PropertyDetails = () => {
     const fetchProperty = async () => {
       try {
         const res = await http.get(`${Backendurl}/properties/get-by-id/${id}`);
-        console.log('fetchProperty',res.data);
+        // console.log('fetchProperty',res.data);
         
         setProperty(res.data);
         // setUserId(res.data.owner)

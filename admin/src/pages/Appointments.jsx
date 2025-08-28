@@ -30,7 +30,7 @@ const Appointments = () => {
     try {
       setLoading(true);
       const response = await http.get(`${Backendurl}/leads/my-properties`);
-      console.log("fetchAppointments:", response.data);
+      // console.log("fetchAppointments:", response.data);
 
       if (response.status == 200) {
 

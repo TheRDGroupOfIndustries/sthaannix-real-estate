@@ -2,15 +2,17 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { Users, RefreshCw, CreditCard, FileText, Home } from "lucide-react";
+import { Users, RefreshCw, CreditCard, FileText, Home, Menu, X } from "lucide-react";
 import { adminAPI, paymentsAPI } from "../api/api";
 import UsersOverview from "../components/UsersOverview";
 import PaymentApproval from "../components/PaymentApproval";
 import AdsApproval from "../components/AdsApproval";
 import PropertyApproval from "../components/PropertyApproval";
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("users");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Users state
   const [users, setUsers] = useState([]);
@@ -32,14 +34,13 @@ const AdminDashboard = () => {
   const [loadingId, setLoadingId] = useState(null);
   const [pendingProperties, setPendingProperties] = useState([]);
   const [rejectedProperties, setRejectedProperties] = useState([]);
+
   // Fetch all users and their data
   const fetchUsersData = async () => {
     try {
       setUsersLoading(true);
-
       const response = await adminAPI.getUsersData();
-      // console.log("fetchUsersData:", response.data.data);
-
+      
       if (response.data.success) {
         setUsers(response.data.data);
       } else {
@@ -52,12 +53,12 @@ const AdminDashboard = () => {
       setUsersLoading(false);
     }
   };
+  
   const fetchAdminStats = async () => {
     try {
       setStatsLoading(true);
       const response = await adminAPI.getStats();
-      // console.log("fetchAdminStats",response.data);
-
+      
       if (response.status == 200) {
         setStats(response.data);
       } else {
@@ -77,8 +78,6 @@ const AdminDashboard = () => {
       setPaymentsLoading(true);
       const response = await paymentsAPI.getAll();
 
-      // console.log("loadPayments:", response.data.data);
-
       if (response.status === 200) {
         setPayments(response.data.data ?? []);
       } else {
@@ -92,12 +91,11 @@ const AdminDashboard = () => {
     }
   };
 
-  // Load ads (implement your adminAPI.getAdsData())
+  // Load ads
   const loadAds = async () => {
     try {
       setAdsLoading(true);
       const response = await adminAPI.getAllAdRequests();
-      //   console.log("loadAds: ", response.data);
 
       if (response.status === 200) {
         setAds(response.data.campaigns || []);
@@ -142,7 +140,7 @@ const AdminDashboard = () => {
     }
   };
 
-  // Load properties (implement your adminAPI.getPropertiesData())
+  // Load properties
   const loadProperties = async () => {
     setPropertyLoading(true);
     try {
@@ -150,7 +148,6 @@ const AdminDashboard = () => {
         adminAPI.getProperties("pending"),
         adminAPI.getProperties("rejected"),
       ]);
-      // console.log("rejectedRes: ", rejectedRes);
 
       if (pendingRes.status === 200) {
         setPendingProperties(pendingRes.data);
@@ -185,8 +182,6 @@ const AdminDashboard = () => {
         }
 
         const res = await adminAPI.rejectProperty(id, reason);
-        // console.log("rejectProperty: ", res);
-
         toast.success("Property rejected");
       }
       await loadProperties();
@@ -236,9 +231,7 @@ const AdminDashboard = () => {
 
       if (res.status === 200) {
         const updatedRes = await paymentsAPI.getAll();
-
         setPayments(updatedRes.data?.data ?? []);
-
         toast.success("Payment approved successfully");
       } else {
         toast.error("Failed to approve payment");
@@ -255,9 +248,7 @@ const AdminDashboard = () => {
 
       if (res.status === 200) {
         const updatedRes = await paymentsAPI.getAll();
-
-        setPayments(updatedRes.data.data ?? []); // ✅ fixed
-
+        setPayments(updatedRes.data.data ?? []);
         toast.success("Payment rejected");
       } else {
         toast.error("Failed to reject payment");
@@ -271,11 +262,9 @@ const AdminDashboard = () => {
   const approveWalletPayment = async (id, utrNumber, paymentMethod) => {
     try {
       const res = await paymentsAPI.walletApprove(id, utrNumber, paymentMethod);
-      console.log("rapprove: ", res);
 
       if (res.status === 200) {
         const updatedRes = await paymentsAPI.getAll();
-
         setPayments(updatedRes.data.data ?? []);
         toast.success("Wallet Payment approved");
       } else {
@@ -289,9 +278,7 @@ const AdminDashboard = () => {
 
   const cancelWalletPayment = async (id, reason) => {
     try {
-      // Call backend reject API with reason
       const res = await paymentsAPI.walletReject(id, reason);
-      console.log("cancelWalletPayment: ", res);
 
       if (res.status === 200) {
         const updatedRes = await paymentsAPI.getAll();
@@ -342,41 +329,99 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen pt-24 px-4 bg-gray-50">
+    <div className="min-h-screen pt-20 md:pt-24 px-4 bg-gray-50">
       <div className="max-w-7xl mx-auto">
+        {/* Mobile menu button */}
+        <div className="lg:hidden flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-2 rounded-md text-gray-700 hover:bg-gray-100"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
+
         {/* Header with tabs */}
-        <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold text-gray-900">
+        <div className="mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+          <div className="hidden lg:flex items-center gap-3">
+            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
               {activeTab === "users" && (
                 <>
-                  <Users className="w-8 h-8 text-blue-600 inline mr-2" /> Admin
+                  <Users className="w-6 h-6 lg:w-8 lg:h-8 text-blue-600 inline mr-2" /> Admin
                   Dashboard
                 </>
               )}
               {activeTab === "payments" && (
                 <>
-                  <CreditCard className="w-8 h-8 text-blue-600 inline mr-2" />{" "}
+                  <CreditCard className="w-6 h-6 lg:w-8 lg:h-8 text-blue-600 inline mr-2" />{" "}
                   Payment Approval
                 </>
               )}
               {activeTab === "ads" && (
                 <>
-                  <FileText className="w-8 h-8 text-blue-600 inline mr-2" /> Ads
+                  <FileText className="w-6 h-6 lg:w-8 lg:h-8 text-blue-600 inline mr-2" /> Ads
                   Approval
                 </>
               )}
               {activeTab === "properties" && (
                 <>
-                  <Home className="w-8 h-8 text-blue-600 inline mr-2" />{" "}
+                  <Home className="w-6 h-6 lg:w-8 lg:h-8 text-blue-600 inline mr-2" />{" "}
                   Property Approval
                 </>
               )}
             </h1>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+          <div className="w-full flex flex-col lg:flex-row items-stretch lg:items-center gap-4">
+            {/* Mobile tabs dropdown */}
+            {mobileMenuOpen && (
+              <div className="lg:hidden grid grid-cols-2 gap-2 mb-4">
+                <button
+                  onClick={() => { setActiveTab("users"); setMobileMenuOpen(false); }}
+                  className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
+                    activeTab === "users"
+                      ? "bg-blue-600 text-white"
+                      : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300"
+                  }`}
+                >
+                  Users
+                </button>
+                <button
+                  onClick={() => { setActiveTab("payments"); setMobileMenuOpen(false); }}
+                  className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
+                    activeTab === "payments"
+                      ? "bg-blue-600 text-white"
+                      : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300"
+                  }`}
+                >
+                  Payments
+                </button>
+                <button
+                  onClick={() => { setActiveTab("ads"); setMobileMenuOpen(false); }}
+                  className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
+                    activeTab === "ads"
+                      ? "bg-blue-600 text-white"
+                      : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300"
+                  }`}
+                >
+                  Ads
+                </button>
+                <button
+                  onClick={() => { setActiveTab("properties"); setMobileMenuOpen(false); }}
+                  className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
+                    activeTab === "properties"
+                      ? "bg-blue-600 text-white"
+                      : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300"
+                  }`}
+                >
+                  Properties
+                </button>
+              </div>
+            )}
+
+            {/* Desktop tabs */}
+            <div className="hidden lg:flex border border-gray-300 rounded-lg overflow-hidden">
               <button
                 onClick={() => setActiveTab("users")}
                 className={`px-4 py-2 text-sm font-medium transition-colors ${
@@ -422,13 +467,24 @@ const AdminDashboard = () => {
             <button
               onClick={handleRefresh}
               disabled={refreshing}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 transition-colors disabled:opacity-50"
+              className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 transition-colors disabled:opacity-50"
             >
               <RefreshCw
-                className={`w-5 h-5 ${refreshing ? "animate-spin" : ""}`}
+                className={`w-4 h-4 lg:w-5 lg:h-5 ${refreshing ? "animate-spin" : ""}`}
               />
-              {refreshing ? "Refreshing" : "Refresh"}
+              <span className="hidden sm:inline">{refreshing ? "Refreshing" : "Refresh"}</span>
             </button>
+          </div>
+        </div>
+
+        {/* Mobile active tab indicator */}
+        <div className="lg:hidden mb-6">
+          <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-lg">
+            <span className="font-medium">Current View: </span>
+            {activeTab === "users" && "Users Overview"}
+            {activeTab === "payments" && "Payment Approval"}
+            {activeTab === "ads" && "Ads Approval"}
+            {activeTab === "properties" && "Property Approval"}
           </div>
         </div>
 

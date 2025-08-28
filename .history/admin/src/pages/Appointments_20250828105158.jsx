@@ -33,10 +33,10 @@ const Appointments = () => {
       console.log("fetchAppointments:", response.data);
 
       if (response.status == 200) {
-            // Filter out appointments with missing user data
-      const validAppointments = response.data.filter(
-      (apt) => apt?.buyer?._id && apt?.property?._id
-    );
+        // Filter out appointments with missing user data
+   const validAppointments = response.data.filter(
+  (apt) => apt?.buyer?._id && apt?.property?._id
+);
 
         setAppointments(validAppointments);
       } else {

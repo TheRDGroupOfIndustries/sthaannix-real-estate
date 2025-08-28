@@ -114,30 +114,48 @@ export const getAllAdRequests = async (req: Request, res: Response) => {
 
 
 // Admin updates campaign status
+// Admin updates campaign status
 export const updateAdStatus = async (req: Request, res: Response) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
     const { id } = req.params;
     const { status } = req.body;
 
     if (!["approved", "rejected", "pending"].includes(status)) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(400).json({
         success: false,
         message: "Invalid status. Allowed values: approved, rejected, pending",
       });
     }
 
-    const campaign = await AdCampaign.findByIdAndUpdate(
-      id,
-      { status },
-      { new: true }
-    );
-
+    const campaign = await AdCampaign.findById(id).session(session);
     if (!campaign) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(404).json({
         success: false,
         message: "Ad campaign not found",
       });
     }
+
+    // If rejected, refund user
+    if (status === "rejected" && campaign.status === "pending") {
+      const user = await User.findById(campaign.user).session(session);
+      if (user) {
+        user.walletBalance += campaign.budget;
+        await user.save({ session });
+      }
+    }
+
+    campaign.status = status;
+    await campaign.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
 
     return res.status(200).json({
       success: true,
@@ -145,6 +163,8 @@ export const updateAdStatus = async (req: Request, res: Response) => {
       campaign,
     });
   } catch (error: any) {
+    await session.abortTransaction();
+    session.endSession();
     console.error("Error updating ad status:", error);
     return res.status(500).json({
       success: false,
@@ -153,6 +173,7 @@ export const updateAdStatus = async (req: Request, res: Response) => {
     });
   }
 };
+
 
 // Get ads of logged-in user
 export const getUserAdRequests = async (req: Request, res: Response) => {

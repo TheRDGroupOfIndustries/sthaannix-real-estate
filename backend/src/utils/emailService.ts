@@ -220,3 +220,37 @@ export const sendPaymentConfirmation = async (
     `,
   });
 };
+
+// Add this new function to your Node.js file
+export const sendContactFormMessage = async (formData: {
+  name: string;
+  email: string;
+  phone?: string;
+  message: string;
+}) => {
+  return sendEmail({
+    to: process.env.BUSINESS_EMAIL ?? "default@email.com", // This is a new environment variable for your business email address
+    subject: `New Contact Form Message from ${formData.name}`,
+    text: `You have a new message from a contact form.
+Name: ${formData.name}
+Email: ${formData.email}
+Phone: ${formData.phone || "Not provided"}
+Message: ${formData.message}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+        <h2 style="color: #2d3748;">New Contact Form Submission</h2>
+        <p>You have a new message from your website's contact form. Here are the details:</p>
+        
+        <div style="background: #f7fafc; padding: 20px; border-radius: 8px; margin: 24px 0;">
+          <p style="margin: 0 0 10px 0;"><strong>Name:</strong> ${formData.name}</p>
+          <p style="margin: 0 0 10px 0;"><strong>Email:</strong> <a href="mailto:${formData.email}">${formData.email}</a></p>
+          <p style="margin: 0 0 10px 0;"><strong>Phone:</strong> ${formData.phone || "Not provided"}</p>
+          <p style="margin: 0 0 0 0;"><strong>Message:</strong></p>
+          <p style="margin-top: 5px; padding-left: 10px; border-left: 2px solid #cbd5e0;">${formData.message}</p>
+        </div>
+        
+        <p style="font-size: 14px; color: #718096;">Sthaanix Contact Form System</p>
+      </div>
+    `,
+  });
+};

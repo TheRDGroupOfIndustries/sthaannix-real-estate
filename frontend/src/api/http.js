@@ -4,7 +4,7 @@ import { configBackendURL } from "../config";
 const http = axios.create({
   baseURL: configBackendURL,
   withCredentials: true,
-});
+}); 
 
 http.interceptors.request.use(
   (config) => {

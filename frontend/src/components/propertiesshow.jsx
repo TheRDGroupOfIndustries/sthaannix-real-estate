@@ -208,10 +208,7 @@ const PropertiesShow = () => {
     const loadProperties = async () => {
       try {
         setLoading(true);
-        const response = await fetchProperties();
-
-        console.log(configBackendURL);
-        
+        const response = await fetchProperties();        
         
         if (response) {
           // Take only the first 6 properties for featured section

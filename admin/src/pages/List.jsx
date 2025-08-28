@@ -1104,6 +1104,7 @@ const PropertyListings = () => {
             >
               <AnimatePresence>
                 {filteredProperties.map((property, index) => (
+                  <Link to={`/property/${property._id}`} className="block group"   key={property._id}>
                   <motion.div
                     key={property._id}
                     variants={cardVariants}
@@ -1156,6 +1157,7 @@ const PropertyListings = () => {
                       <div className="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
                         <Link
                           to={`/update/${property._id}`}
+                           onClick={(e) => e.stopPropagation()}
                           className="p-2 bg-white/90 backdrop-blur-sm text-blue-600 rounded-full hover:bg-blue-600 hover:text-white transition-all duration-200 shadow-lg"
                         >
                           <Edit3 className="w-4 h-4" />
@@ -1163,8 +1165,9 @@ const PropertyListings = () => {
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
-                          onClick={() =>
-                            handleRemoveProperty(property._id, property.title)
+                          onClick={(e) =>
+                           { e.stopPropagation()
+                            handleRemoveProperty(property._id, property.title)}
                           }
                           className="p-2 bg-white/90 backdrop-blur-sm text-red-600 rounded-full hover:bg-red-600 hover:text-white transition-all duration-200 shadow-lg"
                         >
@@ -1270,16 +1273,18 @@ const PropertyListings = () => {
                           <div className="flex items-center gap-2">
                             <Link
                               to={`/update/${property._id}`}
+                               onClick={(e) => e.stopPropagation()}
                               className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
                             >
                               <Edit3 className="w-4 h-4" />
                             </Link>
                             <button
-                              onClick={() =>
+                              onClick={(e) =>
+                                {e.stopPropagation()
                                 handleRemoveProperty(
                                   property._id,
                                   property.title
-                                )
+                                )}
                               }
                               className="p-2 text-gray-400 hover:text-red-600 transition-colors"
                             >
@@ -1290,6 +1295,7 @@ const PropertyListings = () => {
                       )}
                     </div>
                   </motion.div>
+                  </Link>
                 ))}
               </AnimatePresence>
             </div>

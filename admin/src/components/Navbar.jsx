@@ -15,7 +15,8 @@ import {
   HandCoins,
   User,
   ChevronDown,
-  ChartCandlestick
+  ChartCandlestick,
+  MessageSquareText 
 } from 'lucide-react';
 
 const Navbar = () => {
@@ -90,6 +91,7 @@ const Navbar = () => {
       { path: '/add', label: 'Add Property', icon: PlusSquare },
       { path: '/appointments', label: 'Leads', icon: Calendar },
       { path: '/revenue', label: 'Revenue', icon: ChartCandlestick },
+      { path: '/users-messages', label: 'User Messages', icon: MessageSquareText  },
     ],
     broker: [
       { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },

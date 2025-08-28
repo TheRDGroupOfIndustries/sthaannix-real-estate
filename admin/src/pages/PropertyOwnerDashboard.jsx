@@ -239,7 +239,7 @@ const PropertyOwnerDashboard = () => {
                 />
                 <h2 className="font-semibold text-lg mb-1">{property.title}</h2>
                 <p className="text-gray-600 mb-1">
-                  {property.location?.address}
+                 {property.location?.address}, {property.location?.city}, {property.location?.state} - {property.location?.pincode}
                 </p>
                 <p className="text-blue-600 font-bold mb-2">
                   ₹{property.price.toLocaleString()}

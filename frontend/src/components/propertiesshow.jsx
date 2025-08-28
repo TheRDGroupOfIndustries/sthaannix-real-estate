@@ -14,7 +14,6 @@ import {
   Search,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-// import { Backendurl } from '../App';
 import PropTypes from "prop-types";
 import { fetchProperties } from "../services/property-InqueryService";
 import { configBackendURL } from "../config";

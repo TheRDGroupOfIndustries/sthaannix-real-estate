@@ -390,7 +390,7 @@ const PropertiesPage = () => {
                   ? "grid-cols-1 md:grid-cols-2"
                   : "grid-cols-1"
               }`}
-            >
+            > 
               <AnimatePresence>
                 {filteredProperties.length > 0 ? (
                   filteredProperties.map((property) => (

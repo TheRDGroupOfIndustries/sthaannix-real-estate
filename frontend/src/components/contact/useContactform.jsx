@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { configBackendURL } from '../../config';
+import 'react-toastify/dist/ReactToastify.css'; // Make sure this CSS is loaded once, typically in your main App.js or index.js
+import { configBackendURL } from '../../config'; // Assuming '../../config' is the correct path for your config file
 
 export default function useContactForm() {
   const [formData, setFormData] = useState({
@@ -13,6 +13,7 @@ export default function useContactForm() {
   });
 
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false); // New loading state
 
   const validateForm = () => {
     const newErrors = {};
@@ -38,6 +39,7 @@ export default function useContactForm() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    // Clear error for the field as user types
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: undefined }));
     }
@@ -45,20 +47,40 @@ export default function useContactForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true); // Set loading to true when submission starts
+
     if (validateForm()) {
       try {
-        const response = await axios.post(`${configBackendURL}/api/forms/submit`, formData);
-        toast.success('Form submitted successfully!');
-        // Reset form
-        setFormData({ name: '', email: '', phone: '', message: '' });
+        // Ensure the endpoint matches your backend route
+        const response = await axios.post(`${configBackendURL}/contact/send`, formData);
+
+        if (response.data.success) { // Assuming your backend returns { success: true, ... }
+          toast.success('Form submitted successfully!');
+          // Reset form
+          setFormData({ name: '', email: '', phone: '', message: '' });
+          setErrors({}); // Clear any lingering errors
+        } else {
+          // Handle cases where the backend responds with success: false
+          toast.error(response.data.message || 'Error submitting form. Please try again.');
+          console.error('Backend error (success: false):', response.data.message);
+        }
       } catch (error) {
         toast.error('Error submitting form. Please try again.');
         console.error('Error submitting form:', error);
+        // Log the full error response for debugging if available
+        if (error.response) {
+          console.error('Error response data:', error.response.data);
+          console.error('Error response status:', error.response.status);
+        }
+      } finally {
+        setIsLoading(false); // Always set loading to false after submission attempt
       }
     } else {
+      toast.error('Please correct the highlighted errors.'); // Notify user about validation errors
+      setIsLoading(false); // Stop loading if validation fails
       console.log('Validation errors:', errors); // Debugging log
     }
   };
 
-  return { formData, errors, handleChange, handleSubmit };
+  return { formData, errors, isLoading, handleChange, handleSubmit };
 }

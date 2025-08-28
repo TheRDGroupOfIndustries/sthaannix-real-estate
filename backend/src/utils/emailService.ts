@@ -229,7 +229,7 @@ export const sendContactFormMessage = async (formData: {
   message: string;
 }) => {
   return sendEmail({
-    to: process.env.BUSINESS_EMAIL ?? "default@email.com", // This is a new environment variable for your business email address
+    to: process.env.BUSINESS_EMAIL ?? "default@email.com", 
     subject: `New Contact Form Message from ${formData.name}`,
     text: `You have a new message from a contact form.
 Name: ${formData.name}

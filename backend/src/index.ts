@@ -14,11 +14,12 @@ import userRoutes from "./routes/userRoutes";
 import paymentRoutes from "./routes/paymentRoutes";
 import adRoute from "./routes/adRoutes";
 import revenueRoute from "./routes/adminRevenueRoute";
+import contactRoutes from "./routes/contactRoutes";
 
 const app = express();
 const port = process.env.PORT || 12000;
 app.use(
-  cors({
+  cors({ 
     origin: ["http://localhost:5173", "http://localhost:5174", "https://sthaannix-real-estate.vercel.app", "https://sthaannix-real-estate-xyrj.vercel.app"],
     credentials: true, 
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
@@ -38,6 +39,7 @@ app.use("/me", userRoutes);
 app.use("/payment", paymentRoutes);
 app.use("/ad", adRoute);
 app.use("/revenue", revenueRoute);
+app.use("/contact", contactRoutes);
 
 const runServer = async () => {
   const connected = await dbConnect();

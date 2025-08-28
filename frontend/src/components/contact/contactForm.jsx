@@ -12,7 +12,7 @@ function ContactForm() {
       whileInView={{ x: 0, opacity: 1 }}
       viewport={{ once: true }}
       className="bg-white p-8 rounded-2xl shadow-sm"
-    > 
+    >
       <h2 className="text-2xl font-bold mb-6">Send Us a Message</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>

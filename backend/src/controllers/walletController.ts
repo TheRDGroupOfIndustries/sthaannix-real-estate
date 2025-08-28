@@ -165,7 +165,7 @@ export const reviewTopUpRequest = async (req: Request, res: Response) => {
     }
 
     if (paymentMethod) {
-      topUp.paymentMethod = paymentMethod; // ✅ now safe
+      topUp.paymentMethod = paymentMethod; 
     }
 
     if (action === "approved") {

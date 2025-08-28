@@ -121,6 +121,7 @@ const AdsApproval = ({ ads, adsLoading, approveAd, rejectAd }) => {
                     {ad.property?.bhk || "-"}Bhk/{ad.property?.bathroom || "-"}
                     Bath
                   </td>
+        
                   <td className="px-6 py-4">
                     {ad.platform?.join(", ") || "-"}
                   </td>

@@ -33,10 +33,11 @@ const Appointments = () => {
       console.log("fetchAppointments:", response.data);
 
       if (response.status == 200) {
-            // Filter out appointments with missing user data
-      const validAppointments = response.data.filter(
-      (apt) => apt?.buyer?._id && apt?.property?._id
-    );
+
+        // Filter out appointments with missing user data
+        const validAppointments = response.data.filter(
+          (apt) => apt?.buyer?._id && apt?.property?._id
+
 
         setAppointments(validAppointments);
       } else {
@@ -224,7 +225,7 @@ const Appointments = () => {
                         <Home className="w-5 h-5 text-gray-400 mr-2" />
                         <div>
                           <p className="font-medium text-gray-900 ">
-                            {appointment.property.title}
+                            {appointment.property?.title || "Unknown Property"}
                           </p>
                           <p className="text-sm text-gray-500">
                             {appointment.property.location.city}

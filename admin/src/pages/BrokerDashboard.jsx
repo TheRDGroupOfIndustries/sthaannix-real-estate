@@ -287,7 +287,7 @@ const handleDeletePayment = async (id, type) => {
     </div>
   ) : (
     <div className="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
-      <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
@@ -295,6 +295,7 @@ const handleDeletePayment = async (id, type) => {
              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
             <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
           </tr>
         </thead>
@@ -306,6 +307,7 @@ const handleDeletePayment = async (id, type) => {
                <td className="px-6 py-4 whitespace-nowrap">{payment.amount || "-"}</td>
               <td className="px-6 py-4 whitespace-nowrap">{new Date(payment.createdAt).toLocaleString()}</td>
               <td className="px-6 py-4 whitespace-nowrap">{payment.purpose || "Wallet Top-up"}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{payment.status || "-"}</td>
               <td className="px-6 py-4 whitespace-nowrap text-center">
                 <button
                   onClick={() => handleDeletePayment(payment._id,payment.type)}

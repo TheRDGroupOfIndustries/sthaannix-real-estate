@@ -22,11 +22,12 @@ export const updateProfile = async (req: Request, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
-    const { name, email, password } = req.body;
+    const { name, email, password, phone } = req.body;
 
     let updateData: any = {};
     if (name) updateData.name = name;
     if (email) updateData.email = email;
+    if (phone) updateData.phone = phone;
     if (password) {
       const salt = await bcrypt.genSalt(10);
       updateData.password = await bcrypt.hash(password, salt);

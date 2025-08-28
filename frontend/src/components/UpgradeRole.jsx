@@ -178,7 +178,7 @@ export default function UpgradeRole() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-4 sm:p-6 lg:p-8 max-w-3xl mx-auto bg-white rounded-xl shadow-lg"
+      className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto bg-white rounded-xl shadow-lg"
     >
       <h2 className="text-3xl font-extrabold text-gray-900 mb-2">
         Upgrade Your Role
@@ -375,7 +375,7 @@ export default function UpgradeRole() {
             </div>
 
             {/* Payment Proof Upload (always shown if a payment method is selected) */}
-            {selectedPaymentMethod && (
+            {/* {selectedPaymentMethod && (
               <div>
                 <label
                   htmlFor="proofFile"
@@ -406,7 +406,53 @@ export default function UpgradeRole() {
                   </div>
                 </div>
               </div>
+            )} */}
+            {/* Payment Proof Upload (always shown if a payment method is selected) */}
+            {selectedPaymentMethod && (
+              <div>
+                <label
+                  htmlFor="proofFile"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Upload Payment Proof (Screenshot)
+                </label>
+                <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-5 text-center cursor-pointer hover:bg-gray-50 transition-colors duration-200">
+                  <input
+                    id="proofFile"
+                    type="file"
+                    name="proofFile"
+                    onChange={handleFileChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    accept="image/*"
+                    required
+                  />
+                  <div className="flex flex-col items-center space-y-3">
+                    <UploadCloud className="w-9 h-9 text-gray-400" />
+                    <p className="text-base text-gray-500">
+                      {formData.proofFile
+                        ? `File Selected: ${formData.proofFile.name}`
+                        : "Click to upload your payment screenshot"}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      Accepted formats: JPG, PNG, GIF
+                    </p>
+                  </div>
+                </div>
+
+                {/* ✅ Image Preview */}
+                {formData.proofFile && (
+                  <div className="mt-4">
+                    <p className="text-sm font-medium text-gray-700 mb-2">Preview:</p>
+                    <img
+                      src={URL.createObjectURL(formData.proofFile)}
+                      alt="Payment Proof Preview"
+                      className="w-full max-h-80 object-contain rounded-lg shadow"
+                    />
+                  </div>
+                )}
+              </div>
             )}
+
 
             {selectedPaymentMethod === "whatsapp" && (
               <div className="p-4 bg-yellow-50 rounded-lg border-l-4 border-yellow-500 shadow-sm">

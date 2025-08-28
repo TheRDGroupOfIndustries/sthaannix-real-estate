@@ -94,7 +94,7 @@ const ForgotPassword = () => {
     }
 
     try {
-      const response = await axios.post(`${configBackendURL}/user/reset`, {
+      const response = await axios.post(`${configBackendURL}user/reset`, {
         email,
         newPassword: password,
       });
@@ -116,7 +116,7 @@ const ForgotPassword = () => {
     setLoading(true);
     setResetClick(true);
     try {
-      const response = await axios.post(`${configBackendURL}/user/send-otp`, {
+      const response = await axios.post(`${configBackendURL}user/send-otp`, {
         email,
       });
       if (response.data.success) {
@@ -137,7 +137,7 @@ const ForgotPassword = () => {
     setLoading(true);
     setResetClick(true);
     try {
-      const response = await axios.post(`${configBackendURL}/user/verify-pass-otp`, {
+      const response = await axios.post(`${configBackendURL}user/verify-pass-otp`, {
         email,
         otp,
       });
@@ -395,7 +395,6 @@ const ForgotPassword = () => {
                     value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);
-                      console.log(password);
                     }}
                     className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
@@ -405,7 +404,6 @@ const ForgotPassword = () => {
                     value={confirmPassword}
                     onChange={(e) => {
                       setConfirmPassword(e.target.value);
-                      console.log(confirmPassword);
                     }}
                     className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />

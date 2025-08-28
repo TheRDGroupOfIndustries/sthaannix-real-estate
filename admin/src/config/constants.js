@@ -15,4 +15,4 @@
 // };
 
 
-export const Backendurl = "http://localhost:12000"
+export const Backendurl = import.meta.env.VITE_API_BASE_URL

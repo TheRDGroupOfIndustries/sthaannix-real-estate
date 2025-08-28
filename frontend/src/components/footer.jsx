@@ -334,7 +334,7 @@ const companyLinks = [
 ];
 
 const helpLinks = [
-  { name: 'Customer Support', href: '/', icon: Heart },
+  { name: 'Customer Support', href: '/contact', icon: Heart },
   { name: 'FAQs', href: '/', icon: Sparkles },
   { name: 'Terms & Conditions', href: '/', icon: Shield },
   { name: 'Privacy Policy', href: '/', icon: Clock },

@@ -115,7 +115,7 @@ const Revenue = () => {
                 Ad Campaign Revenue (Admin Share)
               </p>
               <p className="text-2xl font-bold text-gray-900">
-                ₹{revenue.totalAdRevenue}
+               ₹{Number(revenue.totalAdRevenue).toFixed(2)}
               </p>
               <p className="text-xs text-gray-500">
                 {revenue.adRevenues?.length} campaigns

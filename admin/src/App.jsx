@@ -239,6 +239,7 @@ import Wallet from "./pages/Wallet";
 import Revenue from "./Revenue";
 import Ads from "./pages/Ads";
 import PropertyDetails from "./pages/PropertyDetails";
+import ContactMessages from "./pages/ContactMessages";
 
 export const Backendurl = import.meta.env.VITE_API_BASE_URL;
 
@@ -411,6 +412,11 @@ const App = () => {
                 element={getUser() ? <Payment /> : <Navigate to="/login" replace />}
               />
 
+                <Route path="users-messages"  element={
+                  <PrivateRoute allowedRoles={["admin"]}>
+                    <ContactMessages />
+                  </PrivateRoute>
+                }/>
 
               <Route
                 path="/revenue"

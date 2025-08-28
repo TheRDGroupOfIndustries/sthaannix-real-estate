@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; // Make sure this CSS is loaded once, typically in your main App.js or index.js
 import { configBackendURL } from '../../config'; // Assuming '../../config' is the correct path for your config file
-
+import http from '../../api/http';
 export default function useContactForm() {
   const [formData, setFormData] = useState({
     name: '',
@@ -52,7 +51,7 @@ export default function useContactForm() {
     if (validateForm()) {
       try {
         // Ensure the endpoint matches your backend route
-        const response = await axios.post(`${configBackendURL}/contact/send`, formData);
+        const response = await http.post(`${configBackendURL}/contact/send`, formData);
 
         if (response.data.success) { // Assuming your backend returns { success: true, ... }
           toast.success('Form submitted successfully!');

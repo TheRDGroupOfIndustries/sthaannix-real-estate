@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Send } from "lucide-react";
 import useContactForm from "./useContactform";
+import Replies from "./Replies";
 
 function ContactForm() {
   const { formData, errors, handleChange, handleSubmit } = useContactForm();
 
+  const [modalOpen, setModalOpen] = useState(false);
   return (
     <motion.div
       initial={{ x: -20, opacity: 0 }}
@@ -106,6 +108,20 @@ function ContactForm() {
           Send Message
         </button>
       </form>
+      <hr className="m-4 border-gray-400" />
+      <button
+        onClick={() => setModalOpen(true)}
+        className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center"
+      >
+        Recieved Replies
+      </button>
+      <Replies
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title="Recieved Replies"
+      >
+        
+      </Replies>
     </motion.div>
   );
 }

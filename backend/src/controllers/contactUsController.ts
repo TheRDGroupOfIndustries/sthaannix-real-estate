@@ -80,3 +80,29 @@ export const replyToContact = async (req: Request, res: Response) => {
       .json({ success: false, message: "Failed to send reply" });
   }
 };
+
+export const getUserReplies = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId)
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+
+    const contacts = await Contact.find({
+      createdBy: userId,
+      reply: { $exists: true, $ne: "" }, 
+    })
+      .populate("createdBy", "name email role")
+      .populate("repliedBy", "name email role")
+      .sort({ updatedAt: -1 }); 
+
+    return res.status(200).json({ success: true, contacts });
+  } catch (error: any) {
+    console.error("Error fetching user replies:", (error as Error).message);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch replies",
+      error: (error as Error).message,
+    });
+  }
+};

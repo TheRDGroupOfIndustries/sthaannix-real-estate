@@ -43,10 +43,11 @@ const navigate = useNavigate();
     });
 
     if (response.status === 200) {
-      setProperties(response.data); // backend returns array of properties
+      setProperties(Array.isArray(response.data) ? response.data : response.data.properties || []);
     } else {
       toast.error("Failed to fetch properties");
     }
+
   } catch (error) {
     console.error("Fetch properties error:", error);
     toast.error("Failed to fetch properties");

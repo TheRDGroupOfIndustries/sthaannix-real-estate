@@ -195,13 +195,7 @@ const socialLinks = [
     color: 'from-[#fd5949] via-[#d6249f] to-[#285AEB]',
     hoverColor: 'hover:shadow-pink-500/25' 
   },
-  // { 
-  //   icon: Github, 
-  //   href: 'https://github.com/AAYUSH412/Real-Estate-Website', 
-  //   label: 'GitHub', 
-  //   color: 'from-gray-800 to-gray-600',
-  //   hoverColor: 'hover:shadow-gray-800/25' 
-  // },
+
 ];
 
 const SocialLinks = () => {
@@ -260,19 +254,19 @@ const Newsletter = () => {
 
   return (
     <motion.div 
-      className="relative p-6 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl border border-blue-100 shadow-lg"
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5 }}
+      // className="relative p-6 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl border border-blue-100 shadow-lg"
+      // initial={{ opacity: 0, scale: 0.95 }}
+      // animate={{ opacity: 1, scale: 1 }}
+      // transition={{ duration: 0.5 }}
     >
       {/* Background decoration */}
-      <div className="absolute top-2 right-2">
+      {/* <div className="absolute top-2 right-2">
         <motion.div animate={glowAnimation}>
           <Sparkles className="w-6 h-6 text-blue-400" />
         </motion.div>
-      </div>
+      </div> */}
       
-      <div className="flex items-center gap-3 mb-4">
+      {/* <div className="flex items-center gap-3 mb-4">
         <motion.div 
           className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg"
           animate={floatingAnimation}
@@ -280,13 +274,13 @@ const Newsletter = () => {
           <Mail className="w-5 h-5 text-white" />
         </motion.div>
         <h3 className="text-xl font-bold text-gray-800">Stay Updated</h3>
-      </div>
+      </div> */}
       
-      <p className="text-gray-600 mb-6 text-sm leading-relaxed">
+      {/* <p className="text-gray-600 mb-6 text-sm leading-relaxed">
         Get the latest property listings, market insights, and exclusive deals delivered straight to your inbox.
-      </p>
+      </p> */}
       
-      <form onSubmit={handleSubmit} className="space-y-4">
+      {/* <form onSubmit={handleSubmit} className="space-y-4">
         <div className="relative">
           <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
           <input
@@ -320,12 +314,12 @@ const Newsletter = () => {
             </div>
           )}
         </motion.button>
-      </form>
+      </form> */}
 
-      <p className="mt-4 text-xs text-gray-500 flex items-center gap-1">
+      {/* <p className="mt-4 text-xs text-gray-500 flex items-center gap-1">
         <Shield className="w-3 h-3" />
         By subscribing, you agree to our <a href="#" className="underline hover:text-blue-600 transition-colors">Privacy Policy</a>.
-      </p>
+      </p> */}
     </motion.div>
   );
 };

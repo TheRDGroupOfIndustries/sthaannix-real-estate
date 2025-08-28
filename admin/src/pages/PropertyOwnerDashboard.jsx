@@ -25,7 +25,7 @@ useEffect(() => {
       return;
     }
 
-     if (activeTab === "properties") fetchProperties();
+    if (activeTab === "properties") fetchProperties();
     else if (activeTab === "payments") loadPayments(user.email);
     else if (activeTab === "ads") loadAds(user.id);
 
@@ -42,11 +42,11 @@ useEffect(() => {
       },
     });
 
-    if (response.status === 200) {
-      setProperties(response.data); // backend returns array of properties
-    } else {
-      toast.error("Failed to fetch properties");
-    }
+      if (response.status === 200) {
+        setProperties(Array.isArray(response.data) ? response.data : response.data.properties || []);
+      } else {
+        toast.error("Failed to fetch properties");
+      }
   } catch (error) {
     console.error("Fetch properties error:", error);
     toast.error("Failed to fetch properties");
@@ -61,7 +61,7 @@ const loadPayments = async (email) => {
     const res = await paymentsAPI.myPayments();
 
     if (res.data?.success) {
-      setPayments(res.data.transactions); // <-- use transactions, not payments
+      setPayments(res.data.transactions); 
     } else {
       toast.error("Failed to load payments");
       setPayments([]);
@@ -85,7 +85,7 @@ const loadAds = async () => {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    setAds(res.data.campaigns); // already filtered by backend
+    setAds(res.data.campaigns); 
   } catch (error) {
     console.error(error);
     toast.error("Failed to load advertisement details");

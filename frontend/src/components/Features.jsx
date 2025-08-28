@@ -192,7 +192,7 @@ const Features = () => {
                 </p>
                 
                 {/* Enhanced Learn More Link */}
-                <motion.div
+                {/* <motion.div
                   className="flex items-center justify-between pt-6 border-t border-gray-100 group-hover:border-blue-200 transition-colors duration-300"
                 >
                   <motion.a 
@@ -210,7 +210,7 @@ const Features = () => {
                   >
                     <ArrowRight className="w-4 h-4 text-blue-600" />
                   </motion.div>
-                </motion.div>
+                </motion.div> */}
 
                 {/* Number indicator */}
                 <div className="absolute top-6 right-6 w-8 h-8 bg-gray-100 group-hover:bg-blue-100 rounded-full flex items-center justify-center text-sm font-bold text-gray-600 group-hover:text-blue-600 transition-all duration-300">

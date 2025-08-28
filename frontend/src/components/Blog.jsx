@@ -321,7 +321,7 @@ const Blog = () => {
           transition={{ delay: 0.3 }}
         >
           <div className="flex flex-col lg:flex-row gap-6 justify-between items-center">
-            <div className="relative max-w-md w-full">
+            {/* <div className="relative max-w-md w-full">
               <motion.div
                 className={`relative transition-all duration-300 ${isSearchFocused ? 'scale-105' : 'scale-100'}`}
               >
@@ -346,9 +346,9 @@ const Blog = () => {
                   </motion.button>
                 )}
               </motion.div>
-            </div>
+            </div> */}
             
-            <div className="flex flex-wrap gap-3 justify-center lg:justify-end">
+            {/* <div className="flex flex-wrap gap-3 justify-center lg:justify-end">
               {categories.map((category, index) => (
                 <motion.button
                   key={category}
@@ -367,7 +367,7 @@ const Blog = () => {
                   {category}
                 </motion.button>
               ))}
-            </div>
+            </div> */}
           </div>
         </motion.div>
         
@@ -418,7 +418,7 @@ const Blog = () => {
         )}
         
         {/* Enhanced View all articles button */}
-        <motion.div 
+        {/* <motion.div 
           className="text-center mt-20"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -440,7 +440,7 @@ const Blog = () => {
           <p className="text-gray-500 mt-4 text-sm">
             Join thousands of readers staying informed about real estate trends
           </p>
-        </motion.div>
+        </motion.div> */}
       </div>
     </section>
   );

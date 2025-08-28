@@ -184,7 +184,7 @@ const PropertyApproval = ({
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
-                    #
+                    No
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
                     Title
@@ -193,10 +193,13 @@ const PropertyApproval = ({
                     Location
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                    Image
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
                     Owner
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
-                    Image
+                    Email
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
                     Price
@@ -234,7 +237,7 @@ const PropertyApproval = ({
                       {property.location?.city || "-"},{" "}
                       {property.location?.state || "-"}
                     </td>
-                    <td className="px-6 py-4">{property.owner?.name || "-"}</td>
+                    
                     <td className="px-6 py-4">
                       {property.images && property.images.length > 0 ? (
                         <div
@@ -257,6 +260,8 @@ const PropertyApproval = ({
                         "-"
                       )}
                     </td>
+                    <td className="px-6 py-4">{property.owner?.name || "-"}</td>
+                    <td className="px-6 py-4">{property.owner?.email || "-"}</td>
                     <td className="px-6 py-4">₹{property.price || "-"}</td>
                     <td className="px-6 py-4">
                       {property.propertyType || "-"}

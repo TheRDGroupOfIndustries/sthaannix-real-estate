@@ -30,14 +30,16 @@ const Appointments = () => {
     try {
       setLoading(true);
       const response = await http.get(`${Backendurl}/leads/my-properties`);
-      console.log("fetchAppointments:", response.data);
+      // console.log("fetchAppointments:", response.data);
 
       if (response.status == 200) {
+
         // Filter out appointments with missing user data
         const validAppointments = response.data.filter(
-          (apt) => apt.buyer._id && apt.property._id
-        );
-        setAppointments(validAppointments);
+          (apt) => apt?.buyer?._id && apt?.property?._id
+        )
+
+        setAppointments(validAppointments)
       } else {
         toast.error(response.data.message);
       }
@@ -160,7 +162,7 @@ const Appointments = () => {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Search appointments..."
+                placeholder="Search Leads..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
@@ -223,7 +225,7 @@ const Appointments = () => {
                         <Home className="w-5 h-5 text-gray-400 mr-2" />
                         <div>
                           <p className="font-medium text-gray-900 ">
-                            {appointment.property.title}
+                            {appointment.property?.title || "Unknown Property"}
                           </p>
                           <p className="text-sm text-gray-500">
                             {appointment.property.location.city}

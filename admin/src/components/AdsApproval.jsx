@@ -63,6 +63,9 @@ const AdsApproval = ({ ads, adsLoading, approveAd, rejectAd }) => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Property Type
                 </th>
+                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Purpose
+                  </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   BHK/Bath
                 </th>
@@ -113,11 +116,11 @@ const AdsApproval = ({ ads, adsLoading, approveAd, rejectAd }) => {
                   <td className="px-6 py-4 capitalize">
                     {ad.property?.propertyType}
                   </td>
+                   <td className="px-6 py-4">{ad.property?.transactionType || "-"}</td>
                   <td className="px-6 py-4">
                     {ad.property?.bhk || "-"}Bhk/{ad.property?.bathroom || "-"}
                     Bath
                   </td>
-                  <td className="px-6 py-4"></td>
                   <td className="px-6 py-4">
                     {ad.platform?.join(", ") || "-"}
                   </td>
@@ -190,6 +193,9 @@ const AdsApproval = ({ ads, adsLoading, approveAd, rejectAd }) => {
                     BHK/Bath
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Purpose
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Platform
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -233,6 +239,7 @@ const AdsApproval = ({ ads, adsLoading, approveAd, rejectAd }) => {
                       {ad.property?.bhk || "-"} Bhk/{" "}
                       {ad.property?.bathroom || "-"}Bath
                     </td>
+                    <td className="px-6 py-4">{ad.property?.transactionType || "-"}</td>
                     <td className="px-6 py-4">
                       {ad.platform?.join(", ") || "-"}
                     </td>

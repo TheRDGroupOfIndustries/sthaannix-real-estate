@@ -17,7 +17,7 @@ const PropertyOwnerDashboard = () => {
 
 useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    console.log("PropertyOwnerDashboard: ",user);
+    // console.log("PropertyOwnerDashboard: ",user);
     
     if (!user || user.role !== "owner") {
       toast.error("Unauthorized. Please login as Owner.");
@@ -25,7 +25,7 @@ useEffect(() => {
       return;
     }
 
-     if (activeTab === "properties") fetchProperties();
+    if (activeTab === "properties") fetchProperties();
     else if (activeTab === "payments") loadPayments(user.email);
     else if (activeTab === "ads") loadAds(user.id);
 
@@ -42,11 +42,11 @@ useEffect(() => {
       },
     });
 
-    if (response.status === 200) {
-      setProperties(response.data); // backend returns array of properties
-    } else {
-      toast.error("Failed to fetch properties");
-    }
+      if (response.status === 200) {
+        setProperties(Array.isArray(response.data) ? response.data : response.data.properties || []);
+      } else {
+        toast.error("Failed to fetch properties");
+      }
   } catch (error) {
     console.error("Fetch properties error:", error);
     toast.error("Failed to fetch properties");
@@ -61,7 +61,7 @@ const loadPayments = async (email) => {
     const res = await paymentsAPI.myPayments();
 
     if (res.data?.success) {
-      setPayments(res.data.transactions); // <-- use transactions, not payments
+      setPayments(res.data.transactions); 
     } else {
       toast.error("Failed to load payments");
       setPayments([]);
@@ -85,7 +85,7 @@ const loadAds = async () => {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    setAds(res.data.campaigns); // already filtered by backend
+    setAds(res.data.campaigns); 
   } catch (error) {
     console.error(error);
     toast.error("Failed to load advertisement details");
@@ -288,13 +288,15 @@ const handleDeletePayment = async (id, type) => {
     </div>
   ) : (
     <div className="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
-      <table className="min-w-full divide-y divide-gray-200">
+           <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unique Transaction Reference</th>
+             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
             <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
           </tr>
         </thead>
@@ -303,8 +305,10 @@ const handleDeletePayment = async (id, type) => {
             <tr key={payment.id} className="hover:bg-gray-50">
               <td className="px-6 py-4 whitespace-nowrap">{idx + 1}</td>
               <td className="px-6 py-4 font-mono text-sm whitespace-nowrap">{payment.utrNumber || "-"}</td>
+               <td className="px-6 py-4 whitespace-nowrap">{payment.amount || "-"}</td>
               <td className="px-6 py-4 whitespace-nowrap">{new Date(payment.createdAt).toLocaleString()}</td>
               <td className="px-6 py-4 whitespace-nowrap">{payment.purpose || "Wallet Top-up"}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{payment.status || "-"}</td>
               <td className="px-6 py-4 whitespace-nowrap text-center">
                 <button
                   onClick={() => handleDeletePayment(payment._id,payment.type)}

@@ -8,8 +8,8 @@ const otpSchema = new mongoose.Schema(
     phone: { type: String },
     role: { 
       type: String, 
-      enum: ["buyer", "broker", "builder", "owner", "admin", "user"], 
-      default: "user" 
+      enum: ["buyer", "broker", "builder", "owner", "admin"], 
+      default: "buyer" 
     },
     password: { type: String }, 
     purpose: { 

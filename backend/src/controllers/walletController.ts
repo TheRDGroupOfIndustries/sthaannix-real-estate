@@ -56,10 +56,10 @@ export const createTopUpRequest = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Valid amount is required" });
     }
 
-    if (numericAmount < 100) {
+   if (numericAmount < 1500) {
       return res
         .status(400)
-        .json({ message: "Minimum top-up amount is ₹100" });
+        .json({ message: "Minimum top-up amount is ₹1500" });
     }
 
     // --- Handle Proofs (Screenshots) ---

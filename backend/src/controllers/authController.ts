@@ -44,7 +44,7 @@ export const register = async (req: Request, res: Response) => {
       otp: generatedOTP,
       name,
       phone,
-      role: role ? role.toLowerCase() : "user",
+      role: role ? role.toLowerCase() : "buyer",
       password,
     });
     console.log(role);

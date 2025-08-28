@@ -22,6 +22,7 @@ import logo from "../assets/home-regular-24.png";
 import { useAuth } from "../context/AuthContext";
 import PropTypes from "prop-types"; 
 import path from "path";
+import toast from "react-hot-toast";
 
 // Enhanced Animation Variants
 const navVariants = {
@@ -132,6 +133,8 @@ const Navbar = () => {
   const handleLogout = () => {
     logout();
     setIsDropdownOpen(false);
+     toast.success("Logout successfully");
+    navigate('/')
   };
 
   const getInitials = (name) => {

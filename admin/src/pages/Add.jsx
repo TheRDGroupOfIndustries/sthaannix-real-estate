@@ -868,22 +868,22 @@ const PropertyForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    console.log(formData.price);
+    // console.log(formData.price);
 
     // logs for debug
-    {
-      console.log("Title:", formData.title);
-      console.log("Description:", formData.description);
-      console.log("Property Type:", formData.propertyType);
-      console.log("Transaction Type:", formData.transactionType);
-      console.log("Price:", formData.price);
-      console.log("Size:", formData.size);
-      console.log("BHK:", formData.bhk);
-      console.log("Bathroom:", formData.bathroom);
-      console.log("Location:", formData.location);
-      console.log("Is Promoted:", formData.isPromoted);
-      // console.log("Phone:", formData.phone);
-    }
+    // {
+    //   console.log("Title:", formData.title);
+    //   console.log("Description:", formData.description);
+    //   console.log("Property Type:", formData.propertyType);
+    //   console.log("Transaction Type:", formData.transactionType);
+    //   console.log("Price:", formData.price);
+    //   console.log("Size:", formData.size);
+    //   console.log("BHK:", formData.bhk);
+    //   console.log("Bathroom:", formData.bathroom);
+    //   console.log("Location:", formData.location);
+    //   console.log("Is Promoted:", formData.isPromoted);
+    //   // console.log("Phone:", formData.phone);
+    // }
 
     const price = Number(formData.price);
     if (!price || isNaN(price)) {
@@ -940,7 +940,7 @@ const PropertyForm = () => {
       });
 
       const response = await http.post("/properties/create", formPayload);
-console.log("properties",response);
+// console.log("properties",response);
 
       toast.success("Property added successfully");
       setFormData({

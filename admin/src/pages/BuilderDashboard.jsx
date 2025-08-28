@@ -17,7 +17,7 @@ const navigate = useNavigate();
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    console.log("BuilderDashboard: ",user);
+    // console.log("BuilderDashboard: ",user);
     
     if (!user || user.role !== "builder") {
       toast.error("Unauthorized. Please login as Builder.");

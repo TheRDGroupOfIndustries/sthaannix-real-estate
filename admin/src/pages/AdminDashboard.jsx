@@ -77,7 +77,7 @@ const AdminDashboard = () => {
       setPaymentsLoading(true);
       const response = await paymentsAPI.getAll();
 
-      console.log("loadPayments:", response.data.data);
+      // console.log("loadPayments:", response.data.data);
 
       if (response.status === 200) {
         setPayments(response.data.data ?? []);
@@ -150,7 +150,7 @@ const AdminDashboard = () => {
         adminAPI.getProperties("pending"),
         adminAPI.getProperties("rejected"),
       ]);
-      console.log("rejectedRes: ", rejectedRes);
+      // console.log("rejectedRes: ", rejectedRes);
 
       if (pendingRes.status === 200) {
         setPendingProperties(pendingRes.data);
@@ -185,7 +185,7 @@ const AdminDashboard = () => {
         }
 
         const res = await adminAPI.rejectProperty(id, reason);
-        console.log("rejectProperty: ", res);
+        // console.log("rejectProperty: ", res);
 
         toast.success("Property rejected");
       }

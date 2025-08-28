@@ -16,7 +16,7 @@ const BrokerDashboard = () => {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    console.log("BrokerDashboard: ",user);
+    // console.log("BrokerDashboard: ",user);
     
     if (!user || user.role !== "broker") {
       toast.error("Unauthorized. Please login as Broker.");

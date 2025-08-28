@@ -17,7 +17,7 @@ const PropertyOwnerDashboard = () => {
 
 useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    console.log("PropertyOwnerDashboard: ",user);
+    // console.log("PropertyOwnerDashboard: ",user);
     
     if (!user || user.role !== "owner") {
       toast.error("Unauthorized. Please login as Owner.");

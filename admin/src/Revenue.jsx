@@ -21,7 +21,7 @@ const Revenue = () => {
         }
       } catch (error) {
         toast.error("Error fetching revenue");
-        console.log("error: ", error);
+        console.error("error: ", error);
       } finally {
         setLoading(false);
       }

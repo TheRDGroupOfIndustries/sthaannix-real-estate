@@ -12,6 +12,8 @@ import {
   Reply,
   Check,
   MessageCircleMore,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { adminAPI } from "../api/api";
@@ -23,6 +25,7 @@ const ContactMessages = () => {
   const [replyTexts, setReplyTexts] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all");
+  const [expandedRow, setExpandedRow] = useState(null);
 
   // Fetch contacts
   const fetchContacts = async () => {
@@ -105,13 +108,13 @@ const ContactMessages = () => {
   }
 
   return (
-    <div className="min-h-screen pt-32 px-4 bg-gray-50">
+    <div className="min-h-screen pt-20 md:pt-32 px-4 bg-gray-50">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-1 flex items-center gap-2">
-              <MessageSquare className="w-8 h-8 text-blue-500" />
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1 flex items-center gap-2">
+              <MessageSquare className="w-6 h-6 md:w-8 md:h-8 text-blue-500" />
               Contact Messages
             </h1>
             <p className="text-gray-600">
@@ -119,24 +122,24 @@ const ContactMessages = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="relative">
+          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 w-full md:w-auto">
+            <div className="relative w-full md:w-64">
               <input
                 type="text"
                 placeholder="Search messages..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               />
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             </div>
 
-            <div className="flex items-center gap-2">
-              <Filter className="text-gray-400" />
+            <div className="flex items-center gap-2 w-full md:w-auto">
+              <Filter className="text-gray-400 hidden md:block" />
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                className="rounded-lg border border-gray-200 px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                className="w-full md:w-auto rounded-lg border border-gray-200 px-4 py-2 focus:ring-2 focus:ring-blue-500"
               >
                 <option value="all">All</option>
                 <option value="pending">Pending</option>
@@ -146,8 +149,8 @@ const ContactMessages = () => {
           </div>
         </div>
 
-        {/* Table */}
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden my-10">
+        {/* Desktop Table */}
+        <div className="hidden lg:block bg-white rounded-lg shadow-lg overflow-hidden my-10">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50">
@@ -276,6 +279,128 @@ const ContactMessages = () => {
 
           {filteredContacts.length === 0 && (
             <div className="text-center py-8 text-gray-500">
+              No messages found
+            </div>
+          )}
+        </div>
+
+        {/* Mobile Cards */}
+        <div className="lg:hidden space-y-4 my-6">
+          {filteredContacts.map((contact) => (
+            <motion.div
+              key={contact._id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-lg shadow-md p-4"
+            >
+              <div 
+                className="flex justify-between items-start cursor-pointer"
+                onClick={() => setExpandedRow(expandedRow === contact._id ? null : contact._id)}
+              >
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <User className="w-4 h-4 text-gray-400" />
+                    <p className="font-medium text-gray-900">{contact.name}</p>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
+                    <Mail className="w-4 h-4" />
+                    <span>{contact.email}</span>
+                  </div>
+                  {contact.phone && (
+                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                      <Phone className="w-4 h-4" />
+                      <span>{contact.phone}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <Calendar className="w-4 h-4" />
+                    <span>
+                      {new Date(contact.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+                <button className="p-1">
+                  {expandedRow === contact._id ? (
+                    <ChevronUp className="w-5 h-5 text-gray-400" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                  )}
+                </button>
+              </div>
+
+              {expandedRow === contact._id && (
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  {/* Message */}
+                  <div className="mb-4">
+                    <h3 className="text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+                      <MessageCircleMore className="w-4 h-4" />
+                      Message
+                    </h3>
+                    <p className="text-gray-600 text-sm">{contact.message}</p>
+                  </div>
+
+                  {/* Reply Status */}
+                  <div className="mb-4">
+                    <h3 className="text-sm font-medium text-gray-700 mb-1">
+                      Reply Status
+                    </h3>
+                    {contact.reply ? (
+                      <div>
+                        <p className="text-sm text-green-700 font-medium mb-1">
+                          {contact.reply}
+                        </p>
+                        {contact.repliedBy && (
+                          <p className="text-xs text-gray-500">
+                            by {contact.repliedBy.name}
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-gray-400 italic text-sm">No reply yet</span>
+                    )}
+                  </div>
+
+                  {/* Actions */}
+                  {!contact.reply && (
+                    <div className="space-y-2">
+                      <input
+                        type="text"
+                        value={replyTexts[contact._id] || ""}
+                        onChange={(e) =>
+                          setReplyTexts((prev) => ({
+                            ...prev,
+                            [contact._id]: e.target.value,
+                          }))
+                        }
+                        placeholder="Write reply..."
+                        className="w-full border rounded px-3 py-2 text-sm"
+                      />
+                      <button
+                        onClick={() => handleReply(contact._id)}
+                        disabled={replying === contact._id}
+                        className="w-full flex items-center justify-center gap-2 bg-blue-500 text-white rounded px-4 py-2 text-sm hover:bg-blue-600 disabled:opacity-50"
+                      >
+                        {replying === contact._id ? (
+                          <>
+                            <Loader className="w-4 h-4 animate-spin" />
+                            Sending...
+                          </>
+                        ) : (
+                          <>
+                            <Reply className="w-4 h-4" />
+                            Send Reply
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </motion.div>
+          ))}
+
+          {filteredContacts.length === 0 && (
+            <div className="text-center py-8 text-gray-500 bg-white rounded-lg shadow-md">
               No messages found
             </div>
           )}

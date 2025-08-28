@@ -160,7 +160,7 @@ const PropertyOwnerDashboard = () => {
   return (
     <div className="min-h-screen pt-16 px-6 bg-gray-50 max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Broker Dashboard</h1>
+        <h1 className="text-3xl font-bold">Property Owner Dashboard</h1>
         <div className="flex space-x-5">
           {activeTab === "properties" && (
             <button

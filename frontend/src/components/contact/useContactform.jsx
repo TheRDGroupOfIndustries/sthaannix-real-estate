@@ -2,7 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Backendurl } from '../../App';
+import { configBackendURL } from '../../config';
 
 export default function useContactForm() {
   const [formData, setFormData] = useState({
@@ -47,7 +47,7 @@ export default function useContactForm() {
     e.preventDefault();
     if (validateForm()) {
       try {
-        const response = await axios.post(`${Backendurl}/api/forms/submit`, formData);
+        const response = await axios.post(`${configBackendURL}/api/forms/submit`, formData);
         toast.success('Form submitted successfully!');
         // Reset form
         setFormData({ name: '', email: '', phone: '', message: '' });

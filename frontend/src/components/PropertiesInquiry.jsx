@@ -10,7 +10,7 @@ import {
   Loader,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { fetchInquiryys } from "../services/property-InqueryService";
+import { fetchInquiries } from "../services/property-InqueryService";
 
 export default function PropertiesInquiry() {
   const [inquiries, setInquiries] = useState([]);
@@ -21,7 +21,7 @@ export default function PropertiesInquiry() {
   const fetchInquiryData = async () => {
     try {
       setLoading(true);
-      const response = await fetchInquiryys();
+      const response = await fetchInquiries();
 
       // Support both (response.data) and direct array response
       const data = response?.data ?? response;

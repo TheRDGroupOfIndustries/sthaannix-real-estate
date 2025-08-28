@@ -23,8 +23,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
-import { Backendurl } from '../App';
 import PropTypes from 'prop-types';
+import { configBackendURL } from '../config';
 
 // Enhanced Animation Variants
 const containerVariants = {
@@ -243,7 +243,7 @@ const Newsletter = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post(`${Backendurl || 'http://localhost:4000'}/news/newsdata`, { email });
+      const response = await axios.post(`${configBackendURL}/news/newsdata`, { email });
       if (response.status === 200) {
         toast.success('🎉 Successfully subscribed to our newsletter!');
         setEmail('');

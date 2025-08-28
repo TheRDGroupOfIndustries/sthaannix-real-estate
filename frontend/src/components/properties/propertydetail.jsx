@@ -109,7 +109,7 @@ const PropertyDetails = () => {
   }, [id]);
 
   useEffect(() => {
-    if (!property || !property.owner) return; // ✅ guard
+    if (!property || !property.owner) return;
 
     const fetchPropertyOwner = async () => {
       try {
@@ -119,7 +119,7 @@ const PropertyDetails = () => {
         setUser(res.data.user);
         setWhatsappNum(res.data.user.phone);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     };
 
@@ -135,7 +135,6 @@ const PropertyDetails = () => {
     if (property) {
       setLocalStorage(localStorageKey, property);
     }
-    console.log(property);
   }, [property, localStorageKey]);
 
   // const parseAmenities = (amenities) => {
@@ -445,19 +444,18 @@ const PropertyDetails = () => {
           {/* Left column */}
           <div>
             <div className="bg-blue-50 rounded-lg p-6 mb-6 space-y-4">
-              
-          <h3
-            className="text-xl font-semibold text-gray-900 line-clamp-2 
+              <h3
+                className="text-xl font-semibold text-gray-900 line-clamp-2 
             group-hover:text-blue-600 transition-colors text-transform: capitalize"
-          >
-            {property.title}
-          </h3>
-          <h5
-            className="text-m font-semibold text-gray-900 line-clamp-2 
+              >
+                {property.title}
+              </h3>
+              <h5
+                className="text-m font-semibold text-gray-900 line-clamp-2 
             group-hover:text-blue-600 transition-colors text-transform: capitalize"
-          >
-            - {property.propertyType}
-          </h5>
+              >
+                - {property.propertyType}
+              </h5>
               <p className="text-3xl font-bold text-blue-600 mb-2">
                 ₹{Number(property.price).toLocaleString("en-IN")}
               </p>

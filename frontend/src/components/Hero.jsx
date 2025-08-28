@@ -258,8 +258,8 @@ const Hero = () => {
                 variants={itemVariants}
                 className="relative max-w-4xl mx-auto mb-16"
               >
-                  {/* Property Type Filters */}
-                  {/* <div className="flex flex-wrap justify-center gap-3 mb-6">
+                {/* Property Type Filters */}
+                {/* <div className="flex flex-wrap justify-center gap-3 mb-6">
                     {quickFilters.map((filter) => (
                       <motion.button
                         key={filter.label}
@@ -279,8 +279,8 @@ const Hero = () => {
                     ))}
                   </div> */}
 
-                  {/* Transaction Type Filters */}
-                  {/* <div className="flex flex-wrap justify-center gap-3 mb-6">
+                {/* Transaction Type Filters */}
+                {/* <div className="flex flex-wrap justify-center gap-3 mb-6">
                     {transactionTypes.map((type) => (
                       <motion.button
                         key={type.value}
@@ -299,27 +299,27 @@ const Hero = () => {
                     ))}
                   </div> */}
 
-                  {/* Search Input */}
-                  <div className="flex flex-col lg:flex-row gap-4 ">
-                    <div className="relative flex-1"></div>
+                {/* Search Input */}
+                <div className="flex flex-col  ">
+                  <div className="relative flex-1"></div>
 
-                    <div className="flex justify-center items-center">
-                      <motion.div
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <Link
-                          to="/properties" // ✅ change this path as needed
-                          className="px-8 py-4 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 
+                  <div className="flex justify-center items-center">
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <Link
+                        to="/properties"
+                        className="px-8 py-4 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 
         text-white rounded-2xl hover:shadow-2xl transition-all flex items-center gap-3 
         font-bold text-lg shadow-xl"
-                        >
-                          <Search className="w-5 h-5" />
-                          <span>Search Properties</span>
-                          <ArrowRight className="w-5 h-5" />
-                        </Link>
-                      </motion.div>
-                    </div>
+                      >
+                        <Search className="w-5 h-5" />
+                        <span>Search Properties</span>
+                        <ArrowRight className="w-5 h-5" />
+                      </Link>
+                    </motion.div>
+                  </div>
 
                   {/* Enhanced Location Suggestions */}
                   {/* <AnimatePresence>

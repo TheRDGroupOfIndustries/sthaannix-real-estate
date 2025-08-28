@@ -1,6 +1,6 @@
-import { logos } from '../assets/logo';
-import { motion } from 'framer-motion';
-import { Shield, TrendingUp, Star, Users, Award } from 'lucide-react';
+import { logos } from "../assets/logo";
+import { motion } from "framer-motion";
+import { Shield, TrendingUp, Star, Users, Award } from "lucide-react";
 
 // Animation variants
 const containerVariants = {
@@ -9,37 +9,37 @@ const containerVariants = {
     opacity: 1,
     transition: {
       delayChildren: 0.3,
-      staggerChildren: 0.1
-    }
-  }
+      staggerChildren: 0.1,
+    },
+  },
 };
 
 const itemVariants = {
   hidden: { opacity: 0, y: 20, scale: 0.9 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     scale: 1,
     transition: {
       type: "spring",
       stiffness: 100,
       damping: 20,
-      duration: 0.6
-    }
-  }
+      duration: 0.6,
+    },
+  },
 };
 
 const logoVariants = {
   hidden: { opacity: 0, scale: 0.8 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     scale: 1,
     transition: {
       type: "spring",
       stiffness: 120,
-      damping: 25
-    }
-  }
+      damping: 25,
+    },
+  },
 };
 
 const floatingAnimation = {
@@ -47,8 +47,8 @@ const floatingAnimation = {
   transition: {
     duration: 4,
     repeat: Infinity,
-    ease: "easeInOut"
-  }
+    ease: "easeInOut",
+  },
 };
 
 const Companies = () => {
@@ -56,7 +56,7 @@ const Companies = () => {
     { icon: Users, value: "200+", label: "Trusted Partners" },
     { icon: Star, value: "4.9", label: "Average Rating" },
     { icon: Award, value: "50M+", label: "Properties Listed" },
-    { icon: TrendingUp, value: "98%", label: "Success Rate" }
+    { icon: TrendingUp, value: "98%", label: "Success Rate" },
   ];
 
   const companyLogos = [
@@ -64,7 +64,7 @@ const Companies = () => {
     { src: logos.Bookinglogo, alt: "Booking.com", name: "Booking.com" },
     { src: logos.Airbnblogo, alt: "Airbnb", name: "Airbnb" },
     { src: logos.Microsoftlogo, alt: "Microsoft", name: "Microsoft" },
-    { src: logos.Amazonlogo, alt: "Amazon", name: "Amazon" }
+    { src: logos.Amazonlogo, alt: "Amazon", name: "Amazon" },
   ];
 
   return (
@@ -85,29 +85,30 @@ const Companies = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <motion.div 
+          <motion.div
             variants={itemVariants}
             className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-6"
           >
             <Shield className="w-4 h-4" />
             Trusted Worldwide
           </motion.div>
-          
-          <motion.h2 
+
+          <motion.h2
             variants={itemVariants}
             className="text-4xl md:text-5xl font-bold text-gray-900 mb-4"
           >
-            Trusted by{' '}
+            Trusted by{" "}
             <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
               Industry Leaders
             </span>
           </motion.h2>
-          
-          <motion.p 
+
+          <motion.p
             variants={itemVariants}
             className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
           >
-            Join thousands of successful companies that rely on our platform for their real estate needs
+            Join thousands of successful companies that rely on our platform for
+            their real estate needs
           </motion.p>
         </motion.div>
 
@@ -132,8 +133,12 @@ const Companies = () => {
               >
                 <stat.icon className="w-6 h-6 text-white" />
               </motion.div>
-              <div className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</div>
-              <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
+              <div className="text-2xl font-bold text-gray-900 mb-1">
+                {stat.value}
+              </div>
+              <div className="text-sm text-gray-600 font-medium">
+                {stat.label}
+              </div>
             </motion.div>
           ))}
         </motion.div>
@@ -146,19 +151,17 @@ const Companies = () => {
           viewport={{ once: true }}
           className="bg-white/60 backdrop-blur-md rounded-3xl p-8 md:p-12 border border-gray-200 shadow-2xl"
         >
-          <motion.div 
-            variants={itemVariants}
-            className="text-center mb-12"
-          >
+          <motion.div variants={itemVariants} className="text-center mb-12">
             <h3 className="text-2xl font-bold text-gray-900 mb-2">
               Powering Success for Global Brands
             </h3>
             <p className="text-gray-600">
               {`From startups to Fortune 500 companies, we're the trusted choice
-`}            </p>
+`}{" "}
+            </p>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             variants={containerVariants}
             className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 items-center"
           >
@@ -166,25 +169,25 @@ const Companies = () => {
               <motion.div
                 key={index}
                 variants={logoVariants}
-                whileHover={{ 
+                whileHover={{
                   scale: 1.1,
                   y: -8,
-                  transition: { type: "spring", stiffness: 400, damping: 10 }
+                  transition: { type: "spring", stiffness: 400, damping: 10 },
                 }}
                 className="group relative"
               >
                 <div className="relative overflow-hidden rounded-xl bg-white/80 backdrop-blur-sm p-6 border border-gray-100 shadow-lg group-hover:shadow-xl transition-all duration-300">
-                  <img 
-                    className="h-12 w-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300" 
-                    src={logo.src} 
+                  <img
+                    className="h-12 w-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                    src={logo.src}
                     alt={logo.alt}
-                    width="158" 
-                    height="48" 
+                    width="158"
+                    height="48"
                   />
-                  
+
                   {/* Hover effect overlay */}
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-indigo-500/5 opacity-0 group-hover:opacity-100 rounded-xl transition-opacity duration-300"></div>
-                  
+
                   {/* Tooltip */}
                   <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-3 py-1 rounded-lg text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
                     {logo.name}
@@ -235,12 +238,14 @@ const Companies = () => {
               shadow-2xl hover:shadow-blue-500/25 transition-all font-bold text-lg inline-flex items-center group relative overflow-hidden"
           >
             <span className="relative z-10 flex items-center">
-              Join Our Network
+              <a href={import.meta.env.VITE_JOIN_OUR_NETWORK}>
+                Join Our Network
+              </a>
               <TrendingUp className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
             </span>
             <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </motion.button>
-          
+
           <p className="text-gray-500 mt-4 text-sm">
             Start your journey with industry-leading companies today
           </p>

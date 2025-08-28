@@ -17,6 +17,7 @@ import { motion, AnimatePresence } from "framer-motion";
 // import { Backendurl } from '../App';
 import PropTypes from "prop-types";
 import { fetchProperties } from "../services/property-InqueryService";
+import { configBackendURL } from "../config";
 
 // Sample featured properties for fallback
 const sampleProperties = [
@@ -100,7 +101,7 @@ const PropertyCard = ({ property }) => {
           className="w-full h-full object-cover"
         />
 
-      {/* Property Tags */}
+        {/* Property Tags */}
         <div className="absolute top-4 left-4 flex flex-col gap-2">
           <motion.span
             initial={{ opacity: 0, x: -20 }}
@@ -110,7 +111,6 @@ const PropertyCard = ({ property }) => {
           >
             {property.propertyType}
           </motion.span>
-        
         </div>
       </div>
 
@@ -209,8 +209,10 @@ const PropertiesShow = () => {
       try {
         setLoading(true);
         const response = await fetchProperties();
-        console.log(response);
 
+        console.log(configBackendURL);
+        
+        
         if (response) {
           // Take only the first 6 properties for featured section
           const featuredProperties = response.slice(0, 6);

@@ -1,12 +1,9 @@
-import axios from "axios";
-import { Backendurl } from "../App";
 import http from "../api/http";
+
 // Fetch all properties
 export const fetchProperties = async (filters = {}) => {
   try {
-    const response = await axios.get(`${Backendurl}/properties/get`, {
-      params: filters,
-    });
+    const response = await http.get("/properties/get", { params: filters });
     return response.data;
   } catch (error) {
     console.error("Error fetching properties:", error);
@@ -17,9 +14,7 @@ export const fetchProperties = async (filters = {}) => {
 // Fetch single property by ID
 export const fetchPropertyDetail = async (id) => {
   try {
-    const response = await axios.get(
-      `${Backendurl}/properties/get-by-id/${id}`
-    );
+    const response = await http.get(`/properties/get-by-id/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching property ${id}:`, error);
@@ -31,7 +26,6 @@ export const fetchPropertyDetail = async (id) => {
 export const submitInquiry = async (inquiryData) => {
   try {
     const response = await http.post("/leads/create", inquiryData);
-    console.log("Inquiry submitted successfully:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error submitting inquiry:", error);
@@ -39,17 +33,13 @@ export const submitInquiry = async (inquiryData) => {
   }
 };
 
-
-
-export const fetchInquiryys = async () => {
+// Fetch user inquiries
+export const fetchInquiries = async () => {
   try {
-    const token = localStorage.getItem("token");
-
-    const response = await http.get("/leads/my")
-
+    const response = await http.get("/leads/my");
     return response.data;
   } catch (error) {
-    console.error("Error fetching Inquiryys:", error);
+    console.error("Error fetching inquiries:", error);
     throw error;
   }
 };
@@ -58,5 +48,5 @@ export default {
   fetchProperties,
   fetchPropertyDetail,
   submitInquiry,
-  fetchInquiryys,
+  fetchInquiries,
 };

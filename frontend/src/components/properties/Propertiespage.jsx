@@ -77,7 +77,7 @@ const PropertiesPage = () => {
   // }, []);
 
   useEffect(() => {
-    fetchPropertiesHandler(); 
+    fetchPropertiesHandler();
   }, []);
 
   // Save properties to localStorage on update
@@ -88,26 +88,29 @@ const PropertiesPage = () => {
   }, [propertyState.properties]);
 
   const filteredProperties = useMemo(() => {
+    // Add a defensive check to ensure propertyState.properties is an array.
+    // This prevents the error if the data is not yet an array or is corrupted.
+    if (!Array.isArray(propertyState.properties)) {
+      return [];
+    }
+
     return propertyState.properties
       .filter((property) => {
         const searchMatch =
           !filters.searchQuery ||
-           [
-            property.title, 
-            property.description, 
+          [
+            property.title,
+            property.description,
             property.transactionType,
             property.location?.address,
             property.location?.city,
             property.location?.state,
-            property.location?.pincode?.toString()
+            property.location?.pincode?.toString(),
           ].some(
             (field) =>
-              field && field.toLowerCase().includes(filters.searchQuery.toLowerCase())
+              field &&
+              field.toLowerCase().includes(filters.searchQuery.toLowerCase())
           );
-
-        // const typeMatch =
-        //   !filters.propertyType ||
-        //   property.type?.toLowerCase() === filters.propertyType.toLowerCase();
 
         const typeMatch =
           !filters.propertyType ||
@@ -118,15 +121,6 @@ const PropertiesPage = () => {
           property.price >= filters.priceRange[0] &&
           property.price <= filters.priceRange[1];
 
-        // const bedroomsMatch =
-        //   !filters.bedrooms ||
-        //   filters.bedrooms === "0" ||
-        //   property.beds >= parseInt(filters.bedrooms);
-
-        // const bathroomsMatch =
-        //   !filters.bathrooms ||
-        //   filters.bathrooms === "0" ||
-        //   property.baths >= parseInt(filters.bathrooms);
         const bedroomsMatch =
           !filters.bedrooms ||
           filters.bedrooms === "0" ||

@@ -1,5 +1,3 @@
-export const Backendurl =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:12000";
 
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";

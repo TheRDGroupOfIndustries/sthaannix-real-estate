@@ -15,7 +15,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { toast } from "react-toastify";
-import { Backendurl } from "../App";
+import { configBackendURL } from "../config";
 
 // Enhanced Animation Variants
 const containerVariants = {
@@ -165,7 +165,7 @@ const ResetPassword = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post(`${Backendurl}/api/users/reset/${token}`, { password });
+      const response = await axios.post(`${configBackendURL}/api/users/reset/${token}`, { password });
       if (response.data.success) {
         setIsSuccess(true);
         toast.success("Password reset successful!");

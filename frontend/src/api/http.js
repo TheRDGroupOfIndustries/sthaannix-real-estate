@@ -2,7 +2,7 @@ import axios from "axios";
 import { configBackendURL } from "../config";
 
 const http = axios.create({
-  baseURL: configBackendURL || "http://localhost:12000",
+  baseURL: configBackendURL,
   withCredentials: true,
 });
 

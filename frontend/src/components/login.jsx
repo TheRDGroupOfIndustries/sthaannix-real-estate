@@ -108,8 +108,6 @@ const Login = () => {
       ...prev,
       [name]: value,
     }));
-    console.log(formData.email);
-    console.log(formData.password);
   };
 
   const handleSubmit = async (e) => {

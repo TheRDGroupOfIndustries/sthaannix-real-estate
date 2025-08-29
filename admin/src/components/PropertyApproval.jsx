@@ -216,9 +216,6 @@ const PropertyApproval = ({
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
                     Transaction Type
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
-                    Reason
-                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -273,9 +270,6 @@ const PropertyApproval = ({
                     <td className="px-6 py-4">{property.size || "-"}</td>
                     <td className="px-6 py-4 capitalize">
                       {property.transactionType || "-"}
-                    </td>
-                    <td className="px-6 py-4 capitalize">
-                      {property.reason || "No reason provided"}
                     </td>
                   </motion.tr>
                 ))}

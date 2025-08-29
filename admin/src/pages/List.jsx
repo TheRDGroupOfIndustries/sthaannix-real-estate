@@ -629,8 +629,9 @@ import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { propertiesAPI } from "../api/api";
-
+import { useNavigate } from "react-router-dom";
 const PropertyListings = () => {
+  const navigate = useNavigate();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -708,8 +709,9 @@ const PropertyListings = () => {
     if (window.confirm(`Are you sure you want to remove "${propertyTitle}"?`)) {
       try {
         const response = await propertiesAPI.delete(propertyId);
-        if (response.data) {
+        if (response.status == 200) {
           toast.success("Property removed successfully");
+          navigate("/list");
           await fetchProperties();
         } else {
           toast.error(response.data.message || "Failed to remove property");
@@ -822,7 +824,7 @@ const PropertyListings = () => {
     >
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-5 lg:px-8">
         {/* Header Section */}
-        <motion.div variants={itemVariants} className="mb-6 md:mb-8">
+        {/* <motion.div variants={itemVariants} className="mb-6 md:mb-8">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 md:gap-6">
             <div className="space-y-1 md:space-y-2">
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
@@ -866,6 +868,55 @@ const PropertyListings = () => {
               </Link>
             </div>
           </div>
+        </motion.div> */}
+
+        <motion.div variants={itemVariants} className="mb-6 md:mb-8">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 md:gap-6">
+            <div className="space-y-1 md:space-y-2">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent leading-normal">
+                Property Management
+              </h1>
+              <div className="flex flex-col xs:flex-row xs:items-center gap-2 xs:gap-4 text-xs sm:text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span>{filteredProperties.length} Properties Listed</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span>Portfolio Overview</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 sm:gap-3 w-full xs:w-auto xl:w-auto mt-4 xs:mt-0">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleRefresh}
+                disabled={refreshing}
+                className="flex items-center gap-2 px-4 py-2 text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 flex-1 xs:flex-none justify-center min-w-[120px]"
+              >
+                <RefreshCw
+                  className={`w-4 h-4 sm:w-5 sm:h-5 ${
+                    refreshing ? "animate-spin" : ""
+                  }`}
+                />
+                <span>{refreshing ? "Refreshing..." : "Refresh"}</span>
+              </motion.button>
+
+              <Link to="/add" className="flex-1 xs:flex-none ">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl w-full justify-center"
+                >
+                  <Plus className="w-5 h-5 text-white" />
+                  <span className="text-sm sm:text-base xl:text-base whitespace-nowrap">
+                    Add Property
+                  </span>
+                </motion.button>
+              </Link>
+            </div>
+          </div>
         </motion.div>
 
         {/* Stats Cards */}
@@ -883,7 +934,9 @@ const PropertyListings = () => {
                 <TableProperties className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-xs md:text-sm font-medium text-gray-600">Total Properties</p>
+                <p className="text-xs md:text-sm font-medium text-gray-600">
+                  Total Properties
+                </p>
                 <p className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">
                   {properties?.length || 0}
                 </p>
@@ -898,9 +951,12 @@ const PropertyListings = () => {
                 <Home className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-green-600" />
               </div>
               <div>
-                <p className="text-xs md:text-sm font-medium text-gray-600">For Rent</p>
+                <p className="text-xs md:text-sm font-medium text-gray-600">
+                  For Rent
+                </p>
                 <p className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">
-                  {properties?.filter((p) => p.availability === "rent").length || 0}
+                  {properties?.filter((p) => p.availability === "rent")
+                    .length || 0}
                 </p>
               </div>
             </div>
@@ -913,9 +969,12 @@ const PropertyListings = () => {
                 <TrendingUp className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-purple-600" />
               </div>
               <div>
-                <p className="text-xs md:text-sm font-medium text-gray-600">For Buy</p>
+                <p className="text-xs md:text-sm font-medium text-gray-600">
+                  For Buy
+                </p>
                 <p className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">
-                  {properties?.filter((p) => p.availability === "buy").length || 0}
+                  {properties?.filter((p) => p.availability === "buy").length ||
+                    0}
                 </p>
               </div>
             </div>
@@ -928,9 +987,12 @@ const PropertyListings = () => {
                 <Clipboard className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-yellow-600" />
               </div>
               <div>
-                <p className="text-xs md:text-sm font-medium text-gray-600">For Lease</p>
+                <p className="text-xs md:text-sm font-medium text-gray-600">
+                  For Lease
+                </p>
                 <p className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">
-                  {properties?.filter((p) => p.availability === "lease").length || 0}
+                  {properties?.filter((p) => p.availability === "lease")
+                    .length || 0}
                 </p>
               </div>
             </div>
@@ -943,7 +1005,9 @@ const PropertyListings = () => {
                 <Star className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-orange-600" />
               </div>
               <div>
-                <p className="text-xs md:text-sm font-medium text-gray-600">Avg. Price</p>
+                <p className="text-xs md:text-sm font-medium text-gray-600">
+                  Avg. Price
+                </p>
                 <p className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">
                   ₹
                   {properties?.length > 0
@@ -1097,17 +1161,21 @@ const PropertyListings = () => {
             >
               <AnimatePresence>
                 {filteredProperties.map((property, index) => (
-                  <Link to={`/property/${property._id}`} className="block group" key={property._id}>
-                    <motion.div
-                      variants={cardVariants}
-                      initial="hidden"
-                      animate="visible"
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      whileHover="hover"
-                      transition={{ delay: index * 0.05 }}
-                      className={`bg-white rounded-xl md:rounded-2xl shadow-sm border border-gray-100 overflow-hidden group ${
-                        viewMode === "list" ? "flex flex-col sm:flex-row" : ""
-                      }`}
+                  <motion.div
+                    key={property._id}
+                    variants={cardVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    whileHover="hover"
+                    transition={{ delay: index * 0.05 }}
+                    className={`bg-white rounded-xl md:rounded-2xl shadow-sm border border-gray-100 overflow-hidden group ${
+                      viewMode === "list" ? "flex flex-col sm:flex-row" : ""
+                    }`}
+                  >
+                    <Link
+                      to={`/property/${property._id}`}
+                      className="block group"
                     >
                       {/* Property Image */}
                       <div
@@ -1159,7 +1227,11 @@ const PropertyListings = () => {
                             whileTap={{ scale: 0.9 }}
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleRemoveProperty(property._id, property.title);
+                              e.preventDefault();
+                              handleRemoveProperty(
+                                property._id,
+                                property.title
+                              );
                             }}
                             className="p-1.5 md:p-2 bg-white/90 backdrop-blur-sm text-red-600 rounded-full hover:bg-red-600 hover:text-white transition-all duration-200 shadow-lg"
                           >
@@ -1167,117 +1239,131 @@ const PropertyListings = () => {
                           </motion.button>
                         </div>
                       </div>
-
-                      {/* Property Details */}
-                      <div
-                        className={`p-4 md:p-5 lg:p-6 flex-1 ${
-                          viewMode === "list" ? "flex flex-col justify-between" : ""
-                        }`}
-                      >
-                        <div>
-                          <div className="mb-3 md:mb-4">
-                            <h3 className="text-lg md:text-xl font-semibold text-gray-900 line-clamp-2">
-                              {property.title}
-                            </h3>
-                            <p className="mb-2 text-sm md:text-base text-gray-600 line-clamp-2">
-                              {property.description}
+                    </Link>
+                    {/* Property Details */}
+                    <div
+                      className={`p-4 md:p-5 lg:p-6 flex-1 ${
+                        viewMode === "list"
+                          ? "flex flex-col justify-between"
+                          : ""
+                      }`}
+                    >
+                      <div>
+                        <div className="mb-3 md:mb-4">
+                          <h3 className="text-lg md:text-xl font-semibold text-gray-900 line-clamp-2">
+                            {property.title}
+                          </h3>
+                          <p className="mb-2 text-sm md:text-base text-gray-600 line-clamp-2">
+                            {property.description}
+                          </p>
+                          <div className="flex items-center text-gray-600 mb-2 md:mb-3">
+                            <MapPin className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 text-gray-400" />
+                            <span className="text-xs md:text-sm">
+                              {property.location}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <p className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">
+                              ₹{property.price.toLocaleString()}
                             </p>
-                            <div className="flex items-center text-gray-600 mb-2 md:mb-3">
-                              <MapPin className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 text-gray-400" />
-                              <span className="text-xs md:text-sm">{property.location}</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <p className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">
-                                ₹{property.price.toLocaleString()}
-                              </p>
-                              <div className="flex items-center gap-1">
-                                <Eye className="w-3 h-3 md:w-4 md:h-4 text-gray-400" />
-                                <span className="text-xs md:text-sm text-gray-500">2.4k views</span>
-                              </div>
+                            <div className="flex items-center gap-1">
+                              <Eye className="w-3 h-3 md:w-4 md:h-4 text-gray-400" />
+                              <span className="text-xs md:text-sm text-gray-500">
+                                2.4k views
+                              </span>
                             </div>
                           </div>
-
-                          {/* Property Stats */}
-                          <div className="grid grid-cols-3 gap-2 md:gap-3 lg:gap-4 mb-4 md:mb-5 lg:mb-6">
-                            <div className="text-center p-2 md:p-3 bg-gray-50 rounded-xl">
-                              <BedDouble className="w-4 h-4 md:w-5 md:h-5 text-gray-400 mx-auto mb-1" />
-                              <div className="text-xs md:text-sm font-medium text-gray-900">
-                                {property.beds}
-                              </div>
-                              <div className="text-xs text-gray-500">Bedrooms</div>
-                            </div>
-                            <div className="text-center p-2 md:p-3 bg-gray-50 rounded-xl">
-                              <Bath className="w-4 h-4 md:w-5 md:h-5 text-gray-400 mx-auto mb-1" />
-                              <div className="text-xs md:text-sm font-medium text-gray-900">
-                                {property.baths}
-                              </div>
-                              <div className="text-xs text-gray-500">Bathrooms</div>
-                            </div>
-                            <div className="text-center p-2 md:p-3 bg-gray-50 rounded-xl">
-                              <Maximize className="w-4 h-4 md:w-5 md:h-5 text-gray-400 mx-auto mb-1" />
-                              <div className="text-xs md:text-sm font-medium text-gray-900">
-                                {property.sqft}
-                              </div>
-                              <div className="text-xs text-gray-500">Sq Ft</div>
-                            </div>
-                          </div>
-
-                          {/* Amenities */}
-                          {property.amenities.length > 0 && (
-                            <div className="border-t pt-3 md:pt-4">
-                              <h4 className="text-xs md:text-sm font-medium text-gray-900 mb-2 md:mb-3">
-                                Top Amenities
-                              </h4>
-                              <div className="flex flex-wrap gap-1 md:gap-2">
-                                {property.amenities
-                                  .slice(0, 4)
-                                  .map((amenity, index) => (
-                                    <span
-                                      key={index}
-                                      className="inline-flex items-center px-2 py-0.5 md:px-3 md:py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full"
-                                    >
-                                      <Building className="w-2 h-2 md:w-3 md:h-3 mr-1" />
-                                      {amenity}
-                                    </span>
-                                  ))}
-                                {property.amenities.length > 4 && (
-                                  <span className="inline-flex items-center px-2 py-0.5 md:px-3 md:py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
-                                    +{property.amenities.length - 4} more
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          )}
                         </div>
 
-                        {viewMode === "list" && (
-                          <div className="flex items-center justify-between pt-3 md:pt-4 mt-3 md:mt-4 border-t">
-                            <div className="text-xs md:text-sm text-gray-500">
-                              Listed {new Date(property.createdAt).toLocaleDateString()}
+                        {/* Property Stats */}
+                        <div className="grid grid-cols-3 gap-2 md:gap-3 lg:gap-4 mb-4 md:mb-5 lg:mb-6">
+                          <div className="text-center p-2 md:p-3 bg-gray-50 rounded-xl">
+                            <BedDouble className="w-4 h-4 md:w-5 md:h-5 text-gray-400 mx-auto mb-1" />
+                            <div className="text-xs md:text-sm font-medium text-gray-900">
+                              {property.beds}
                             </div>
-                            <div className="flex items-center gap-1 md:gap-2">
-                              <Link
-                                to={`/update/${property._id}`}
-                                onClick={(e) => e.stopPropagation()}
-                                className="p-1 md:p-2 text-gray-400 hover:text-blue-600 transition-colors"
-                              >
-                                <Edit3 className="w-3 h-3 md:w-4 md:h-4" />
-                              </Link>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleRemoveProperty(property._id, property.title);
-                                }}
-                                className="p-1 md:p-2 text-gray-400 hover:text-red-600 transition-colors"
-                              >
-                                <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
-                              </button>
+                            <div className="text-xs text-gray-500">
+                              Bedrooms
+                            </div>
+                          </div>
+                          <div className="text-center p-2 md:p-3 bg-gray-50 rounded-xl">
+                            <Bath className="w-4 h-4 md:w-5 md:h-5 text-gray-400 mx-auto mb-1" />
+                            <div className="text-xs md:text-sm font-medium text-gray-900">
+                              {property.baths}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              Bathrooms
+                            </div>
+                          </div>
+                          <div className="text-center p-2 md:p-3 bg-gray-50 rounded-xl">
+                            <Maximize className="w-4 h-4 md:w-5 md:h-5 text-gray-400 mx-auto mb-1" />
+                            <div className="text-xs md:text-sm font-medium text-gray-900">
+                              {property.sqft}
+                            </div>
+                            <div className="text-xs text-gray-500">Sq Ft</div>
+                          </div>
+                        </div>
+
+                        {/* Amenities */}
+                        {property.amenities.length > 0 && (
+                          <div className="border-t pt-3 md:pt-4">
+                            <h4 className="text-xs md:text-sm font-medium text-gray-900 mb-2 md:mb-3">
+                              Top Amenities
+                            </h4>
+                            <div className="flex flex-wrap gap-1 md:gap-2">
+                              {property.amenities
+                                .slice(0, 4)
+                                .map((amenity, index) => (
+                                  <span
+                                    key={index}
+                                    className="inline-flex items-center px-2 py-0.5 md:px-3 md:py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full"
+                                  >
+                                    <Building className="w-2 h-2 md:w-3 md:h-3 mr-1" />
+                                    {amenity}
+                                  </span>
+                                ))}
+                              {property.amenities.length > 4 && (
+                                <span className="inline-flex items-center px-2 py-0.5 md:px-3 md:py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
+                                  +{property.amenities.length - 4} more
+                                </span>
+                              )}
                             </div>
                           </div>
                         )}
                       </div>
-                    </motion.div>
-                  </Link>
+
+                      {viewMode === "list" && (
+                        <div className="flex items-center justify-between pt-3 md:pt-4 mt-3 md:mt-4 border-t">
+                          <div className="text-xs md:text-sm text-gray-500">
+                            Listed{" "}
+                            {new Date(property.createdAt).toLocaleDateString()}
+                          </div>
+                          <div className="flex items-center gap-1 md:gap-2">
+                            <Link
+                              to={`/update/${property._id}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="p-1 md:p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                            >
+                              <Edit3 className="w-3 h-3 md:w-4 md:h-4" />
+                            </Link>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                handleRemoveProperty(
+                                  property._id,
+                                  property.title
+                                );
+                              }}
+                              className="p-1 md:p-2 text-gray-400 hover:text-red-600 transition-colors"
+                            >
+                              <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
                 ))}
               </AnimatePresence>
             </div>

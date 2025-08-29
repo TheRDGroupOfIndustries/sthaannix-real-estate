@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { CheckCircle, XCircle, FileText } from "lucide-react";
+import { CheckCircle, XCircle, FileText, Image } from "lucide-react";
 
 const AdsApproval = ({ ads, adsLoading, approveAd, rejectAd }) => {
   if (adsLoading) {
@@ -30,7 +30,6 @@ const AdsApproval = ({ ads, adsLoading, approveAd, rejectAd }) => {
 
   const pendingAds = ads.filter((ad) => ad.status === "pending");
   const rejectedAds = ads.filter((ad) => ad.status === "rejected");
-
   return (
     <>
       {pendingAds.length === 0 ? (
@@ -63,9 +62,9 @@ const AdsApproval = ({ ads, adsLoading, approveAd, rejectAd }) => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Property Type
                 </th>
-                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Purpose
-                  </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Purpose
+                </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   BHK/Bath
                 </th>
@@ -94,17 +93,33 @@ const AdsApproval = ({ ads, adsLoading, approveAd, rejectAd }) => {
                 >
                   <td className="px-6 py-4">{idx + 1}</td>
                   <td className="px-6 py-4">{ad.property?.title || "-"}</td>
-                  <td className="px-6 py-4">
-                    {ad.property?.images?.[0] ? (
-                      <img
-                        src={ad?.property?.images[0]}
-                        alt={ad.property?.title}
-                        className="w-full h-14 object-cover rounded"
-                      />
-                    ) : (
-                      "-"
-                    )}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex gap-2">
+                      {ad.property?.images?.length > 0 ? (
+                        ad.property.images.map((imgUrl, idx) => (
+                          <div
+                            key={idx}
+                            className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
+                            title="View Image"
+                            onClick={() => window.open(imgUrl, "_blank")}
+                          >
+                            <img
+                              src={imgUrl}
+                              alt={`${ad.property?.title || "property"}-${idx}`}
+                              className="w-full h-full object-cover"
+                            />
+                            {/* Hover overlay */}
+                            <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
+                              <Image className="w-4 h-4" />
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <span>-</span>
+                      )}
+                    </div>
                   </td>
+
                   <td className="px-6 py-4">{ad.user?.name || "-"}</td>
                   <td className="px-6 py-4">
                     {ad.property?.location?.city},{" "}
@@ -116,7 +131,9 @@ const AdsApproval = ({ ads, adsLoading, approveAd, rejectAd }) => {
                   <td className="px-6 py-4 capitalize">
                     {ad.property?.propertyType}
                   </td>
-                   <td className="px-6 py-4">{ad.property?.transactionType || "-"}</td>
+                  <td className="px-6 py-4">
+                    {ad.property?.transactionType || "-"}
+                  </td>
                   <td className="px-6 py-4">
                     {ad.property?.bhk || "-"}Bhk/{ad.property?.bathroom || "-"}
                     Bath
@@ -216,13 +233,35 @@ const AdsApproval = ({ ads, adsLoading, approveAd, rejectAd }) => {
                     className="hover:bg-gray-50"
                   >
                     <td className="px-6 py-4">{idx + 1}</td>
-                    <td className="px-6 py-4">
-                      <img
-                        src={ad.property?.images?.[0]}
-                        alt={ad.property?.title}
-                        className="w-16 h-12 object-cover rounded"
-                      />
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex gap-2">
+                        {ad.property?.images?.length > 0 ? (
+                          ad.property.images.map((imgUrl, idx) => (
+                            <div
+                              key={idx}
+                              className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
+                              title="View Image"
+                              onClick={() => window.open(imgUrl, "_blank")}
+                            >
+                              <img
+                                src={imgUrl}
+                                alt={`${
+                                  ad.property?.title || "property"
+                                }-${idx}`}
+                                className="w-full h-full object-cover"
+                              />
+                              {/* Hover overlay */}
+                              <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
+                                <Image className="w-4 h-4" />
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <span>-</span>
+                        )}
+                      </div>
                     </td>
+
                     <td className="px-6 py-4">{ad.property?.title || "-"}</td>
                     <td className="px-6 py-4">{ad.user?.name || "-"}</td>
                     <td className="px-6 py-4">
@@ -239,7 +278,9 @@ const AdsApproval = ({ ads, adsLoading, approveAd, rejectAd }) => {
                       {ad.property?.bhk || "-"} Bhk/{" "}
                       {ad.property?.bathroom || "-"}Bath
                     </td>
-                    <td className="px-6 py-4">{ad.property?.transactionType || "-"}</td>
+                    <td className="px-6 py-4">
+                      {ad.property?.transactionType || "-"}
+                    </td>
                     <td className="px-6 py-4">
                       {ad.platform?.join(", ") || "-"}
                     </td>

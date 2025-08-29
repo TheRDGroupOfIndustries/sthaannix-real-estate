@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Search, X, MapPin, Home } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -6,6 +6,7 @@ const SearchBar = ({ onSearch, className }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [recentSearches, setRecentSearches] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchRef = useRef(null);
 
   // Popular locations and transaction types suggestions
   const popularLocations = [
@@ -15,11 +16,21 @@ const SearchBar = ({ onSearch, className }) => {
   const transactionTypes = ['Buy', 'Rent', 'Lease'];
 
   useEffect(() => {
-    // Load recent searches from localStorage
     const saved = localStorage.getItem('recentSearches');
     if (saved) {
       setRecentSearches(JSON.parse(saved));
     }
+
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
   const handleSearch = (query) => {
@@ -54,23 +65,28 @@ const SearchBar = ({ onSearch, className }) => {
     }
   };
 
+  const toggleSuggestions = () => {
+    setShowSuggestions(!showSuggestions);
+  };
+
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative ${className}`} ref={searchRef}>
       <form onSubmit={handleSubmit} className="relative">
         <input
           type="text"
           placeholder="Search by location, address, city, state, pincode or transaction type (buy/rent/lease)..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          onFocus={() => setShowSuggestions(true)}
+          onClick={toggleSuggestions}
           onKeyDown={handleKeyDown}
           className="w-full pl-12 pr-20 py-3 rounded-lg border border-gray-200 
             focus:border-blue-500 focus:ring-2 focus:ring-blue-200 
-            transition-all text-gray-800 placeholder-gray-400"
+            transition-all text-gray-800 placeholder-gray-400 cursor-pointer"
         />
         <Search 
           className="absolute left-4 top-1/2 transform -translate-y-1/2 
-            text-gray-400 h-5 w-5" 
+            text-gray-400 h-5 w-5 cursor-pointer" 
+          onClick={toggleSuggestions}
         />
         
         <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-2">

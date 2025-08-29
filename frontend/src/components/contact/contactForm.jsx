@@ -72,6 +72,8 @@ function ContactForm() {
             type="tel"
             id="phone"
             name="phone"
+            pattern="[0-9]*"
+            inputMode="numeric"
             value={formData.phone}
             onChange={handleChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"

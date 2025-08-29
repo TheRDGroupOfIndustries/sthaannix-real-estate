@@ -153,7 +153,7 @@ const BuilderDashboard = () => {
   return (
     <div className="min-h-screen pt-16 px-3 sm:px-4 md:px-5 lg:px-6 bg-gray-50 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 md:mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold">Broker Dashboard</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">Builder Dashboard</h1>
         <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto"> 
           {activeTab === "properties" && (
             <button

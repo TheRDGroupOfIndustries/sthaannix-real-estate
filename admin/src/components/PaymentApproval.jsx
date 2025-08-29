@@ -17,8 +17,6 @@ const PaymentApproval = ({
   cancelWalletPayment,
 }) => {
 
-
-    
   if (paymentsLoading) {
     return (
       <motion.div
@@ -285,7 +283,7 @@ const PaymentApproval = ({
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex gap-2">
-                        {/* {payment.images?.map((imgUrl, i) => (
+                        {payment.proof?.map((imgUrl, i) => (
                                    <div
                                      key={i}
                                      className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
@@ -301,9 +299,9 @@ const PaymentApproval = ({
                                        <Image className="w-4 h-4" />
                                      </div>
                                    </div>
-                                 ))} */}
+                                 ))}
 
-                        {
+                        {/* {
                           <div
                             key={payment._id}
                             className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
@@ -321,7 +319,7 @@ const PaymentApproval = ({
                               <Image className="w-4 h-4" />
                             </div>
                           </div>
-                        }
+                        } */}
                       </div>
                     </td>
                   </motion.tr>

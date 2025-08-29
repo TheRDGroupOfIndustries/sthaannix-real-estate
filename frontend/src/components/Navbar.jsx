@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import logo from "../assets/home-regular-24.png";
 import { useAuth } from "../context/AuthContext";
-import PropTypes from "prop-types"; 
+import PropTypes from "prop-types";
 import path from "path";
 import toast from "react-hot-toast";
 
@@ -133,8 +133,8 @@ const Navbar = () => {
   const handleLogout = () => {
     logout();
     setIsDropdownOpen(false);
-     toast.success("Logout successfully");
-    navigate('/')
+    toast.success("Logout successfully");
+    navigate("/");
   };
 
   const getInitials = (name) => {
@@ -145,7 +145,7 @@ const Navbar = () => {
       .join("")
       .toUpperCase();
   };
-  
+
   // Profile and inquiry Property navigation
   const handleProfileClick = () => {
     setIsDropdownOpen(false);
@@ -162,7 +162,7 @@ const Navbar = () => {
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: "smooth"
+      behavior: "smooth",
     });
   };
 
@@ -189,8 +189,8 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Enhanced Logo */}
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="flex items-center space-x-3 group"
             onClick={scrollToTop}
           >
@@ -221,160 +221,160 @@ const Navbar = () => {
               <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent group-hover:from-indigo-600 group-hover:via-blue-600 group-hover:to-purple-600 transition-all duration-500">
                 Sthaanix
               </span>
-              <span className="text-xs text-gray-500 font-medium -mt-1">
+              <span className="text-xs text-gray-500 font-medium mt-1">
                 Real Estate
               </span>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <NavLinks 
-              currentPath={location.pathname} 
-              handleNavigation={handleNavigation} 
+          <div className="hidden md:flex flex-1 justify-center">
+            <NavLinks
+              currentPath={location.pathname}
+              handleNavigation={handleNavigation}
             />
-
-            {/* Enhanced Auth Section */}
-            <div className="flex items-center space-x-4">
-              {isLoggedIn ? (
-                <div className="flex items-center space-x-3">
-                  {/* User Profile Dropdown */}
-                  <div className="relative" ref={dropdownRef}>
-                    <motion.button
-                      whileTap={{ scale: 0.97 }}
-                      onClick={toggleDropdown}
-                      className="flex items-center space-x-3 p-1.5 rounded-xl hover:bg-gray-50 transition-all duration-200 focus:outline-none"
-                      aria-label="User menu"
-                      aria-expanded={isDropdownOpen}
-                    >
-                      <div className="relative">
-                        <motion.div
-                          whileHover={{ scale: 1.05 }}
-                          className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-blue-500/30"
-                        >
-                          {getInitials(user?.name)}
-                        </motion.div>
-                        <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-400 border-2 border-white rounded-full flex items-center justify-center">
-                          <div className="w-1.5 h-1.5 bg-green-600 rounded-full" />
-                        </div>
-                      </div>
-                      <div className="hidden lg:flex flex-col items-start">
-                        <span className="text-sm font-semibold text-gray-700">
-                          {user?.name}
-                        </span>
-                      </div>
+          </div>
+          {/* Enhanced Auth Section */}
+          <div className="hidden md:flex items-center space-x-4">
+            {isLoggedIn ? (
+              <div className="flex items-center space-x-3">
+                {/* User Profile Dropdown */}
+                <div className="relative" ref={dropdownRef}>
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    onClick={toggleDropdown}
+                    className="flex items-center space-x-3 p-1.5 rounded-xl hover:bg-gray-50 transition-all duration-200 focus:outline-none"
+                    aria-label="User menu"
+                    aria-expanded={isDropdownOpen}
+                  >
+                    <div className="relative">
                       <motion.div
-                        animate={{ rotate: isDropdownOpen ? 180 : 0 }}
-                        transition={{ duration: 0.3 }}
+                        whileHover={{ scale: 1.05 }}
+                        className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-blue-500/30"
                       >
-                        <ChevronDown className="w-4 h-4 text-gray-400" />
+                        {getInitials(user?.name)}
                       </motion.div>
-                    </motion.button>
+                      <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-400 border-2 border-white rounded-full flex items-center justify-center">
+                        <div className="w-1.5 h-1.5 bg-green-600 rounded-full" />
+                      </div>
+                    </div>
+                    <div className="hidden lg:flex flex-col items-start">
+                      <span className="text-sm font-semibold text-gray-700">
+                        {user?.name}
+                      </span>
+                    </div>
+                    <motion.div
+                      animate={{ rotate: isDropdownOpen ? 180 : 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <ChevronDown className="w-4 h-4 text-gray-400" />
+                    </motion.div>
+                  </motion.button>
 
-                    {/* Enhanced Dropdown Menu */}
-                    <AnimatePresence>
-                      {isDropdownOpen && (
-                        <motion.div
-                          initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                          transition={{ duration: 0.2 }}
-                          className="absolute right-0 mt-3 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
-                        >
-                          {/* Header */}
-                          <div className="px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-100">
-                            <div className="flex items-center space-x-3">
-                              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold shadow-lg">
-                                {getInitials(user?.name)}
-                              </div>
-                              <div className="flex-1">
-                                <p className="text-sm font-bold text-gray-900">
-                                  {user?.name}
-                                </p>
-                                <p className="text-xs text-gray-600 truncate">
-                                  {user?.email}
-                                </p>
-                              </div>
+                  {/* Enhanced Dropdown Menu */}
+                  <AnimatePresence>
+                    {isDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute right-0 mt-3 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
+                      >
+                        {/* Header */}
+                        <div className="px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-100">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold shadow-lg">
+                              {getInitials(user?.name)}
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-bold text-gray-900">
+                                {user?.name}
+                              </p>
+                              <p className="text-xs text-gray-600 truncate">
+                                {user?.email}
+                              </p>
                             </div>
                           </div>
+                        </div>
 
-                          {/* Menu Items */}
-                          <div className="py-2">
-                            <motion.button
-                              onClick={handleProfileClick}
-                              whileHover={{
-                                x: 4,
-                                backgroundColor: "rgb(243 244 246)",
-                              }}
-                              className="w-full px-6 py-3 text-left text-sm text-gray-700 hover:text-blue-600 flex items-center space-x-3 transition-colors"
-                            >
-                              <UserCircle className="w-4 h-4" />
-                              <span>My Profile</span>
-                            </motion.button>
-                            <motion.button
-                              onClick={handleInquiryPropertiesClick}
-                              whileHover={{
-                                x: 4,
-                                backgroundColor: "rgb(243 244 246)",
-                              }}
-                              className="w-full px-6 py-3 text-left text-sm text-gray-700 hover:text-blue-600 flex items-center space-x-3 transition-colors"
-                            >
-                              <Calendar className="w-4 h-4" />
-                              <span> Properties Inquiry</span>
-                            </motion.button>
-                            <div className="border-t border-gray-100 my-2" />
-                            <motion.button
-                              whileHover={{
-                                x: 4,
-                                backgroundColor: "rgb(254 242 242)",
-                              }}
-                              onClick={handleLogout}
-                              className="w-full px-6 py-3 text-left text-sm text-red-600 hover:text-red-700 flex items-center space-x-3 transition-colors"
-                            >
-                              <LogOut className="w-4 h-4" />
-                              <span>Sign out</span>
-                            </motion.button>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-4">
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <Link
-                      to="/login"
-                      className="text-gray-700 hover:text-blue-600 font-medium transition-colors px-4 py-2 rounded-lg hover:bg-blue-50"
-                      onClick={scrollToTop}
-                    >
-                      Sign in
-                    </Link>
-                  </motion.div>
-                  <motion.div
-                    whileHover={{ scale: 1.05, ...glowAnimation }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Link
-                      to="/signup"
-                      className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white px-6 py-2.5 rounded-xl hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl shadow-blue-500/30 font-semibold overflow-hidden"
-                      onClick={scrollToTop}
-                    >
-                      <span className="relative z-10">Sign up</span>
-                      <motion.div
-                        animate={sparkleVariants.animate}
-                        className="absolute top-1 right-1"
-                      >
-                        <Sparkles className="w-3 h-3 text-yellow-300" />
+                        {/* Menu Items */}
+                        <div className="py-2">
+                          <motion.button
+                            onClick={handleProfileClick}
+                            whileHover={{
+                              x: 4,
+                              backgroundColor: "rgb(243 244 246)",
+                            }}
+                            className="w-full px-6 py-3 text-left text-sm text-gray-700 hover:text-blue-600 flex items-center space-x-3 transition-colors"
+                          >
+                            <UserCircle className="w-4 h-4" />
+                            <span>My Profile</span>
+                          </motion.button>
+                          <motion.button
+                            onClick={handleInquiryPropertiesClick}
+                            whileHover={{
+                              x: 4,
+                              backgroundColor: "rgb(243 244 246)",
+                            }}
+                            className="w-full px-6 py-3 text-left text-sm text-gray-700 hover:text-blue-600 flex items-center space-x-3 transition-colors"
+                          >
+                            <Calendar className="w-4 h-4" />
+                            <span> Properties Inquiry</span>
+                          </motion.button>
+                          
+                          <div className="border-t border-gray-100 my-2" />
+                          <motion.button
+                            whileHover={{
+                              x: 4,
+                              backgroundColor: "rgb(254 242 242)",
+                            }}
+                            onClick={handleLogout}
+                            className="w-full px-6 py-3 text-left text-sm text-red-600 hover:text-red-700 flex items-center space-x-3 transition-colors"
+                          >
+                            <LogOut className="w-4 h-4" />
+                            <span>Sign out</span>
+                          </motion.button>
+                        </div>
                       </motion.div>
-                    </Link>
-                  </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-4">
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Link
+                    to="/login"
+                    className="text-gray-700 hover:text-blue-600 font-medium transition-colors px-4 py-2 rounded-lg hover:bg-blue-50"
+                    onClick={scrollToTop}
+                  >
+                    Sign in
+                  </Link>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.05, ...glowAnimation }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Link
+                    to="/signup"
+                    className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white px-6 py-2.5 rounded-xl hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl shadow-blue-500/30 font-semibold overflow-hidden"
+                    onClick={scrollToTop}
+                  >
+                    <span className="relative z-10">Sign up</span>
+                    <motion.div
+                      animate={sparkleVariants.animate}
+                      className="absolute top-1 right-1"
+                    >
+                      <Sparkles className="w-3 h-3 text-yellow-300" />
+                    </motion.div>
+                  </Link>
+                </motion.div>
+              </div>
+            )}
           </div>
 
           {/* Enhanced Mobile menu button */}
@@ -550,8 +550,8 @@ const MobileNavLinks = ({
       path: "/contact",
       icon: MessageCircle,
       color: "from-orange-500 to-red-500",
-      description: "Get in touch"
-    }
+      description: "Get in touch",
+    },
   ];
 
   // Scroll to top and close menu

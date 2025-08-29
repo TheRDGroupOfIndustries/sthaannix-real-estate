@@ -1195,7 +1195,7 @@ const PropertyListings = () => {
 
                         {/* Property Type Badge */}
                         <div className="absolute top-3 left-3 md:top-4 md:left-4">
-                          <span className="px-2 py-1 md:px-3 md:py-1 bg-white/90 backdrop-blur-sm text-gray-800 text-xs md:text-sm font-medium rounded-full shadow-sm">
+                          <span className="px-2 py-1 md:px-3 md:py-1 bg-white/90 backdrop-blur-sm text-gray-800 text-xs md:text-sm font-medium rounded-full shadow-sm text-transform: capitalize">
                             {property.type}
                           </span>
                         </div>
@@ -1203,7 +1203,7 @@ const PropertyListings = () => {
                         {/* Status Badge */}
                         <div className="absolute top-3 right-3 md:top-4 md:right-4">
                           <span
-                            className={`px-2 py-1 md:px-3 md:py-1 text-xs font-medium rounded-full backdrop-blur-sm shadow-sm ${
+                            className={`px-2 py-1 md:px-3 text-transform: capitalize md:py-1 text-xs font-medium rounded-full backdrop-blur-sm shadow-sm ${
                               property.availability === "rent"
                                 ? "bg-green-500/90 text-white"
                                 : "bg-blue-500/90 text-white"
@@ -1250,7 +1250,7 @@ const PropertyListings = () => {
                     >
                       <div>
                         <div className="mb-3 md:mb-4">
-                          <h3 className="text-lg md:text-xl font-semibold text-gray-900 line-clamp-2">
+                          <h3 className="text-lg md:text-xl font-semibold text-gray-900 line-clamp-2 text-transform: capitalize">
                             {property.title}
                           </h3>
                           <p className="mb-2 text-sm md:text-base text-gray-600 line-clamp-2">

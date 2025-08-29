@@ -51,7 +51,7 @@ export default function useContactForm() {
     if (validateForm()) {
       try {
         // Ensure the endpoint matches your backend route
-        const response = await http.post(`${configBackendURL}contact/send`, formData);
+        const response = await http.post(`${configBackendURL}/contact/send`, formData);
 
         if (response.data.success) { // Assuming your backend returns { success: true, ... }
           toast.success('Form submitted successfully!');

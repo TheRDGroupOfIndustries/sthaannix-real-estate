@@ -94,7 +94,7 @@ const ForgotPassword = () => {
     }
 
     try {
-      const response = await axios.post(`${configBackendURL}user/reset`, {
+      const response = await axios.post(`${configBackendURL}/user/reset`, {
         email,
         newPassword: password,
       });
@@ -116,7 +116,7 @@ const ForgotPassword = () => {
     setLoading(true);
     setResetClick(true);
     try {
-      const response = await axios.post(`${configBackendURL}user/send-otp`, {
+      const response = await axios.post(`${configBackendURL}/user/send-otp`, {
         email,
       });
       if (response.data.success) {
@@ -137,7 +137,7 @@ const ForgotPassword = () => {
     setLoading(true);
     setResetClick(true);
     try {
-      const response = await axios.post(`${configBackendURL}user/verify-pass-otp`, {
+      const response = await axios.post(`${configBackendURL}/user/verify-pass-otp`, {
         email,
         otp,
       });

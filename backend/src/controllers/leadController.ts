@@ -15,16 +15,16 @@ export const createLead = async (req: Request, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
+    const { propertyId, message } = req.body as {
+      propertyId: string;
+      message?: string;
+    };
+
     if (!buyerOnly(req.user.role)) {
       return res
         .status(403)
         .json({ message: "Only buyers can send enquiries" });
     }
- 
-    const { propertyId, message } = req.body as {
-      propertyId: string;
-      message?: string;
-    };
 
     if (!propertyId || !mongoose.Types.ObjectId.isValid(propertyId)) {
       return res.status(400).json({ message: "Valid propertyId is required" });
@@ -94,7 +94,7 @@ export const getMyLeadsAsBuyer = async (req: Request, res: Response) => {
 
     const leads = await Lead.find({ buyer: req.user.id })
       .populate("property", "title price location.city")
-      .populate("buyer", "name email phone") 
+      .populate("buyer", "name email phone")
       .sort({ createdAt: -1 });
 
     res.json(leads);

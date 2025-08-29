@@ -28,10 +28,11 @@ export const submitInquiry = async (inquiryData) => {
     const response = await http.post("/leads/create", inquiryData);
     return response.data;
   } catch (error) {
-    console.error("Error submitting inquiry:", error);
-    throw error;
+    console.error("Error submitting inquiry:", error.response?.data || error);
+    throw error; 
   }
 };
+ 
 
 // Fetch user inquiries
 export const fetchInquiries = async () => {

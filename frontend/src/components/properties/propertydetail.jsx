@@ -231,11 +231,6 @@ const PropertyDetails = () => {
   const handleInquirySubmit = async (e) => {
     e.preventDefault();
 
-    if (!inquiryData.name || !inquiryData.email || !inquiryData.phone) {
-      toast.error("Please fill in all required fields.");
-      return;
-    }
-
     if (!property?._id) {
       toast.error("Property not loaded yet.");
       return;
@@ -246,30 +241,21 @@ const PropertyDetails = () => {
     try {
       const payload = {
         propertyId: property._id,
-        name: inquiryData.name,
-        email: inquiryData.email,
-        phone: inquiryData.phone,
         message: inquiryData.message,
       };
 
-      await submitInquiry(payload);
 
+      const res = await http.post("/leads/create", payload);
       toast.success("Inquiry submitted successfully!");
-
       setInquirySuccess(true);
+      
       setTimeout(() => {
         setInquirySuccess(false);
-        setInquiryData({
-          name: "",
-          email: "",
-          phone: "",
-          message: "",
-        });
+        setInquiryData({ message: "" });
       }, 3000);
     } catch (err) {
-      console.error("Inquiry submission error:", err);
+      console.error("Inquiry submission error:", err.message);
 
-      // handle backend error messages
       if (err.response?.status === 400) {
         toast.error(err.response.data.message || "Bad request");
       } else if (err.response?.status === 401) {

@@ -29,7 +29,7 @@ const BrokerDashboard = () => {
 
   }, [activeTab]);
 
-  const fetchProperties = async () => {
+ const fetchProperties = async () => {
   setLoading(true);
   try {
     const token = localStorage.getItem("token");
@@ -40,7 +40,12 @@ const BrokerDashboard = () => {
     });
 
     if (response.status === 200) {
-      setProperties(Array.isArray(response.data) ? response.data : response.data.properties || []);
+      const props =
+        Array.isArray(response.data)
+          ? response.data
+          : response.data.properties || [];
+
+      setProperties(props);
     } else {
       toast.error("Failed to fetch properties");
     }
@@ -220,12 +225,14 @@ const handleDeletePayment = async (id, type) => {
       {/* Tab Content */}
       {loading ? (
         <div className="text-center py-12 md:py-20 text-base md:text-lg">Loading...</div>
-      ) : activeTab === "properties" ? (
-        properties.length === 0 ? (
+      ): activeTab === "properties" ? (
+        properties.filter(p => p.status === "approved").length === 0 ? (
           <div className="text-center py-12 md:py-20 text-base md:text-lg">No properties found.</div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {properties.map((property) => (
+            {properties
+              .filter(p => p.status === "approved")
+              .map((property) => (
               <div
                 key={property._id} 
                 className="bg-white p-3 md:p-4 rounded-lg shadow group hover:shadow-lg transition relative"

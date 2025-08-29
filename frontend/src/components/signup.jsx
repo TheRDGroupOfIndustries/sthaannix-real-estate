@@ -236,7 +236,7 @@ const Signup = () => {
 
       if (response.data) {
         localStorage.setItem("token", response.data.token);
-        toast.success("Account created successfully!");
+        toast.success("Account created successfully. Please sign in to continue.");
         navigate("/");
       } else {
         toast.error(response.data.error || "Invalid OTP");

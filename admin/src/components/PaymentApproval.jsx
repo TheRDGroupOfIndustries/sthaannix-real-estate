@@ -16,10 +16,7 @@ const PaymentApproval = ({
   approveWalletPayment,
   cancelWalletPayment,
 }) => {
-console.log("cancelWalletPayment",canceledPayments);
 
-
-    
   if (paymentsLoading) {
     return (
       <motion.div

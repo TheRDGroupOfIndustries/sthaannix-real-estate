@@ -25,6 +25,7 @@ const BuilderDashboard = () => {
     if (activeTab === "properties") fetchProperties();
     else if (activeTab === "payments") loadPayments(user.email);
     else if (activeTab === "ads") loadAds(user.id);
+    else if (activeTab === "property-list") fetchProperties();
   }, [activeTab]);
 
   const fetchProperties = async () => {
@@ -143,10 +144,11 @@ const BuilderDashboard = () => {
     loadAds();
   }, []);
 
+
   return (
     <div className="min-h-screen pt-16 px-3 sm:px-4 md:px-5 lg:px-6 bg-gray-50 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 md:mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold">Builder Dashboard</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">Broker Dashboard</h1>
         <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto"> 
           {activeTab === "properties" && (
             <button
@@ -201,6 +203,17 @@ const BuilderDashboard = () => {
         >
           Advertisment Detail
         </button>
+
+         <button
+          onClick={() => setActiveTab("property-list")}
+          className={`px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium transition-colors flex-1 ${
+            activeTab === "property-list"
+              ? "bg-blue-600 text-white"
+              : "bg-white text-gray-700 hover:bg-gray-100"
+          }`}
+        >
+          Property Approval
+        </button>
       </div>
 
       {/* Tab Content */}
@@ -213,7 +226,7 @@ const BuilderDashboard = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {properties.map((property) => (
               <div
-                key={property._id}
+                key={property._id} 
                 className="bg-white p-3 md:p-4 rounded-lg shadow group hover:shadow-lg transition relative"
               >
                 <img
@@ -300,7 +313,7 @@ const BuilderDashboard = () => {
                     <td className="px-3 py-2 sm:px-4 sm:py-4 whitespace-nowrap text-sm">{payment.status || "-"}</td>
                     <td className="px-3 py-2 sm:px-4 sm:py-4 whitespace-nowrap text-center">
                       <button
-                        onClick={() => handleDeletePayment(payment._id, payment.type)}
+                        onClick={() => handleDeletePayment(payment._id,payment.type)}
                         className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1 rounded-md bg-red-600 text-white hover:bg-red-700 transition text-xs sm:text-sm"
                       >
                         <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" /> Delete
@@ -366,7 +379,90 @@ const BuilderDashboard = () => {
             </table>
           </div>
         )
-      ) : null}
+      ) : activeTab === "property-list" ? (
+  properties.length === 0 ? (
+    <div className="text-center py-12 md:py-20 text-base md:text-lg text-gray-500">
+      No property approval requests found.
+    </div>
+  ) : (
+    <div className="overflow-x-auto bg-white rounded-lg md:rounded-xl shadow border border-gray-200">
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead className="bg-gray-50">
+          <tr>
+            <th className="px-3 py-2 sm:px-4 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+            <th className="px-3 py-2 sm:px-4 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
+            <th className="px-3 py-2 sm:px-4 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+            <th className="px-3 py-2 sm:px-4 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+            <th className="px-3 py-2 sm:px-4 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+            <th className="px-3 py-2 sm:px-4 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">BHK</th>
+            <th className="px-3 py-2 sm:px-4 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Size</th>
+            <th className="px-3 py-2 sm:px-4 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th className="px-3 py-2 sm:px-4 sm:py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-100">
+          {properties.map((property, idx) => (
+            <tr key={property._id} className="hover:bg-gray-50">
+              <td className="px-3 py-2 sm:px-4 sm:py-4 text-sm">{idx + 1}</td>
+              <td className="px-3 py-2 sm:px-4 sm:py-4">
+                {property.images?.length > 0 ? (
+                  <img
+                    src={property.images[0]}
+                    alt={property.title}
+                    className="w-12 h-10 sm:w-16 sm:h-12 object-cover rounded"
+                  />
+                ) : (
+                  <div className="w-12 h-10 sm:w-16 sm:h-12 bg-gray-200 rounded flex items-center justify-center text-gray-400 text-xs">
+                    No Image
+                  </div>
+                )}
+              </td>
+              <td className="px-3 py-2 sm:px-4 sm:py-4 text-sm font-medium">{property.title}</td>
+              <td className="px-3 py-2 sm:px-4 sm:py-4 text-sm">{property.location?.address || "-"}</td>
+              <td className="px-3 py-2 sm:px-4 sm:py-4 text-sm">₹{property.price.toLocaleString()}</td>
+              <td className="px-3 py-2 sm:px-4 sm:py-4 text-sm">{property.bhk} BHK</td>
+              <td className="px-3 py-2 sm:px-4 sm:py-4 text-sm">{property.size} Sq Ft</td>
+              <td className="px-3 py-2 sm:px-4 sm:py-4 text-sm">
+                <span
+                  className={`px-2 py-1 text-xs rounded-full ${
+                    property.status === "approved"
+                      ? "bg-green-100 text-green-700"
+                      : property.status === "pending"
+                      ? "bg-yellow-100 text-yellow-700"
+                      : "bg-red-100 text-red-700"
+                  }`}
+                >
+                  {property.status || "pending"}
+                </span>
+              </td>
+              <td className="px-3 py-2 sm:px-4 sm:py-4 whitespace-nowrap text-center">
+                <div className="flex gap-2 justify-center">
+                  <button
+                    onClick={() => navigate(`/update/${property._id}`)}
+                    className="px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 text-xs"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteProperty(property._id)}
+                    className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+) 
+      
+      : null}
+
+
+      
     </div>
   );
 };

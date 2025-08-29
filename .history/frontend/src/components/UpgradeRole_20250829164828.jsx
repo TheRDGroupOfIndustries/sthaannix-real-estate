@@ -107,154 +107,72 @@ export default function UpgradeRole() {
   };
 
   // Handles the form submission
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-  //   if (!token) {
-  //     toast.error("You must be logged in to upgrade your role.");
-  //     setLoading(false);
-  //     return;
-  //   }
-
-  //   const data = new FormData();
-  //   data.append("newRole", selectedRole);
-  //   data.append("amount", formData.amount);
-  //   data.append("paymentMethod", selectedPaymentMethod); // ✅ FIX
-
-  //   if (
-  //     selectedPaymentMethod === "upi" ||
-  //     selectedPaymentMethod === "account"
-  //   ) {
-  //     if (!formData.utrNumber) {
-  //       toast.error("UTR Number is required for this payment method.");
-  //       setLoading(false);
-  //       return;
-  //     }
-  //     data.append("utrNumber", formData.utrNumber);
-  //   } else if (selectedPaymentMethod === "whatsapp") {
-  //     if (!formData.whatsappNumber) {
-  //       toast.error("WhatsApp number is required for this payment method.");
-  //       setLoading(false);
-  //       return;
-  //     }
-  //     data.append("whatsappNumber", formData.whatsappNumber);
-  //   }
-
-  //   if (formData.proofFile) {
-  //     data.append("proof", formData.proofFile);
-  //   } else {
-  //     toast.error("Payment proof image is required.");
-  //     setLoading(false);
-  //     return;
-  //   }
-
-  //   try {
-  //     const response = await http.post("/user/role-upgrade", data, {
-  //       headers: { "Content-Type": "multipart/form-data" },
-  //     });
-  //     toast.success(response.data.message);
-
-  //     // reset
-  //     setSelectedRole("");
-  //     setSelectedPaymentMethod("");
-  //     setFormData({
-  //       amount: "1500",
-  //       utrNumber: "",
-  //       proofFile: null,
-  //       whatsappNumber: "",
-  //     });
-  //   } catch (error) {
-  //     console.error("Role upgrade request error:", error);
-  //     toast.error(
-  //       error.response?.data?.message || "An error occurred during submission."
-  //     );
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-// Handles the form submission
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-
-  if (!token) {
-    toast.error("You must be logged in to upgrade your role.");
-    setLoading(false);
-    return;
-  }
-
-  const data = new FormData();
-  data.append("newRole", selectedRole);
-  data.append("amount", formData.amount);
-  data.append("paymentMethod", selectedPaymentMethod);
-
-  if (selectedPaymentMethod === "upi" || selectedPaymentMethod === "account") {
-    if (!formData.utrNumber) {
-      toast.error("UTR Number is required for this payment method.");
+    if (!token) {
+      toast.error("You must be logged in to upgrade your role.");
       setLoading(false);
       return;
     }
 
-    //  Validate length (12–22 characters)
-    if (formData.utrNumber.length < 12 || formData.utrNumber.length > 22) {
-      toast.error("UTR Number must be between 12 and 22 characters.");
+    const data = new FormData();
+    data.append("newRole", selectedRole);
+    data.append("amount", formData.amount);
+    data.append("paymentMethod", selectedPaymentMethod); // ✅ FIX
+
+    if (
+      selectedPaymentMethod === "upi" ||
+      selectedPaymentMethod === "account"
+    ) {
+      if (!formData.utrNumber) {
+        toast.error("UTR Number is required for this payment method.");
+        setLoading(false);
+        return;
+      }
+      data.append("utrNumber", formData.utrNumber);
+    } else if (selectedPaymentMethod === "whatsapp") {
+      if (!formData.whatsappNumber) {
+        toast.error("WhatsApp number is required for this payment method.");
+        setLoading(false);
+        return;
+      }
+      data.append("whatsappNumber", formData.whatsappNumber);
+    }
+
+    if (formData.proofFile) {
+      data.append("proof", formData.proofFile);
+    } else {
+      toast.error("Payment proof image is required.");
       setLoading(false);
       return;
     }
 
-    //  Validate format (letters + digits only)
-    const utrRegex = /^[A-Za-z0-9]+$/;
-    if (!utrRegex.test(formData.utrNumber)) {
-      toast.error("UTR Number must contain only letters and numbers.");
+    try {
+      const response = await http.post("/user/role-upgrade", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      toast.success(response.data.message);
+
+      // reset
+      setSelectedRole("");
+      setSelectedPaymentMethod("");
+      setFormData({
+        amount: "1500",
+        utrNumber: "",
+        proofFile: null,
+        whatsappNumber: "",
+      });
+    } catch (error) {
+      console.error("Role upgrade request error:", error);
+      toast.error(
+        error.response?.data?.message || "An error occurred during submission."
+      );
+    } finally {
       setLoading(false);
-      return;
     }
-
-    data.append("utrNumber", formData.utrNumber);
-  } else if (selectedPaymentMethod === "whatsapp") {
-    if (!formData.whatsappNumber) {
-      toast.error("WhatsApp number is required for this payment method.");
-      setLoading(false);
-      return;
-    }
-    data.append("whatsappNumber", formData.whatsappNumber);
-  }
-
-  if (formData.proofFile) {
-    data.append("proof", formData.proofFile);
-  } else {
-    toast.error("Payment proof image is required.");
-    setLoading(false);
-    return;
-  }
-
-  try {
-    const response = await http.post("/user/role-upgrade", data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    toast.success(response.data.message);
-
-    // reset
-    setSelectedRole("");
-    setSelectedPaymentMethod("");
-    setFormData({
-      amount: "1500",
-      utrNumber: "",
-      proofFile: null,
-      whatsappNumber: "",
-    });
-  } catch (error) {
-    console.error("Role upgrade request error:", error);
-    toast.error(
-      error.response?.data?.message || "An error occurred during submission."
-    );
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   return (
     <motion.div

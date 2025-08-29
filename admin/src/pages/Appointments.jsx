@@ -35,6 +35,7 @@ const Appointments = () => {
     try {
       setLoading(true);
       const response = await http.get(`${Backendurl}/leads/my-properties`);
+      console.log("fetchAppointments: ",response);
       
       if (response.status == 200) {
         // Filter out appointments with missing user data

@@ -118,7 +118,7 @@ const UsersOverview = ({ users, stats, usersLoading, statsLoading }) => {
           <div>
             <p className="text-sm font-medium text-gray-600">Total Revenue</p>
             <p className="text-2xl font-bold text-gray-900">
-              ₹{stats?.adminRevenue?.finalRevenue ?? 0}
+               ₹{Number(stats?.adminRevenue?.finalRevenue).toFixed(2)}
             </p>
           </div>
         </motion.div>

@@ -343,13 +343,12 @@ const AdminDashboard = () => {
         </div>
 
         {/* Header with tabs */}
-        <div className="mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-          <div className="hidden lg:flex items-center gap-3">
-            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
+      <div className="mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+           <div className="hidden lg:flex items-center gap-3">
+           <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 whitespace-nowrap">
               {activeTab === "users" && (
                 <>
-                  <Users className="w-6 h-6 lg:w-8 lg:h-8 text-blue-600 inline mr-2" /> Admin
-                  Dashboard
+                  <Users className="w-6 h-6 lg:w-8 lg:h-8 text-blue-600 inline mr-2" /> Admin Dashboard
                 </>
               )}
               {activeTab === "payments" && (
@@ -373,7 +372,7 @@ const AdminDashboard = () => {
             </h1>
           </div>
 
-          <div className="w-full flex flex-col lg:flex-row items-stretch lg:items-center gap-4">
+          <div className="w-full flex flex-col lg:flex-row items-stretch lg:items-center gap-4 lg:justify-end">
             {/* Mobile tabs dropdown */}
             {mobileMenuOpen && (
               <div className="lg:hidden grid grid-cols-2 gap-2 mb-4">

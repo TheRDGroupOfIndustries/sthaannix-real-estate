@@ -9,6 +9,7 @@ import {
   CreditCard,
   Phone,
   MessageCircle,
+  ClipboardCopy,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import http from "../api/http"; // Assuming 'http' is correctly configured for API calls
@@ -67,6 +68,26 @@ export default function UpgradeRole() {
     },
   ];
 
+  // Bank account and UPI details
+  const accountDetails = {
+    bankName: "Example Bank",
+    accountName: "Sthaanix Registrations",
+    accountNumber: "1234567890",
+    ifsc: "EXAMP0001234",
+    upiId: "sthaanix@upi",
+  };
+
+  // Copy to clipboard function
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        toast.success("Copied to clipboard!");
+      })
+      .catch(() => {
+        toast.error("Failed to copy to clipboard");
+      });
+  };
+
   // Handles the selection of a new role
   const handleRoleSelect = (role) => {
     setSelectedRole(role);
@@ -107,154 +128,85 @@ export default function UpgradeRole() {
   };
 
   // Handles the form submission
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-  //   if (!token) {
-  //     toast.error("You must be logged in to upgrade your role.");
-  //     setLoading(false);
-  //     return;
-  //   }
-
-  //   const data = new FormData();
-  //   data.append("newRole", selectedRole);
-  //   data.append("amount", formData.amount);
-  //   data.append("paymentMethod", selectedPaymentMethod); // ✅ FIX
-
-  //   if (
-  //     selectedPaymentMethod === "upi" ||
-  //     selectedPaymentMethod === "account"
-  //   ) {
-  //     if (!formData.utrNumber) {
-  //       toast.error("UTR Number is required for this payment method.");
-  //       setLoading(false);
-  //       return;
-  //     }
-  //     data.append("utrNumber", formData.utrNumber);
-  //   } else if (selectedPaymentMethod === "whatsapp") {
-  //     if (!formData.whatsappNumber) {
-  //       toast.error("WhatsApp number is required for this payment method.");
-  //       setLoading(false);
-  //       return;
-  //     }
-  //     data.append("whatsappNumber", formData.whatsappNumber);
-  //   }
-
-  //   if (formData.proofFile) {
-  //     data.append("proof", formData.proofFile);
-  //   } else {
-  //     toast.error("Payment proof image is required.");
-  //     setLoading(false);
-  //     return;
-  //   }
-
-  //   try {
-  //     const response = await http.post("/user/role-upgrade", data, {
-  //       headers: { "Content-Type": "multipart/form-data" },
-  //     });
-  //     toast.success(response.data.message);
-
-  //     // reset
-  //     setSelectedRole("");
-  //     setSelectedPaymentMethod("");
-  //     setFormData({
-  //       amount: "1500",
-  //       utrNumber: "",
-  //       proofFile: null,
-  //       whatsappNumber: "",
-  //     });
-  //   } catch (error) {
-  //     console.error("Role upgrade request error:", error);
-  //     toast.error(
-  //       error.response?.data?.message || "An error occurred during submission."
-  //     );
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-// Handles the form submission
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-
-  if (!token) {
-    toast.error("You must be logged in to upgrade your role.");
-    setLoading(false);
-    return;
-  }
-
-  const data = new FormData();
-  data.append("newRole", selectedRole);
-  data.append("amount", formData.amount);
-  data.append("paymentMethod", selectedPaymentMethod);
-
-  if (selectedPaymentMethod === "upi" || selectedPaymentMethod === "account") {
-    if (!formData.utrNumber) {
-      toast.error("UTR Number is required for this payment method.");
+    if (!token) {
+      toast.error("You must be logged in to upgrade your role.");
       setLoading(false);
       return;
     }
 
-    //  Validate length (12–22 characters)
-    if (formData.utrNumber.length < 12 || formData.utrNumber.length > 22) {
-      toast.error("UTR Number must be between 12 and 22 characters.");
+    const data = new FormData();
+    data.append("newRole", selectedRole);
+    data.append("amount", formData.amount);
+    data.append("paymentMethod", selectedPaymentMethod);
+
+    if (selectedPaymentMethod === "upi" || selectedPaymentMethod === "account") {
+      if (!formData.utrNumber) {
+        toast.error("UTR Number is required for this payment method.");
+        setLoading(false);
+        return;
+      }
+
+      //  Validate length (12–22 characters)
+      if (formData.utrNumber.length < 12 || formData.utrNumber.length > 22) {
+        toast.error("UTR Number must be between 12 and 22 characters.");
+        setLoading(false);
+        return;
+      }
+
+      //  Validate format (letters + digits only)
+      const utrRegex = /^[A-Za-z0-9]+$/;
+      if (!utrRegex.test(formData.utrNumber)) {
+        toast.error("UTR Number must contain only letters and numbers.");
+        setLoading(false);
+        return;
+      }
+
+      data.append("utrNumber", formData.utrNumber);
+    } else if (selectedPaymentMethod === "whatsapp") {
+      if (!formData.whatsappNumber) {
+        toast.error("WhatsApp number is required for this payment method.");
+        setLoading(false);
+        return;
+      }
+      data.append("whatsappNumber", formData.whatsappNumber);
+    }
+
+    if (formData.proofFile) {
+      data.append("proof", formData.proofFile);
+    } else {
+      toast.error("Payment proof image is required.");
       setLoading(false);
       return;
     }
 
-    //  Validate format (letters + digits only)
-    const utrRegex = /^[A-Za-z0-9]+$/;
-    if (!utrRegex.test(formData.utrNumber)) {
-      toast.error("UTR Number must contain only letters and numbers.");
+    try {
+      const response = await http.post("/user/role-upgrade", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      toast.success(response.data.message);
+
+      // reset
+      setSelectedRole("");
+      setSelectedPaymentMethod("");
+      setFormData({
+        amount: "1500",
+        utrNumber: "",
+        proofFile: null,
+        whatsappNumber: "",
+      });
+    } catch (error) {
+      console.error("Role upgrade request error:", error);
+      toast.error(
+        error.response?.data?.message || "An error occurred during submission."
+      );
+    } finally {
       setLoading(false);
-      return;
     }
-
-    data.append("utrNumber", formData.utrNumber);
-  } else if (selectedPaymentMethod === "whatsapp") {
-    if (!formData.whatsappNumber) {
-      toast.error("WhatsApp number is required for this payment method.");
-      setLoading(false);
-      return;
-    }
-    data.append("whatsappNumber", formData.whatsappNumber);
-  }
-
-  if (formData.proofFile) {
-    data.append("proof", formData.proofFile);
-  } else {
-    toast.error("Payment proof image is required.");
-    setLoading(false);
-    return;
-  }
-
-  try {
-    const response = await http.post("/user/role-upgrade", data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    toast.success(response.data.message);
-
-    // reset
-    setSelectedRole("");
-    setSelectedPaymentMethod("");
-    setFormData({
-      amount: "1500",
-      utrNumber: "",
-      proofFile: null,
-      whatsappNumber: "",
-    });
-  } catch (error) {
-    console.error("Role upgrade request error:", error);
-    toast.error(
-      error.response?.data?.message || "An error occurred during submission."
-    );
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   return (
     <motion.div
@@ -367,6 +319,75 @@ const handleSubmit = async (e) => {
           transition={{ duration: 0.3 }}
           className="space-y-6 overflow-hidden mt-4"
         >
+          {/* Payment Details Display */}
+          {selectedPaymentMethod === "upi" && (
+            <div className="border border-gray-200 rounded-lg p-4 space-y-3 bg-blue-50">
+              <h3 className="font-semibold text-gray-800 text-lg">UPI Details</h3>
+              <p className="flex items-center justify-between">
+                <span>
+                  <strong>UPI ID:</strong> {accountDetails.upiId}
+                </span>
+                <ClipboardCopy
+                  className="w-5 h-5 cursor-pointer text-blue-600"
+                  onClick={() => copyToClipboard(accountDetails.upiId)}
+                  title="Copy UPI ID"
+                />
+              </p>
+              <p className="text-sm text-gray-600 mt-2">
+                Please use this UPI ID to make your payment and provide the UTR number below.
+              </p>
+            </div>
+          )}
+
+          {selectedPaymentMethod === "account" && (
+            <div className="border border-gray-200 rounded-lg p-4 space-y-3 bg-blue-50">
+              <h3 className="font-semibold text-gray-800 text-lg">Account Details</h3>
+              <p className="flex items-center justify-between">
+                <span>
+                  <strong>Bank:</strong> {accountDetails.bankName}
+                </span>
+                <ClipboardCopy
+                  className="w-5 h-5 cursor-pointer text-blue-600"
+                  onClick={() => copyToClipboard(accountDetails.bankName)}
+                  title="Copy Bank Name"
+                />
+              </p>
+              <p className="flex items-center justify-between">
+                <span>
+                  <strong>Account Name:</strong> {accountDetails.accountName}
+                </span>
+                <ClipboardCopy
+                  className="w-5 h-5 cursor-pointer text-blue-600"
+                  onClick={() => copyToClipboard(accountDetails.accountName)}
+                  title="Copy Account Name"
+                />
+              </p>
+              <p className="flex items-center justify-between">
+                <span>
+                  <strong>Account Number:</strong> {accountDetails.accountNumber}
+                </span>
+                <ClipboardCopy
+                  className="w-5 h-5 cursor-pointer text-blue-600"
+                  onClick={() => copyToClipboard(accountDetails.accountNumber)}
+                  title="Copy Account Number"
+                />
+              </p>
+              <p className="flex items-center justify-between">
+                <span>
+                  <strong>IFSC:</strong> {accountDetails.ifsc}
+                </span>
+                <ClipboardCopy
+                  className="w-5 h-5 cursor-pointer text-blue-600"
+                  onClick={() => copyToClipboard(accountDetails.ifsc)}
+                  title="Copy IFSC"
+                />
+              </p>
+              <p className="text-sm text-gray-600 mt-2">
+                Please use these bank details to make your payment and provide the UTR number below.
+              </p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 p-3 bg-gray-50 rounded-lg">
               <span className="text-base font-medium text-gray-700">
@@ -456,40 +477,7 @@ const handleSubmit = async (e) => {
               )}
             </div>
 
-            {/* Payment Proof Upload (always shown if a payment method is selected) */}
-            {/* {selectedPaymentMethod && (
-              <div>
-                <label
-                  htmlFor="proofFile"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Upload Payment Proof (Screenshot)
-                </label>
-                <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-5 text-center cursor-pointer hover:bg-gray-50 transition-colors duration-200">
-                  <input
-                    id="proofFile"
-                    type="file"
-                    name="proofFile"
-                    onChange={handleFileChange}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    accept="image/*"
-                    required
-                  />
-                  <div className="flex flex-col items-center space-y-3">
-                    <UploadCloud className="w-9 h-9 text-gray-400" />
-                    <p className="text-base text-gray-500">
-                      {formData.proofFile
-                        ? `File Selected: ${formData.proofFile.name}`
-                        : "Click to upload your payment screenshot"}
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      Accepted formats: JPG, PNG, GIF
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )} */}
-            {/* Payment Proof Upload (always shown if a payment method is selected) */}
+            {/* Payment Proof Upload */}
             {selectedPaymentMethod && (
               <div>
                 <label
@@ -534,7 +522,6 @@ const handleSubmit = async (e) => {
                 )}
               </div>
             )}
-
 
             {selectedPaymentMethod === "whatsapp" && (
               <div className="p-4 bg-yellow-50 rounded-lg border-l-4 border-yellow-500 shadow-sm">

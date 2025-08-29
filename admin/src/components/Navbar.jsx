@@ -19,6 +19,8 @@ import {
   MessageSquareText 
 } from 'lucide-react';
 
+import { userAPI } from '../api/api';
+
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -127,14 +129,35 @@ const Navbar = () => {
 
   const navItems = navConfig[role] || [];
 
-  useEffect(() => {
-    // ✅ Read user from localStorage
-    const userData = localStorage.getItem("user");
-    if (userData) {
-      const parsedUser = JSON.parse(userData);
-      setBalance(parsedUser.walletBalance || 0); // if null, default 0
-    }
-  }, []);
+    useEffect(() => {
+        const fetchBalance = async () => {
+          try {
+            const userData = localStorage.getItem("user");
+            if (!userData) return;
+
+            const parsedUser = JSON.parse(userData);
+            const res = await userAPI.getWalletBalance(parsedUser.id);
+
+            setBalance(res.data.walletBalance);
+
+            localStorage.setItem(
+              "user",
+              JSON.stringify({
+                ...parsedUser,
+                walletBalance: res.data.walletBalance,
+              })
+            );
+          } catch (error) {
+            console.error("Error fetching wallet balance:", error);
+          }
+        };
+
+        fetchBalance();
+        const interval = setInterval(fetchBalance, 30000);
+
+        return () => clearInterval(interval);
+      }, []);
+
 
   return (
     <motion.header 

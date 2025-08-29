@@ -71,7 +71,7 @@ export const submitAdRequest = async (req: Request, res: Response) => {
 
     return res.status(201).json({
       success: true,
-      message: "Ad request submitted successfully & wallet updated",
+      message: "Ad request submitted successfully & wallet Updated",
       campaign: newCampaign,
       previousBalance,              // balance before deduction
       deductedAmount: budget,       // clarity on deduction

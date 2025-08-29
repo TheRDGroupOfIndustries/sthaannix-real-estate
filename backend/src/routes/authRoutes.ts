@@ -11,6 +11,7 @@ import {
   sendPasswordResetOTP,
   verifyPasswordResetOTP,
   resetPassword,
+  getUserWalletBalance
 } from "../controllers/authController";
 import { authenticate } from "../middlewares/authenticate";
 import { upload } from "../middlewares/multer";
@@ -37,5 +38,7 @@ router.post(
 );
 
 router.put("/profile", authenticate, updateUserProfile);
+
+router.get("/:id/wallet", authenticate, getUserWalletBalance);
 
 export default router;

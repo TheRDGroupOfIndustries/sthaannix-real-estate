@@ -19,6 +19,8 @@ import {
   MessageSquareText 
 } from 'lucide-react';
 
+import { userAPI } from '../api/api';
+
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -113,16 +115,49 @@ const Navbar = () => {
     ],
   };
 
+  /////////////////////////
+  const formatRoleName = (role) => {
+  switch(role?.toLowerCase()) {
+    case 'broker': return 'Broker';
+    case 'builder': return 'Builder';
+    case 'owner': return 'Property Owner';
+    case 'admin': return 'Administrator';
+    default: return 'User';
+  }
+};
+/////////////////
+
   const navItems = navConfig[role] || [];
 
-  useEffect(() => {
-    // ✅ Read user from localStorage
-    const userData = localStorage.getItem("user");
-    if (userData) {
-      const parsedUser = JSON.parse(userData);
-      setBalance(parsedUser.walletBalance || 0); // if null, default 0
-    }
-  }, []);
+    useEffect(() => {
+        const fetchBalance = async () => {
+          try {
+            const userData = localStorage.getItem("user");
+            if (!userData) return;
+
+            const parsedUser = JSON.parse(userData);
+            const res = await userAPI.getWalletBalance(parsedUser.id);
+
+            setBalance(res.data.walletBalance);
+
+            localStorage.setItem(
+              "user",
+              JSON.stringify({
+                ...parsedUser,
+                walletBalance: res.data.walletBalance,
+              })
+            );
+          } catch (error) {
+            console.error("Error fetching wallet balance:", error);
+          }
+        };
+
+        fetchBalance();
+        const interval = setInterval(fetchBalance, 30000);
+
+        return () => clearInterval(interval);
+      }, []);
+
 
   return (
     <motion.header 
@@ -188,14 +223,14 @@ const Navbar = () => {
           {/* Desktop Profile & Actions */}
           <div className="hidden md:flex items-center space-x-3">
             {/* Notifications */}
-            <motion.button
+            {/* <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="relative p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-all duration-200"
             >
               <Bell className="h-5 w-5" />
               <span className="absolute top-1 right-1 h-3 w-3 bg-red-500 rounded-full border-2 border-white"></span>
-            </motion.button>
+            </motion.button> */}
 
             {/* Profile Dropdown */}
             <div className="relative">
@@ -208,10 +243,16 @@ const Navbar = () => {
                 <div className="h-8 w-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                   <User className="h-4 w-4 text-white" />
                 </div>
-                <div className="text-left hidden lg:block">
-                  <div className="text-sm font-medium text-gray-900">Admin</div>
-                  <div className="text-xs text-gray-500">Administrator</div>
-                </div>
+
+               <div className="text-left hidden lg:block">
+                <div className="text-sm font-medium text-gray-900">
+                  {formatRoleName(user?.role)}
+                </div>  
+                {/* <div className="text-xs text-gray-500">
+                  {user?.role === 'admin' ? 'Administrator' : formatRoleName(user?.role)}
+                </div>   */}
+              </div>
+
                 <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${
                   isProfileOpen ? 'rotate-180' : ''
                 }`} />
@@ -310,8 +351,8 @@ const Navbar = () => {
                     <User className="h-5 w-5 text-white" />
                   </div>
                   <div className="ml-3">
-                    <div className="text-sm font-medium text-gray-900">Admin</div>
-                    <div className="text-xs text-gray-500">Administrator</div>
+                    <div className="text-sm font-medium text-gray-900">   {formatRoleName(user?.role)} </div>
+                    {/* <div className="text-xs text-gray-500">Administrator</div> */}
                   </div>
                 </div>
                 

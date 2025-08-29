@@ -71,7 +71,7 @@ export const submitAdRequest = async (req: Request, res: Response) => {
 
     return res.status(201).json({
       success: true,
-      message: "Ad request submitted successfully & wallet updated",
+      message: "Ad request submitted successfully & wallet Updated",
       campaign: newCampaign,
       previousBalance,              // balance before deduction
       deductedAmount: budget,       // clarity on deduction
@@ -88,6 +88,98 @@ export const submitAdRequest = async (req: Request, res: Response) => {
     });
   }
 };
+
+// // Admin updates campaign status
+// export const updateAdStatus = async (req: Request, res: Response) => {
+//   try {
+//     const { id } = req.params;
+//     const { status } = req.body;
+
+//     // Validate status
+//     if (!["approved", "rejected", "pending"].includes(status)) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Invalid status. Allowed values: approved, rejected, pending",
+//       });
+//     }
+//     // Update campaign
+//     const campaign = await AdCampaign.findByIdAndUpdate(
+//       id,
+//       { status },
+//       { new: true }
+//     );
+
+//     if (!campaign) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Ad campaign not found",
+//       });
+//     }
+
+//     return res.status(200).json({
+//       success: true,
+//       message: `Ad campaign status updated to ${status}`,
+//       campaign,
+//     });
+//   } catch (error: any) {
+//     console.error("Error updating ad status:", error);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Server error",
+//       error: error.message,
+//     });
+//   }
+// };
+
+// Admin updates campaign status
+export const updateAdStatus = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!["approved", "rejected", "pending"].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status. Allowed values: approved, rejected, pending",
+      });
+    }
+
+    const campaign = await AdCampaign.findById(id);
+    if (!campaign) {
+      return res.status(404).json({
+        success: false,
+        message: "Ad campaign not found",
+      });
+    }
+
+    // If rejected refund wallet
+    if (status === "rejected" && campaign.status !== "rejected") {
+      const user = await User.findById(campaign.user);
+      if (user) {
+        user.walletBalance += campaign.budget; // refund the ad budget
+        await user.save();
+      }
+    }
+
+    // If approved wallet already deducted at submission
+    campaign.status = status;
+    await campaign.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Ad campaign status updated to ${status}`,
+      campaign,
+    });
+  } catch (error: any) {
+    console.error("Error updating ad status:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
 
 // Admin gets all ad requests
 export const getAllAdRequests = async (req: Request, res: Response) => {
@@ -111,69 +203,6 @@ export const getAllAdRequests = async (req: Request, res: Response) => {
     });
   }
 };
-
-
-// Admin updates campaign status
-// Admin updates campaign status
-export const updateAdStatus = async (req: Request, res: Response) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
-  try {
-    const { id } = req.params;
-    const { status } = req.body;
-
-    if (!["approved", "rejected", "pending"].includes(status)) {
-      await session.abortTransaction();
-      session.endSession();
-      return res.status(400).json({
-        success: false,
-        message: "Invalid status. Allowed values: approved, rejected, pending",
-      });
-    }
-
-    const campaign = await AdCampaign.findById(id).session(session);
-    if (!campaign) {
-      await session.abortTransaction();
-      session.endSession();
-      return res.status(404).json({
-        success: false,
-        message: "Ad campaign not found",
-      });
-    }
-
-    // If rejected, refund user
-    if (status === "rejected" && campaign.status === "pending") {
-      const user = await User.findById(campaign.user).session(session);
-      if (user) {
-        user.walletBalance += campaign.budget;
-        await user.save({ session });
-      }
-    }
-
-    campaign.status = status;
-    await campaign.save({ session });
-
-    await session.commitTransaction();
-    session.endSession();
-
-    return res.status(200).json({
-      success: true,
-      message: `Ad campaign ${status}`,
-      campaign,
-    });
-  } catch (error: any) {
-    await session.abortTransaction();
-    session.endSession();
-    console.error("Error updating ad status:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Server error",
-      error: error.message,
-    });
-  }
-};
-
 
 // Get ads of logged-in user
 export const getUserAdRequests = async (req: Request, res: Response) => {

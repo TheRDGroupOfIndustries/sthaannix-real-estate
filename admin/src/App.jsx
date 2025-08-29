@@ -307,7 +307,7 @@ const App = () => {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback} onReset={() => window.location.reload()}>
       <div className="min-h-screen bg-gray-50">
-        {!isAuthOrPaymentPage && <Navbar />}
+        {!isAuthOrPaymentPage && <Navbar user={getUser()} />}
 
         <AnimatePresence mode="wait" initial={false}>
           <motion.div

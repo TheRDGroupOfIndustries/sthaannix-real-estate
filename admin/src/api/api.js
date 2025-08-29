@@ -134,4 +134,9 @@ export const paymentsAPI = {
     }),
 };
 
+export const userAPI = {
+  getWalletBalance: (id) => api.get(`/user/${id}/wallet`),
+};
+
+
 export default api;

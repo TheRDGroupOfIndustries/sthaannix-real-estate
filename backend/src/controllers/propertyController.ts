@@ -26,63 +26,6 @@ const isOwnerOrAdmin = (
   role?: string
 ) => role === "admin" || userId === ownerId.toString();
 
-// export const createProperty = async (req: Request, res: Response) => {
-//   try {
-//     if (!req.user) {
-//       return res.status(401).json({ message: "Unauthorized" });
-//     }
-//     if (!canCreateProperty(req.user.role)) {
-//       return res.status(403).json({ message: "You cannot create properties" });
-//     }
-//     // if (req.user.status === "pending") {
-//     //   return res.status(403).json({
-//     //     message:
-//     //       "Your account is pending approval. You cannot create properties yet.",
-//     //   });
-//     // }
-//     const {
-//       title,
-//       description,
-//       propertyType,
-//       transactionType,
-//       price,
-//       size,
-//       bhk,
-//       location,
-//       isPromoted,
-//     } = req.body;
-
-//     const uploadedImages: string[] = [];
-//     if (req.files && Array.isArray(req.files)) {
-//       for (const file of req.files as Express.Multer.File[]) {
-//         const result = await uploadFile(file.buffer, "properties/images");
-//         uploadedImages.push(result.secure_url);
-//       }
-//     }
-
-//     const property = new Property({
-//       title,
-//       description,
-//       propertyType,
-//       transactionType,
-//       price,
-//       size,
-//       bhk,
-//       location,
-//       isPromoted,
-//       owner: req.user.id,
-//       images: uploadedImages,
-//       videos: [],
-//     });
-
-//     await property.save();
-//     res.status(201).json(property);
-//   } catch (error) {
-//     console.error("Create Property Error:", error);
-//     res.status(500).json({ message: "Failed to create property", error });
-//   }
-// };
-
 export const createProperty = async (req: Request, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
@@ -144,6 +87,7 @@ export const createProperty = async (req: Request, res: Response) => {
       owner: req.user.id,
       images: uploadedImages,
       videos: [],
+      status: req.user.role === "admin" ? "approved" : "pending", 
     });
 
     await property.save();
@@ -337,25 +281,49 @@ export const deleteProperty = async (req: Request, res: Response) => {
   }
 };
 
+// export const myProperties = async (req: Request, res: Response) => {
+//   try {
+//     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+
+//     const { sort, status } = req.query as {
+//       sort?: string;
+//       status?: string;
+//     };
+
+//     const filter: Record<string, any> = { owner: req.user.id };
+
+//     if (status) {
+//       const allowedStatuses = ["pending", "approved", "rejected"];
+//       if (allowedStatuses.includes(status)) {
+//         filter.status = status;
+//       } else {
+//         return res.status(400).json({ message: `Invalid status: ${status}` });
+//       }
+//     }
+
+//     const sortOptions: Record<string, any> = {};
+//     if (sort === "newest") sortOptions.createdAt = -1;
+//     if (sort === "cheapest") sortOptions.price = 1;
+
+//     const properties = await Property.find(filter).sort(sortOptions).exec();
+
+//     res.json(properties);
+//   } catch (error) {
+//     console.error("My Properties Error:", error);
+//     res.status(500).json({ message: "Failed to fetch your properties", error });
+//   }
+// };
+
 export const myProperties = async (req: Request, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
-    const { sort, status } = req.query as {
-      sort?: string;
-      status?: string;
+    const { sort } = req.query as { sort?: string };
+
+    const filter: Record<string, any> = {
+      owner: req.user.id,
+      status: "approved",  //  Only approved properties
     };
-
-    const filter: Record<string, any> = { owner: req.user.id };
-
-    if (status) {
-      const allowedStatuses = ["pending", "approved", "rejected"];
-      if (allowedStatuses.includes(status)) {
-        filter.status = status;
-      } else {
-        return res.status(400).json({ message: `Invalid status: ${status}` });
-      }
-    }
 
     const sortOptions: Record<string, any> = {};
     if (sort === "newest") sortOptions.createdAt = -1;
@@ -369,3 +337,64 @@ export const myProperties = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Failed to fetch your properties", error });
   }
 };
+
+
+
+
+
+// export const createProperty = async (req: Request, res: Response) => {
+//   try {
+//     if (!req.user) {
+//       return res.status(401).json({ message: "Unauthorized" });
+//     }
+//     if (!canCreateProperty(req.user.role)) {
+//       return res.status(403).json({ message: "You cannot create properties" });
+//     }
+//     // if (req.user.status === "pending") {
+//     //   return res.status(403).json({
+//     //     message:
+//     //       "Your account is pending approval. You cannot create properties yet.",
+//     //   });
+//     // }
+//     const {
+//       title,
+//       description,
+//       propertyType,
+//       transactionType,
+//       price,
+//       size,
+//       bhk,
+//       location,
+//       isPromoted,
+//     } = req.body;
+
+//     const uploadedImages: string[] = [];
+//     if (req.files && Array.isArray(req.files)) {
+//       for (const file of req.files as Express.Multer.File[]) {
+//         const result = await uploadFile(file.buffer, "properties/images");
+//         uploadedImages.push(result.secure_url);
+//       }
+//     }
+
+//     const property = new Property({
+//       title,
+//       description,
+//       propertyType,
+//       transactionType,
+//       price,
+//       size,
+//       bhk,
+//       location,
+//       isPromoted,
+//       owner: req.user.id,
+//       images: uploadedImages,
+//       videos: [],
+//     });
+
+//     await property.save();
+//     res.status(201).json(property);
+//   } catch (error) {
+//     console.error("Create Property Error:", error);
+//     res.status(500).json({ message: "Failed to create property", error });
+//   }
+// };

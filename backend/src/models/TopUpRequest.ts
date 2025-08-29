@@ -35,7 +35,14 @@ const TopUpRequestSchema = new Schema<ITopUpRequest>(
     reviewedBy: { type: Schema.Types.ObjectId, ref: "User" },
     reviewedAt: { type: Date },
     reason: { type: String },
-    utrNumber: { type: String ,unique: true, sparse: true}, // Optional field
+    utrNumber: {
+      type: String,
+      unique: true,
+      sparse: true,
+      minlength: 12,
+      maxlength: 22,
+      match: /^[A-Za-z0-9]+$/, 
+    },
        //  New field for payment method
     paymentMethod: {
       type: String,

@@ -64,67 +64,153 @@ const Payment = () => {
   };
 
   
-  const handlePaymentSubmit = async (e) => {
-    e.preventDefault();
+  // const handlePaymentSubmit = async (e) => {
+  //   e.preventDefault();
 
-    const token = localStorage.getItem("token");
-    if (!token) {
-      toast.error("Please login first");
-      navigate("/login");
-      return;
-    }
+  //   const token = localStorage.getItem("token");
+  //   if (!token) {
+  //     toast.error("Please login first");
+  //     navigate("/login");
+  //     return;
+  //   }
 
-    const utrNumber = paymentRef?.trim();
+  //   const utrNumber = paymentRef?.trim();
+  //   if (!utrNumber) {
+  //     toast.error("Please enter Unique Transaction Reference");
+  //     return;
+  //   }
+
+  //   if (!images || images.length === 0) {
+  //     toast.error("Please upload payment proof images");
+  //     return;
+  //   }
+
+  //   setLoading(true);
+
+  //   try {
+  //     const formDataToSend = new FormData();
+  //     formDataToSend.append("amount", formData?.amount || "0");
+  //     formDataToSend.append("purpose", "registration"); // or "role-upgrade"
+  //     formDataToSend.append("utrNumber", utrNumber);
+
+  //     let methodValue = "upi";
+  //     if (selectedMethod === "Account") methodValue = "account";
+  //     if (selectedMethod === "Whatsapp Deposit") methodValue = "whatsapp";
+
+  //     formDataToSend.append("paymentMethod", methodValue);
+
+  //     // append multiple images
+  //     images.forEach((file) => {
+  // formDataToSend.append("proof", file); //  match backend
+  // });
+
+  //     const response = await paymentsAPI.submitProof(formDataToSend, token);
+
+  //     if (response?.status === 201 || response?.data?.payment) {
+  //       toast.success(
+  //         "Payment submitted successfully! Your account will be activated after verification."
+  //       );
+  //       navigate("/login");
+  //     } else {
+  //       toast.error(response?.data?.message || "Payment submission failed");
+  //     }
+  //   } catch (error) {
+  //     console.error("Payment submission error:", error);
+  //     toast.error(
+  //       error?.response?.data?.message ||
+  //         "Failed to submit payment. Please try again."
+  //     );
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+
+const handlePaymentSubmit = async (e) => {
+  e.preventDefault();
+
+  const token = localStorage.getItem("token");
+  if (!token) {
+    toast.error("Please login first");
+    navigate("/login");
+    return;
+  }
+
+  const utrNumber = paymentRef?.trim();
+
+  //  UTR validation (only for UPI / Account methods)
+  if (selectedMethod === "UPI" || selectedMethod === "Account") {
     if (!utrNumber) {
-      toast.error("Please enter Unique Transaction Reference");
+      toast.error("Please enter Unique Transaction Reference (UTR)");
       return;
     }
 
-    if (!images || images.length === 0) {
-      toast.error("Please upload payment proof images");
+    //  Length check
+    if (utrNumber.length < 12 || utrNumber.length > 22) {
+      toast.error("UTR Number must be between 12 and 22 characters.");
       return;
     }
 
-    setLoading(true);
+    //  Alphanumeric check
+    const utrRegex = /^[A-Za-z0-9]+$/;
+    if (!utrRegex.test(utrNumber)) {
+      toast.error("UTR Number must contain only letters and numbers.");
+      return;
+    }
+  }
 
-    try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("amount", formData?.amount || "0");
-      formDataToSend.append("purpose", "registration"); // or "role-upgrade"
-      formDataToSend.append("utrNumber", utrNumber);
+  //  WhatsApp deposit case → skip UTR
+  if (selectedMethod === "Whatsapp Deposit" && !utrNumber) {
+    console.log("Skipping UTR for WhatsApp method");
+  }
 
-      // ✅ add paymentMethod mapping
-      let methodValue = "upi";
-      if (selectedMethod === "Account") methodValue = "account";
-      if (selectedMethod === "Whatsapp Deposit") methodValue = "whatsapp";
+  if (!images || images.length === 0) {
+    toast.error("Please upload payment proof images");
+    return;
+  }
 
-      formDataToSend.append("paymentMethod", methodValue);
+  setLoading(true);
 
-      // append multiple images
-      images.forEach((file) => {
-  formDataToSend.append("proof", file); // ✅ match backend
-  });
+  try {
+    const formDataToSend = new FormData();
+    formDataToSend.append("amount", formData?.amount || "0");
+    formDataToSend.append("purpose", "registration"); // or "role-upgrade"
 
-      const response = await paymentsAPI.submitProof(formDataToSend, token);
+    // append utr only if present
+    if (utrNumber) formDataToSend.append("utrNumber", utrNumber);
 
-      if (response?.status === 201 || response?.data?.payment) {
-        toast.success(
-          "Payment submitted successfully! Your account will be activated after verification."
-        );
-        navigate("/login");
-      } else {
-        toast.error(response?.data?.message || "Payment submission failed");
-      }
-    } catch (error) {
-      console.error("Payment submission error:", error);
-      toast.error(
-        error?.response?.data?.message ||
-          "Failed to submit payment. Please try again."
+    // map payment method
+    let methodValue = "upi";
+    if (selectedMethod === "Account") methodValue = "account";
+    if (selectedMethod === "Whatsapp Deposit") methodValue = "whatsapp";
+
+    formDataToSend.append("paymentMethod", methodValue);
+
+    // append multiple images
+    images.forEach((file) => {
+      formDataToSend.append("proof", file);
+    });
+
+    const response = await paymentsAPI.submitProof(formDataToSend, token);
+
+    if (response?.status === 201 || response?.data?.payment) {
+      toast.success(
+        "Payment submitted successfully! Your account will be activated after verification."
       );
-    } finally {
-      setLoading(false);
+      navigate("/login");
+    } else {
+      toast.error(response?.data?.message || "Payment submission failed");
     }
-  };
+  } catch (error) {
+    console.error("Payment submission error:", error);
+    toast.error(
+      error?.response?.data?.message ||
+        "Failed to submit payment. Please try again."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">

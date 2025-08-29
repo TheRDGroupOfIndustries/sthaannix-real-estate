@@ -57,7 +57,6 @@ const Wallet = () => {
     setShowUpiDetails(false);
   };
 
-
 const handlePaymentSubmit = async (e) => {
   e.preventDefault();
 
@@ -69,9 +68,32 @@ const handlePaymentSubmit = async (e) => {
   }
 
   const utrNumber = paymentRef?.trim();
-  if (!utrNumber) {
-    toast.error("Please enter Unique Transaction Reference");
-    return;
+
+  // Check if UTR is required (upi / account only)
+  if (selectedMethod === "UPI" || selectedMethod === "Account") {
+    if (!utrNumber) {
+      toast.error("Please enter Unique Transaction Reference (UTR)");
+      return;
+    }
+
+    // Validate length
+    if (utrNumber.length < 12 || utrNumber.length > 22) {
+      toast.error("UTR Number must be between 12 and 22 characters.");
+      return;
+    }
+
+    //  Validate format
+    const utrRegex = /^[A-Za-z0-9]+$/;
+    if (!utrRegex.test(utrNumber)) {
+      toast.error("UTR Number must contain only letters and numbers.");
+      return;
+    }
+  }
+
+  // ✅ WhatsApp deposit flow (UTR not required)
+  if (selectedMethod === "Whatsapp Deposit" && !utrNumber) {
+    // you could allow empty, or if you want, require WA number instead
+    console.log("Skipping UTR for WhatsApp method");
   }
 
   if (!images || images.length === 0) {
@@ -84,8 +106,10 @@ const handlePaymentSubmit = async (e) => {
   try {
     const formDataToSend = new FormData();
     formDataToSend.append("amount", formData?.amount || "0");
-    formDataToSend.append("purpose", "promotion"); 
-    formDataToSend.append("utrNumber", utrNumber);
+    formDataToSend.append("purpose", "promotion");
+
+    // only append utr if not empty
+    if (utrNumber) formDataToSend.append("utrNumber", utrNumber);
 
     //  map payment method
     let methodValue = "upi";
@@ -96,10 +120,8 @@ const handlePaymentSubmit = async (e) => {
 
     // append multiple images
     images.forEach((file) => {
-       formDataToSend.append("proof", file);
+      formDataToSend.append("proof", file);
     });
-
-    // correct API call
     const response = await api.post("/wallet/topup", formDataToSend, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -125,6 +147,7 @@ const handlePaymentSubmit = async (e) => {
     setLoading(false);
   }
 };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">

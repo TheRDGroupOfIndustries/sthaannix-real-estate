@@ -271,6 +271,7 @@ const PropertyApproval = ({
                     <td className="px-6 py-4 capitalize">
                       {property.transactionType || "-"}
                     </td>
+
                   </motion.tr>
                 ))}
               </tbody>

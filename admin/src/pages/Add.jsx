@@ -924,15 +924,19 @@ const PropertyForm = () => {
       });
 
       const response = await http.post("/properties/create", formPayload);
-// console.log("properties",response);
 
-    const role = localStorage.getItem("role");
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      const parsedUser = JSON.parse(userData);
+      const role = parsedUser.role;
 
-    if (role && role.toLowerCase() === "admin") {
-      toast.success("Property added successfully ✅");
-    } else {
-      toast.success("Property added successfully, wait for admin approval ⏳");
+      if (role && role.toLowerCase() === "admin") {
+        toast.success("Property added successfully ✅");
+      } else {
+        toast.success("Property added successfully, wait for admin approval ⏳");
+      }
     }
+
 
       setFormData({
         title: "",

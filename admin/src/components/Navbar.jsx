@@ -24,13 +24,14 @@ import { userAPI } from '../api/api';
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [balance, setBalance] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-   const storedUser = localStorage.getItem("user");
-  const user = storedUser ? JSON.parse(storedUser) : null;
-  const role = user?.role;
+ const storedUser = localStorage.getItem("user");
+const user = storedUser ? JSON.parse(storedUser) : null;
+const role = user?.role;
+
+const [balance, setBalance] = useState(user?.walletBalance || 0);
 
   // Handle scroll effect
   useEffect(() => {
@@ -129,34 +130,29 @@ const Navbar = () => {
 
   const navItems = navConfig[role] || [];
 
-    useEffect(() => {
-        const fetchBalance = async () => {
-          try {
-            const userData = localStorage.getItem("user");
-            if (!userData) return;
+  useEffect(() => {
+  const fetchBalance = async () => {
+    try {
+      if (!user) return;
+      const res = await userAPI.getWalletBalance(user.id);
 
-            const parsedUser = JSON.parse(userData);
-            const res = await userAPI.getWalletBalance(parsedUser.id);
+      setBalance(res.data.walletBalance);
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          ...user,
+          walletBalance: res.data.walletBalance,
+        })
+      );
+    } catch (error) {
+      console.error("Error fetching wallet balance:", error);
+    }
+  };
 
-            setBalance(res.data.walletBalance);
-
-            localStorage.setItem(
-              "user",
-              JSON.stringify({
-                ...parsedUser,
-                walletBalance: res.data.walletBalance,
-              })
-            );
-          } catch (error) {
-            console.error("Error fetching wallet balance:", error);
-          }
-        };
-
-        fetchBalance();
-        const interval = setInterval(fetchBalance, 30000);
-
-        return () => clearInterval(interval);
-      }, []);
+  fetchBalance();
+  const interval = setInterval(fetchBalance, 30000);
+  return () => clearInterval(interval);
+}, []);
 
 
   return (

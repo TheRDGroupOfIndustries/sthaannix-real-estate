@@ -370,8 +370,8 @@ export const getAllPayments = async (req: Request, res: Response) => {
         utrNumber: t.utrNumber,
         amount: t.amount,
         status: t.status,
-        proof: t.proof, 
-        paymentMethod: t.paymentMethod, 
+        proof: t.proof,
+        paymentMethod: t.paymentMethod,
         reviewedAt: t.reviewedAt,
         reviewedBy: t.reviewedBy,
         createdAt: t.createdAt,
@@ -432,12 +432,14 @@ export const rejectPayment = async (req: Request, res: Response) => {
     res.json({ message: "Payment rejected", payment });
   } catch (error) {
     await session.abortTransaction();
-    res.status(500).json({ message: "Rejection failed", error: (error as Error).message });
+    res
+      .status(500)
+      .json({ message: "Rejection failed", error: (error as Error).message });
   } finally {
     session.endSession();
   }
 };
- 
+
 export const getMyPayments = async (req: Request, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
@@ -470,11 +472,9 @@ export const getMyPayments = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("getMyPayments error:", error);
-    res.status(500).json({ message: "Failed to fetch payments",  });
+    res.status(500).json({ message: "Failed to fetch payments" });
   }
 };
-
-
 
 export const deletePaymentHistory = async (req: Request, res: Response) => {
   try {
@@ -485,7 +485,9 @@ export const deletePaymentHistory = async (req: Request, res: Response) => {
     const { id, type } = req.params; // id + type ("payment" or "wallet-topup")
 
     if (!id || !type) {
-      return res.status(400).json({ success: false, message: "Payment id and type are required" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Payment id and type are required" });
     }
 
     let deleted;
@@ -493,18 +495,27 @@ export const deletePaymentHistory = async (req: Request, res: Response) => {
     if (type === "payment") {
       deleted = await Payment.findOneAndDelete({ _id: id, user: req.user.id });
     } else if (type === "wallet-topup") {
-      deleted = await TopUpRequest.findOneAndDelete({ _id: id, user: req.user.id });
+      deleted = await TopUpRequest.findOneAndDelete({
+        _id: id,
+        user: req.user.id,
+      });
     } else {
-      return res.status(400).json({ success: false, message: "Invalid transaction type" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid transaction type" });
     }
 
     if (!deleted) {
-      return res.status(404).json({ success: false, message: "Transaction not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Transaction not found" });
     }
 
     res.json({ success: true, message: "Transaction deleted successfully" });
   } catch (error) {
     console.error("deletePaymentHistory error:", error);
-    res.status(500).json({ success: false, message: "Failed to delete transaction" });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to delete transaction" });
   }
 };

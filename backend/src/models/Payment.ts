@@ -34,8 +34,14 @@ const PaymentSchema = new Schema<IPayment>(
       default: "pending",
     },
     screenshot: { type: Schema.Types.Mixed, required: true },
-    utrNumber: { type: String, unique: true, sparse: true },
-
+    utrNumber: {
+      type: String,
+      unique: true,
+      sparse: true,
+      minlength: 12,
+      maxlength: 22,
+      match: /^[A-Za-z0-9]+$/, // allows digits + letters
+    },
     approvedBy: { type: Schema.Types.ObjectId, ref: "User" },
     rejectedBy: { type: Schema.Types.ObjectId, ref: "User" }, // 👈 added here
     reviewedAt: { type: Date },

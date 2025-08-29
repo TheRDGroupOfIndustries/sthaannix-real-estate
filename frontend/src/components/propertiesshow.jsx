@@ -16,7 +16,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import PropTypes from "prop-types";
 import { fetchProperties } from "../services/property-InqueryService";
-import { configBackendURL } from "../config";
+// import { configBackendURL } from "../config";
 
 // Sample featured properties for fallback
 const sampleProperties = [
@@ -241,6 +241,8 @@ const PropertiesShow = () => {
         );
 
   const viewAllProperties = () => {
+    // Scroll to top before navigating
+    window.scrollTo({ top: 0, behavior: "smooth" });
     navigate("/properties");
   };
 

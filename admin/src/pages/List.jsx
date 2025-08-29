@@ -711,7 +711,7 @@ const PropertyListings = () => {
         const response = await propertiesAPI.delete(propertyId);
         if (response.status == 200) {
           toast.success("Property removed successfully");
-          navigate("/list");
+          // navigate("/list");
           await fetchProperties();
         } else {
           toast.error(response.data.message || "Failed to remove property");

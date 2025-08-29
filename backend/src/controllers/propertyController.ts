@@ -45,20 +45,6 @@ export const createProperty = async (req: Request, res: Response) => {
       isPromoted,
     } = req.body;
 
-    console.log(
-      "Data: ",
-      title,
-      description,
-      propertyType,
-      transactionType,
-      price,
-      size,
-      bhk,
-      bathroom,
-      location,
-      isPromoted
-    );
-
     if (isNaN(price)) {
       return res.status(400).json({ message: "Price must be a valid number" });
     }

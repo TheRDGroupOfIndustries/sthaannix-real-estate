@@ -566,7 +566,7 @@ const Update = () => {
 
       if (res.status === 200) {
         toast.success("Property updated successfully!");
-        navigate("/list");
+        navigate(-1);
       } else {
         toast.error(res.data.message || "Failed to update");
       }

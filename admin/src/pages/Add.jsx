@@ -924,7 +924,6 @@ const PropertyForm = () => {
       });
 
       const response = await http.post("/properties/create", formPayload);
-// console.log("properties",response);
 
     const userData = localStorage.getItem("user");
     if (userData) {

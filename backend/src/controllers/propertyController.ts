@@ -26,63 +26,6 @@ const isOwnerOrAdmin = (
   role?: string
 ) => role === "admin" || userId === ownerId.toString();
 
-// export const createProperty = async (req: Request, res: Response) => {
-//   try {
-//     if (!req.user) {
-//       return res.status(401).json({ message: "Unauthorized" });
-//     }
-//     if (!canCreateProperty(req.user.role)) {
-//       return res.status(403).json({ message: "You cannot create properties" });
-//     }
-//     // if (req.user.status === "pending") {
-//     //   return res.status(403).json({
-//     //     message:
-//     //       "Your account is pending approval. You cannot create properties yet.",
-//     //   });
-//     // }
-//     const {
-//       title,
-//       description,
-//       propertyType,
-//       transactionType,
-//       price,
-//       size,
-//       bhk,
-//       location,
-//       isPromoted,
-//     } = req.body;
-
-//     const uploadedImages: string[] = [];
-//     if (req.files && Array.isArray(req.files)) {
-//       for (const file of req.files as Express.Multer.File[]) {
-//         const result = await uploadFile(file.buffer, "properties/images");
-//         uploadedImages.push(result.secure_url);
-//       }
-//     }
-
-//     const property = new Property({
-//       title,
-//       description,
-//       propertyType,
-//       transactionType,
-//       price,
-//       size,
-//       bhk,
-//       location,
-//       isPromoted,
-//       owner: req.user.id,
-//       images: uploadedImages,
-//       videos: [],
-//     });
-
-//     await property.save();
-//     res.status(201).json(property);
-//   } catch (error) {
-//     console.error("Create Property Error:", error);
-//     res.status(500).json({ message: "Failed to create property", error });
-//   }
-// };
-
 export const createProperty = async (req: Request, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
@@ -144,6 +87,7 @@ export const createProperty = async (req: Request, res: Response) => {
       owner: req.user.id,
       images: uploadedImages,
       videos: [],
+      status: req.user.role === "admin" ? "approved" : "pending", 
     });
 
     await property.save();
@@ -394,3 +338,63 @@ export const myProperties = async (req: Request, res: Response) => {
   }
 };
 
+
+
+
+
+// export const createProperty = async (req: Request, res: Response) => {
+//   try {
+//     if (!req.user) {
+//       return res.status(401).json({ message: "Unauthorized" });
+//     }
+//     if (!canCreateProperty(req.user.role)) {
+//       return res.status(403).json({ message: "You cannot create properties" });
+//     }
+//     // if (req.user.status === "pending") {
+//     //   return res.status(403).json({
+//     //     message:
+//     //       "Your account is pending approval. You cannot create properties yet.",
+//     //   });
+//     // }
+//     const {
+//       title,
+//       description,
+//       propertyType,
+//       transactionType,
+//       price,
+//       size,
+//       bhk,
+//       location,
+//       isPromoted,
+//     } = req.body;
+
+//     const uploadedImages: string[] = [];
+//     if (req.files && Array.isArray(req.files)) {
+//       for (const file of req.files as Express.Multer.File[]) {
+//         const result = await uploadFile(file.buffer, "properties/images");
+//         uploadedImages.push(result.secure_url);
+//       }
+//     }
+
+//     const property = new Property({
+//       title,
+//       description,
+//       propertyType,
+//       transactionType,
+//       price,
+//       size,
+//       bhk,
+//       location,
+//       isPromoted,
+//       owner: req.user.id,
+//       images: uploadedImages,
+//       videos: [],
+//     });
+
+//     await property.save();
+//     res.status(201).json(property);
+//   } catch (error) {
+//     console.error("Create Property Error:", error);
+//     res.status(500).json({ message: "Failed to create property", error });
+//   }
+// };

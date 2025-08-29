@@ -868,22 +868,6 @@ const PropertyForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // console.log(formData.price);
-
-    // logs for debug
-    // {
-    //   console.log("Title:", formData.title);
-    //   console.log("Description:", formData.description);
-    //   console.log("Property Type:", formData.propertyType);
-    //   console.log("Transaction Type:", formData.transactionType);
-    //   console.log("Price:", formData.price);
-    //   console.log("Size:", formData.size);
-    //   console.log("BHK:", formData.bhk);
-    //   console.log("Bathroom:", formData.bathroom);
-    //   console.log("Location:", formData.location);
-    //   console.log("Is Promoted:", formData.isPromoted);
-    //   // console.log("Phone:", formData.phone);
-    // }
 
     const price = Number(formData.price);
     if (!price || isNaN(price)) {
@@ -942,7 +926,14 @@ const PropertyForm = () => {
       const response = await http.post("/properties/create", formPayload);
 // console.log("properties",response);
 
-      toast.success("Property added successfully");
+    const role = localStorage.getItem("role");
+
+    if (role && role.toLowerCase() === "admin") {
+      toast.success("Property added successfully ✅");
+    } else {
+      toast.success("Property added successfully, wait for admin approval ⏳");
+    }
+
       setFormData({
         title: "",
         propertyType: "",

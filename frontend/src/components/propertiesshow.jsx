@@ -237,10 +237,6 @@ useEffect(() => {
     try {
       setLoading(true);
       const response = await fetchProperties();
-
-      console.log("API response:", response); // Debug in production
-
-      // Ensure it's an array
       const propertiesArray = Array.isArray(response)
         ? response
         : response?.properties || [];
@@ -250,7 +246,7 @@ useEffect(() => {
         setProperties(featuredProperties);
       } else {
         setError("No properties found");
-        setProperties(sampleProperties); // fallback
+        setProperties(sampleProperties); 
       }
     } catch (err) {
       console.error("Error fetching properties:", err);
@@ -275,7 +271,6 @@ useEffect(() => {
         );
 
   const viewAllProperties = () => {
-    // Scroll to top before navigating
     window.scrollTo({ top: 0, behavior: "smooth" });
     navigate("/properties");
   };

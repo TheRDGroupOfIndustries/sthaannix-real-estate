@@ -203,33 +203,67 @@ const PropertiesShow = () => {
     },
   };
 
-  useEffect(() => {
-    const loadProperties = async () => {
-      try {
-        setLoading(true);
-        const response = await fetchProperties();        
+  // useEffect(() => {
+  //   const loadProperties = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const response = await fetchProperties();        
         
-        if (response) {
-          // Take only the first 6 properties for featured section
-          const featuredProperties = response.slice(0, 6);
-          setProperties(featuredProperties);
-        } else {
-          setError("Failed to fetch properties");
-          // Fallback to sample data in case of API error
-          setProperties(sampleProperties);
-        }
-      } catch (err) {
-        console.error("Error fetching properties:", err);
-        setError("Failed to load properties. Using sample data instead.");
-        // Fallback to sample data
-        setProperties(sampleProperties);
-      } finally {
-        setLoading(false);
-      }
-    };
+  //       if (response) {
+  //         // Take only the first 6 properties for featured section
+  //         const featuredProperties = response.slice(0, 6);
+  //         setProperties(featuredProperties);
+  //       } else {
+  //         setError("Failed to fetch properties");
+  //         // Fallback to sample data in case of API error
+  //         setProperties(sampleProperties);
+  //       }
+  //     } catch (err) {
+  //       console.error("Error fetching properties:", err);
+  //       setError("Failed to load properties. Using sample data instead.");
+  //       // Fallback to sample data
+  //       setProperties(sampleProperties);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    loadProperties();
-  }, []);
+  //   loadProperties();
+  // }, []);
+
+
+useEffect(() => {
+  const loadProperties = async () => {
+    try {
+      setLoading(true);
+      const response = await fetchProperties();
+
+      console.log("API response:", response); // Debug in production
+
+      // Ensure it's an array
+      const propertiesArray = Array.isArray(response)
+        ? response
+        : response?.properties || [];
+
+      if (propertiesArray.length > 0) {
+        const featuredProperties = propertiesArray.slice(0, 6);
+        setProperties(featuredProperties);
+      } else {
+        setError("No properties found");
+        setProperties(sampleProperties); // fallback
+      }
+    } catch (err) {
+      console.error("Error fetching properties:", err);
+      setError("Failed to load properties. Using sample data instead.");
+      setProperties(sampleProperties);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  loadProperties();
+}, []);
+
 
   const filteredProperties =
     activeCategory === "all"

@@ -236,8 +236,6 @@
 
 // export default Register;
 
-
-
 import { useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -322,7 +320,7 @@ const Register = () => {
       const response = await axios.post(`${Backendurl}/user/register`, {
         ...formData,
         email: formData.email.trim(),
-         role: formData.role.toLowerCase(),
+        role: formData.role.toLowerCase(),
         password: formData.password.trim(),
       });
       if (response.status === 200 && response.data.email) {
@@ -338,75 +336,74 @@ const Register = () => {
   };
 
   // Submit OTP for verification
-// const handleOtpSubmit = async (e) => {
-//   e.preventDefault();
+  // const handleOtpSubmit = async (e) => {
+  //   e.preventDefault();
 
-//   if (otp.some((digit) => !digit)) {
-//     toast.error("Please enter the full OTP");
-//     return;
-//   }
+  //   if (otp.some((digit) => !digit)) {
+  //     toast.error("Please enter the full OTP");
+  //     return;
+  //   }
 
-//   setLoading(true);
+  //   setLoading(true);
 
-//   try {
-//     const otpValue = otp.join("");
-//     const response = await axios.post(`${Backendurl}/user/verify-otp`, {
-//       email: formData.email.trim(),
-//       otp: otpValue,
-//       password: formData.password.trim(),
-//        role: formData.role.toLowerCase(),
-//       phone: formData.phone,
-//       name: formData.name,
-//     });
-//       if (response.data.message) {
-//       toast.success("OTP verified successfully");
-//       navigate("/payment");
-//     } else {
-//       toast.error(res.data.message || "OTP verification failed");
-//     }
-//   } catch (err) {
-//     toast.error(err.response?.data?.message || "OTP verification failed");
-//   }
-// };
+  //   try {
+  //     const otpValue = otp.join("");
+  //     const response = await axios.post(`${Backendurl}/user/verify-otp`, {
+  //       email: formData.email.trim(),
+  //       otp: otpValue,
+  //       password: formData.password.trim(),
+  //        role: formData.role.toLowerCase(),
+  //       phone: formData.phone,
+  //       name: formData.name,
+  //     });
+  //       if (response.data.message) {
+  //       toast.success("OTP verified successfully");
+  //       navigate("/payment");
+  //     } else {
+  //       toast.error(res.data.message || "OTP verification failed");
+  //     }
+  //   } catch (err) {
+  //     toast.error(err.response?.data?.message || "OTP verification failed");
+  //   }
+  // };
 
-const handleOtpSubmit = async (e) => {
-  e.preventDefault();
+  const handleOtpSubmit = async (e) => {
+    e.preventDefault();
 
-  if (otp.some((digit) => !digit)) {
-    toast.error("Please enter the full OTP");
-    return;
-  }
-
-  setLoading(true);
-
-  try {
-    const otpValue = otp.join("");
-    const response = await axios.post(`${Backendurl}/user/verify-otp`, {
-      email: formData.email.trim(),
-      otp: otpValue,
-      password: formData.password.trim(),
-      role: formData.role.toLowerCase(),
-      phone: formData.phone,
-      name: formData.name,
-    });
-
-    if (response.data.message) {
-      toast.success("OTP verified successfully");
-      navigate("/login");
-    } else {
-      toast.error(response.data.message || "OTP verification failed");
-      // Reset OTP inputs on failure so user can try again
-      setOtp(Array(OTP_LENGTH).fill(""));
+    if (otp.some((digit) => !digit)) {
+      toast.error("Please enter the full OTP");
+      return;
     }
-  } catch (err) {
-    toast.error(err.response?.data?.message || "OTP verification failed");
-    // Reset OTP inputs on error so user can try again
-    setOtp(Array(OTP_LENGTH).fill(""));
-  } finally {
-    setLoading(false);
-  }
-};
 
+    setLoading(true);
+
+    try {
+      const otpValue = otp.join("");
+      const response = await axios.post(`${Backendurl}/user/verify-otp`, {
+        email: formData.email.trim(),
+        otp: otpValue,
+        password: formData.password.trim(),
+        role: formData.role.toLowerCase(),
+        phone: formData.phone,
+        name: formData.name,
+      });
+
+      if (response.data.message) {
+        toast.success("OTP verified successfully");
+        navigate("/login");
+      } else {
+        toast.error(response.data.message || "OTP verification failed");
+        // Reset OTP inputs on failure so user can try again
+        setOtp(Array(OTP_LENGTH).fill(""));
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "OTP verification failed");
+      // Reset OTP inputs on error so user can try again
+      setOtp(Array(OTP_LENGTH).fill(""));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-3">
@@ -414,7 +411,9 @@ const handleOtpSubmit = async (e) => {
         {!otpSent ? (
           <>
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900">Create account</h2>
+              <h2 className="text-3xl font-bold text-gray-900">
+                Create account
+              </h2>
               <p className="mt-2 text-gray-600">Join our platform</p>
             </div>
 
@@ -569,7 +568,7 @@ const handleOtpSubmit = async (e) => {
                 <strong>{formData.email}</strong>
               </p>
             </div>
-            <form
+            {/* <form
               onSubmit={handleOtpSubmit}
               className="mt-8 space-y-6 flex justify-center space-x-2"
             >
@@ -596,6 +595,37 @@ const handleOtpSubmit = async (e) => {
                   {loading ? "Verifying..." : "Verify OTP"}
                 </motion.button>
               </div>
+            </form> */}
+            <form
+              onSubmit={handleOtpSubmit}
+              className="mt-8 flex flex-col items-center space-y-6"
+            >
+              {/* OTP inputs */}
+              <div className="flex space-x-2">
+                {otp.map((digit, idx) => (
+                  <input
+                    key={idx}
+                    type="text"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleOtpChange(e, idx)}
+                    onKeyDown={(e) => handleOtpKeyDown(e, idx)}
+                    ref={(el) => (inputs.current[idx] = el)}
+                    className="w-10 h-10 text-center border rounded text-lg"
+                    inputMode="numeric"
+                  />
+                ))}
+              </div>
+
+              {/* Button */}
+              <motion.button
+                type="submit"
+                whileTap={{ scale: 0.95 }}
+                disabled={loading}
+                className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              >
+                {loading ? "Verifying..." : "Verify OTP"}
+              </motion.button>
             </form>
           </>
         )}

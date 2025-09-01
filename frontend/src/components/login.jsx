@@ -117,16 +117,23 @@ const Login = () => {
       const response = await loginUser(formData);
       if (response.data) {
         await login(response.data.token, response.data.user);
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
         toast.success("Login successful!");
         navigate("/");
       } else {
         toast.error(response.data.message);
       }
     } catch (error) {
-      console.error("Error logging in:", error);
-      toast.error("An error occurred. Please try again.");
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("An error occurred. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

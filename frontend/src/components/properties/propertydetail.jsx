@@ -244,11 +244,10 @@ const PropertyDetails = () => {
         message: inquiryData.message,
       };
 
-
       const res = await http.post("/leads/create", payload);
       toast.success("Inquiry submitted successfully!");
       setInquirySuccess(true);
-      
+
       setTimeout(() => {
         setInquirySuccess(false);
         setInquiryData({ message: "" });
@@ -545,13 +544,14 @@ const PropertyDetails = () => {
                     name="name"
                     type="text"
                     required
-                    value={inquiryData.name}
+                    value={inquiryData.name || ""}
                     onChange={handleInquiryChange}
                     disabled={inquirySubmitting}
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm
-                      px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+        px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
+
                 <div>
                   <label
                     htmlFor="email"
@@ -564,13 +564,14 @@ const PropertyDetails = () => {
                     name="email"
                     type="email"
                     required
-                    value={inquiryData.email}
+                    value={inquiryData.email || ""}
                     onChange={handleInquiryChange}
                     disabled={inquirySubmitting}
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm
-                      px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+        px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
+
                 <div>
                   <label
                     htmlFor="phone"
@@ -583,13 +584,14 @@ const PropertyDetails = () => {
                     name="phone"
                     type="tel"
                     required
-                    value={inquiryData.phone}
+                    value={inquiryData.phone || ""}
                     onChange={handleInquiryChange}
                     disabled={inquirySubmitting}
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm
-                      px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+        px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
+
                 <div>
                   <label
                     htmlFor="message"
@@ -601,20 +603,21 @@ const PropertyDetails = () => {
                     id="message"
                     name="message"
                     rows="3"
-                    value={inquiryData.message}
+                    value={inquiryData.message || ""}
                     onChange={handleInquiryChange}
                     disabled={inquirySubmitting}
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm
-                      px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+        px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Any questions or details..."
                   />
                 </div>
+
                 <div>
                   <button
                     type="submit"
                     disabled={inquirySubmitting}
                     className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700
-                      transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+        transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {inquirySubmitting ? "Sending..." : "Send Inquiry"}
                   </button>

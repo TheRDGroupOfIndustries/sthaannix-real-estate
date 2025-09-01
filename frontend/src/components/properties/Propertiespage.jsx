@@ -309,7 +309,7 @@ const PropertiesPage = () => {
               </motion.aside>
             )}
           </AnimatePresence>
-
+ 
           <div
             className={`${
               viewState.showFilters ? "lg:col-span-3" : "lg:col-span-4"

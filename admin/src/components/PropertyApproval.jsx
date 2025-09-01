@@ -97,26 +97,32 @@ const PropertyApproval = ({
                   </td>
                   <td className="px-6 py-4">
                     {property.images && property.images.length > 0 ? (
-                      <div
-                        className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
-                        title="View Image"
-                        onClick={() =>
-                          window.open(property.images[0], "_blank")
-                        }
-                      >
-                        <img
-                          src={property.images[0]}
-                          alt={property.title || "Property image"}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
-                          <Image className="w-4 h-4" />
-                        </div>
+                      <div className="flex gap-2 ">
+                        {property.images.map((imgUrl, idx) => (
+                          <div
+                            key={idx}
+                            className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
+                            title="View Image"
+                            onClick={() => window.open(imgUrl, "_blank")}
+                          >
+                            <img
+                              src={imgUrl}
+                              alt={`${
+                                property.title || "Property image"
+                              }-${idx}`}
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
+                              <Image className="w-4 h-4" />
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     ) : (
                       "-"
                     )}
                   </td>
+
                   <td className="px-6 py-4">{property.owner?.name || "-"}</td>
                   <td className="px-6 py-4">{property.owner?.email || "-"}</td>
 
@@ -234,7 +240,7 @@ const PropertyApproval = ({
                       {property.location?.city || "-"},{" "}
                       {property.location?.state || "-"}
                     </td>
-                    
+
                     <td className="px-6 py-4">
                       {property.images && property.images.length > 0 ? (
                         <div
@@ -258,7 +264,9 @@ const PropertyApproval = ({
                       )}
                     </td>
                     <td className="px-6 py-4">{property.owner?.name || "-"}</td>
-                    <td className="px-6 py-4">{property.owner?.email || "-"}</td>
+                    <td className="px-6 py-4">
+                      {property.owner?.email || "-"}
+                    </td>
                     <td className="px-6 py-4">₹{property.price || "-"}</td>
                     <td className="px-6 py-4">
                       {property.propertyType || "-"}
@@ -271,7 +279,6 @@ const PropertyApproval = ({
                     <td className="px-6 py-4 capitalize">
                       {property.transactionType || "-"}
                     </td>
-
                   </motion.tr>
                 ))}
               </tbody>

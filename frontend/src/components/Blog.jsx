@@ -268,6 +268,8 @@ const Blog = () => {
     
     return matchesSearch && matchesCategory;
   });
+  console.log("filteredPosts:",filteredPosts);
+  
 
   return (
     <section className="py-32 bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50 relative overflow-hidden">

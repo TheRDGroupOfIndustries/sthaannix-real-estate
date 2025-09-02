@@ -268,7 +268,6 @@ const Blog = () => {
     
     return matchesSearch && matchesCategory;
   });
-  console.log("filteredPosts:",filteredPosts);
   
 
   return (

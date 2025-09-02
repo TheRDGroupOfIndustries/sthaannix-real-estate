@@ -21,13 +21,13 @@ const port = process.env.PORT || 12000;
 app.use(
   cors({ 
     origin: ["http://localhost:5173", "http://localhost:5174", "https://sthaannix-real-estate.vercel.app", "https://sthaannix-real-estate-huxt.vercel.app"],
-    credentials: true, 
+    credentials: false, 
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"], 
   })
 );
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 
 app.use("/user", authRoutes);
 app.use("/properties", propertyRoutes);

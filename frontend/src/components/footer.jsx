@@ -392,7 +392,7 @@ const Footer = () => {
             </div>
             
             <motion.p 
-              className="text-gray-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed text-lg"
+              className="text-gray-600 max-w-7xl mx-auto lg:mx-0 leading-relaxed text-lg"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.6 }}

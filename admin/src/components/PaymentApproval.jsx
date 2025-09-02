@@ -11,10 +11,9 @@ const PaymentApproval = ({
   approveWalletPayment,
   cancelWalletPayment,
 }) => {
+    // console.log("pendingPayments: ", pendingPayments);
+    // console.log("canceledPayments: ", canceledPayments);
   if (paymentsLoading) {
-    console.log("pendingPayments: ", pendingPayments);
-    console.log("canceledPayments: ", canceledPayments);
-
     return (
       <motion.div
         initial={{ opacity: 0 }}

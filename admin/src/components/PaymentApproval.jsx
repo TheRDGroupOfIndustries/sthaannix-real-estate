@@ -1,10 +1,5 @@
 import { motion } from "framer-motion";
-import {
-  CheckCircle,
-  XCircle,
-  FileText,
-  Image,
-} from "lucide-react";
+import { CheckCircle, XCircle, FileText, Image } from "lucide-react";
 
 const PaymentApproval = ({
   payments,
@@ -16,7 +11,10 @@ const PaymentApproval = ({
   approveWalletPayment,
   cancelWalletPayment,
 }) => {
-if (paymentsLoading) {
+  if (paymentsLoading) {
+    console.log("pendingPayments: ", pendingPayments);
+    console.log("canceledPayments: ", canceledPayments);
+
     return (
       <motion.div
         initial={{ opacity: 0 }}
@@ -41,7 +39,6 @@ if (paymentsLoading) {
       </motion.div>
     );
   }
-  
 
   return (
     <>
@@ -127,8 +124,9 @@ if (paymentsLoading) {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex gap-2">
-                      {payment.type === "Wallet" && payment.proof?.length > 0
-                        ? payment.proof.map((imgUrl, idx) => (
+                      {payment.type === "Wallet" ? (
+                        Array.isArray(payment.proof) ? (
+                          payment.proof.map((imgUrl, idx) => (
                             <div
                               key={idx}
                               className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
@@ -145,25 +143,58 @@ if (paymentsLoading) {
                               </div>
                             </div>
                           ))
-                        :  payment.screenshot?.length > 0 ? (
-    payment.screenshot.map((imgUrl, idx) => (
-      <div
-        key={idx}
-        className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
-        title="View Image"
-        onClick={() => window.open(imgUrl, "_blank")}
-      >
-        <img
-          src={imgUrl}
-          alt={`payment-screenshot-${idx}`}
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
-          <Image className="w-4 h-4" />
-        </div>
-      </div>
-    ))
-  ) : null}                          
+                        ) : payment.proof ? (
+                          <div
+                            className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
+                            title="View Image"
+                            onClick={() => window.open(payment.proof, "_blank")}
+                          >
+                            <img
+                              src={payment.proof}
+                              alt="payment-proof"
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
+                              <Image className="w-4 h-4" />
+                            </div>
+                          </div>
+                        ) : null
+                      ) : Array.isArray(payment.screenshot) ? (
+                        payment.screenshot.map((imgUrl, idx) => (
+                          <div
+                            key={idx}
+                            className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
+                            title="View Image"
+                            onClick={() => window.open(imgUrl, "_blank")}
+                          >
+                            <img
+                              src={imgUrl}
+                              alt={`payment-screenshot-${idx}`}
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
+                              <Image className="w-4 h-4" />
+                            </div>
+                          </div>
+                        ))
+                      ) : payment.screenshot ? (
+                        <div
+                          className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
+                          title="View Image"
+                          onClick={() =>
+                            window.open(payment.screenshot, "_blank")
+                          }
+                        >
+                          <img
+                            src={payment.screenshot}
+                            alt="payment-screenshot"
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
+                            <Image className="w-4 h-4" />
+                          </div>
+                        </div>
+                      ) : null}
                     </div>
                   </td>
 
@@ -283,45 +314,44 @@ if (paymentsLoading) {
                       {payment?.paymentMethod}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                     <div className="flex gap-2">
-                      {payment.type === "Wallet" && payment.proof?.length > 0
-                        ? payment.proof.map((imgUrl, idx) => (
-                            <div
-                              key={idx}
-                              className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
-                              title="View Image"
-                              onClick={() => window.open(imgUrl, "_blank")}
-                            >
-                              <img
-                                src={imgUrl}
-                                alt={`payment-proof-${idx}`}
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
-                                <Image className="w-4 h-4" />
+                      <div className="flex gap-2">
+                        {payment.type === "Wallet" && payment.proof?.length > 0
+                          ? payment.proof.map((imgUrl, idx) => (
+                              <div
+                                key={idx}
+                                className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
+                                title="View Image"
+                                onClick={() => window.open(imgUrl, "_blank")}
+                              >
+                                <img
+                                  src={imgUrl}
+                                  alt={`payment-proof-${idx}`}
+                                  className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
+                                  <Image className="w-4 h-4" />
+                                </div>
                               </div>
-                            </div>
-                          ))
-                        : payment.screenshot  && (
-                            <div
-                              className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
-                              title="View Image"
-                              onClick={() =>
-                                window.open(payment.screenshot, "_blank")
-                              }
-                            >
-                              <img
-                                src={payment.screenshot}
-                                alt="payment-proof"
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
-                                <Image className="w-4 h-4" />
+                            ))
+                          : payment.screenshot && (
+                              <div
+                                className="w-12 h-12 rounded overflow-hidden border border-gray-300 cursor-pointer group relative"
+                                title="View Image"
+                                onClick={() =>
+                                  window.open(payment.screenshot, "_blank")
+                                }
+                              >
+                                <img
+                                  src={payment.screenshot}
+                                  alt="payment-proof"
+                                  className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs rounded">
+                                  <Image className="w-4 h-4" />
+                                </div>
                               </div>
-                            </div>
-                          )}
-                    </div>
-
+                            )}
+                      </div>
                     </td>
                   </motion.tr>
                 ))}

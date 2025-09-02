@@ -410,7 +410,7 @@ const Footer = () => {
             {/* Quick Links Column */}
             <FooterColumn 
               title="Quick Links" 
-              className="col-span-3" 
+              className="col-span-4" 
               delay={0.2}
               icon={Home}
             >
@@ -428,7 +428,7 @@ const Footer = () => {
             {/* Help Column */}
             <FooterColumn 
               title="Support" 
-              className="col-span-3" 
+              className="col-span-4" 
               delay={0.3}
               icon={Heart}
             >
@@ -446,7 +446,7 @@ const Footer = () => {
             {/* Contact Info */}
             <FooterColumn 
               title="Contact Us" 
-              className="col-span-3" 
+              className="col-span-4" 
               delay={0.4}
               icon={MapPin}
             >
@@ -471,9 +471,9 @@ const Footer = () => {
             </FooterColumn>
             
             {/* Newsletter */}
-            <div className="col-span-3">
+            {/* <div className="col-span-3">
               <Newsletter />
-            </div>
+            </div> */}
           </div>
 
           {/* Mobile Accordions */}
@@ -526,9 +526,9 @@ const Footer = () => {
               </ul>
             </MobileFooterSection>
 
-            <div className="pt-6">
+            {/* <div className="pt-6">
               <Newsletter />
-            </div>
+            </div> */}
           </motion.div>
         </div>
       </div>
